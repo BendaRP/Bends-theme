@@ -22,9 +22,14 @@
         return;
       }
 
-      this.form = document.getElementById(this.dataset.form);
       this.addEventListener('change', this.onChange.bind(this));
       this.updateAvailability();
+    }
+
+    /** The buy buttons render after this element, so the form cannot be
+        resolved during connectedCallback. Look it up when it is needed. */
+    get form() {
+      return document.getElementById(this.dataset.form);
     }
 
     /** The option values currently chosen, in option order. */
@@ -109,7 +114,8 @@
     }
 
     setUnavailable() {
-      var button = this.form && this.form.querySelector('[data-add-to-cart]');
+      var form = this.form;
+      var button = form && form.querySelector('[data-add-to-cart]');
       if (!button) return;
       button.setAttribute('disabled', 'disabled');
       var text = button.querySelector('[data-add-to-cart-text]');
@@ -117,11 +123,13 @@
     }
 
     updateForm(variant) {
-      if (!this.form) return;
-      var input = this.form.querySelector('[data-variant-input]');
+      var form = this.form;
+      if (!form) return;
+
+      var input = form.querySelector('[data-variant-input]');
       if (input) input.value = variant.id;
 
-      var button = this.form.querySelector('[data-add-to-cart]');
+      var button = form.querySelector('[data-add-to-cart]');
       if (!button) return;
       var text = button.querySelector('[data-add-to-cart-text]');
 
@@ -263,13 +271,38 @@
       if (mode === 'none') return;
 
       if (mode === 'lightbox') {
-        var lightbox = document.querySelector('[data-lightbox]');
-        if (!lightbox) return;
+        /* The lightbox markup follows this element, so it cannot be resolved
+           during connectedCallback. Wire it up on the first zoom instead. */
         var release = null;
+        var bound = false;
+
+        var close = function (lightbox) {
+          lightbox.classList.remove('is-open');
+          utils.lockScroll(false);
+          if (release) { release(); release = null; }
+          window.setTimeout(function () { lightbox.hidden = true; }, 240);
+        };
 
         this.addEventListener('click', function (event) {
           var trigger = event.target.closest('[data-gallery-zoom]');
           if (!trigger) return;
+
+          var lightbox = document.querySelector('[data-lightbox]');
+          if (!lightbox) return;
+
+          if (!bound) {
+            bound = true;
+            Array.prototype.forEach.call(lightbox.querySelectorAll('[data-lightbox-close]'), function (node) {
+              node.addEventListener('click', function () { close(lightbox); });
+            });
+            lightbox.addEventListener('click', function (inner) {
+              if (inner.target === lightbox) close(lightbox);
+            });
+            lightbox.addEventListener('keydown', function (inner) {
+              if (inner.key === 'Escape') close(lightbox);
+            });
+          }
+
           lightbox.hidden = false;
           window.requestAnimationFrame(function () { lightbox.classList.add('is-open'); });
           utils.lockScroll(true);
@@ -277,23 +310,6 @@
 
           var item = lightbox.querySelector('[data-lightbox-item][data-index="' + trigger.dataset.index + '"]');
           if (item) item.scrollIntoView({ block: 'center', behavior: 'auto' });
-        });
-
-        var close = function () {
-          lightbox.classList.remove('is-open');
-          utils.lockScroll(false);
-          if (release) { release(); release = null; }
-          window.setTimeout(function () { lightbox.hidden = true; }, 240);
-        };
-
-        Array.prototype.forEach.call(lightbox.querySelectorAll('[data-lightbox-close]'), function (node) {
-          node.addEventListener('click', close);
-        });
-        lightbox.addEventListener('click', function (event) {
-          if (event.target === lightbox) close();
-        });
-        lightbox.addEventListener('keydown', function (event) {
-          if (event.key === 'Escape') close();
         });
         return;
       }
@@ -542,7 +558,9 @@
     }
 
     fetchAvailability() {
-      var url = this.dataset.baseUrl + 'variants/' + this.dataset.variant + '/?section_id=pickup-availability';
+      var base = this.dataset.baseUrl || '/';
+      if (base.charAt(base.length - 1) !== '/') base += '/';
+      var url = base + 'variants/' + this.dataset.variant + '/?section_id=pickup-availability';
       utils.fetchSection(url)
         .then(function (html) {
           var doc = utils.parseHTML(html);
