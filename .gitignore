@@ -2,3 +2,6 @@ node_modules/
 dist/
 *.zip
 .DS_Store
+
+# Generated preview, assembled from the theme CSS and settings_data.json
+.dev/preview.html
