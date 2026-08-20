@@ -138,6 +138,9 @@
       palette, while still reading as the merchant's chosen border.
     endcomment
     assign control_border = scheme.settings.border | color_mix: scheme.settings.text, 50
+    assign control_border_r = control_border | color_extract: 'red'
+    assign control_border_g = control_border | color_extract: 'green'
+    assign control_border_b = control_border | color_extract: 'blue'
   -%}
   {{ scheme_class }} {
     --color-background: {{ scheme.settings.background.red }} {{ scheme.settings.background.green }} {{ scheme.settings.background.blue }};
@@ -150,7 +153,7 @@
     --color-border: {{ scheme.settings.border.red }} {{ scheme.settings.border.green }} {{ scheme.settings.border.blue }};
     --color-card: {{ scheme.settings.card.red }} {{ scheme.settings.card.green }} {{ scheme.settings.card.blue }};
     --color-shadow: {{ scheme.settings.shadow.red }} {{ scheme.settings.shadow.green }} {{ scheme.settings.shadow.blue }};
-    --color-border-control: {{ control_border.red }} {{ control_border.green }} {{ control_border.blue }};
+    --color-border-control: {{ control_border_r }} {{ control_border_g }} {{ control_border_b }};
     {%- if scheme.settings.background_gradient != blank %}
     --gradient-background: {{ scheme.settings.background_gradient }};
     {%- else %}
@@ -160,7 +163,12 @@
 {%- endfor %}
 
 {%- if settings.dark_mode != 'off' %}
-  {%- assign dark_control_border = settings.dark_border | color_mix: settings.dark_text, 50 -%}
+  {%- liquid
+    assign dark_control_border = settings.dark_border | color_mix: settings.dark_text, 50
+    assign dark_border_r = dark_control_border | color_extract: 'red'
+    assign dark_border_g = dark_control_border | color_extract: 'green'
+    assign dark_border_b = dark_control_border | color_extract: 'blue'
+  -%}
   {%- capture dark_tokens -%}
     --color-background: {{ settings.dark_background.red }} {{ settings.dark_background.green }} {{ settings.dark_background.blue }};
     --color-text: {{ settings.dark_text.red }} {{ settings.dark_text.green }} {{ settings.dark_text.blue }};
@@ -170,7 +178,7 @@
     --color-button-text: {{ settings.dark_background.red }} {{ settings.dark_background.green }} {{ settings.dark_background.blue }};
     --color-button-secondary-text: {{ settings.dark_text.red }} {{ settings.dark_text.green }} {{ settings.dark_text.blue }};
     --color-border: {{ settings.dark_border.red }} {{ settings.dark_border.green }} {{ settings.dark_border.blue }};
-    --color-border-control: {{ dark_control_border.red }} {{ dark_control_border.green }} {{ dark_control_border.blue }};
+    --color-border-control: {{ dark_border_r }} {{ dark_border_g }} {{ dark_border_b }};
     --color-card: {{ settings.dark_card.red }} {{ settings.dark_card.green }} {{ settings.dark_card.blue }};
     --color-shadow: 0 0 0;
     --gradient-background: none;

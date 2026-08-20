@@ -144,7 +144,7 @@
   {%- when 'volume_pricing' -%}
     {%- if block.settings.tier_2_quantity > 1 -%}
       <div class="volume-pricing" data-volume-pricing>
-        <span class="eyebrow">{{ block.settings.heading | default: 'products.product.volume_pricing.title' | t }}</span>
+        <span class="eyebrow">{% if block.settings.heading != blank %}{{ block.settings.heading }}{% else %}{{ 'products.product.volume_pricing.title' | t }}{% endif %}</span>
         <ul class="volume-pricing__tiers">
           {%- for i in (1..3) -%}
             {%- liquid
@@ -368,7 +368,7 @@
       aria-haspopup="dialog"
     >
       {% render 'icon', icon: 'ruler' %}
-      <span>{{ block.settings.label | default: 'products.product.size_chart' | t }}</span>
+      <span>{% if block.settings.label != blank %}{{ block.settings.label }}{% else %}{{ 'products.product.size_chart' | t }}{% endif %}</span>
     </button>
     {%- assign size_chart_modal_id = 'size-chart-' | append: block_id -%}
     {%- render 'modal',
@@ -486,14 +486,14 @@
       data-complementary
       data-url="{{ routes.product_recommendations_url }}?section_id=product-recommendations&product_id={{ product.id }}&limit={{ block.settings.limit }}&intent=complementary"
     >
-      <h2 class="h6">{{ block.settings.heading | default: 'products.product.complementary' | t }}</h2>
+      <h2 class="h6">{% if block.settings.heading != blank %}{{ block.settings.heading }}{% else %}{{ 'products.product.complementary' | t }}{% endif %}</h2>
       <div class="complementary__list" data-complementary-list></div>
     </div>
 
   {%- when 'bundle' -%}
     {%- if block.settings.products != blank -%}
       <product-bundle class="bundle" data-bundle data-base-price="{{ variant.price }}">
-        <h2 class="h6">{{ block.settings.heading | default: 'products.product.bundle.title' | t }}</h2>
+        <h2 class="h6">{% if block.settings.heading != blank %}{{ block.settings.heading }}{% else %}{{ 'products.product.bundle.title' | t }}{% endif %}</h2>
         <ul class="bundle__list">
           <li class="bundle__item">
             <label class="checkbox">

@@ -35,6 +35,14 @@ end
 # with the wrong type, which is only visible once the page renders.
 FILTERED_TAG_ARGS = /\{%-?\s*(form|paginate)\s+[^%]*\|/
 
+# `x | default: 'a.b' | t` hands the resolved value to `t`, so a set value is
+# looked up as a translation key and renders "Translation missing".
+DEFAULT_THEN_T = /\|\s*default:\s*'[a-z_]+(?:\.[a-z_]+)+'\s*\|\s*t\b/
+
+# color_mix returns a string, so .red / .green / .blue on its result are nil
+# and the CSS colour silently collapses to rgb( ).
+COLOR_MIX_CHANNEL = /color_mix[^%}]*\n?.*?\.(red|green|blue)/
+
 # Blocks Shopify treats as raw. Blanked before parsing, preserving line count so
 # reported line numbers still match the file.
 RAW_BLOCKS = %w[schema javascript stylesheet doc].freeze
@@ -53,8 +61,20 @@ Dir.glob('{layout,sections,snippets,templates,blocks}/**/*.liquid').sort.each do
   source = File.read(path, encoding: 'UTF-8')
 
   source.each_line.with_index(1) do |line, number|
-    next unless line =~ FILTERED_TAG_ARGS
-    failures << "#{path}:#{number}: filter used in a #{$1} tag argument — assign it first"
+    if line =~ FILTERED_TAG_ARGS
+      failures << "#{path}:#{number}: filter used in a #{$1} tag argument — assign it first"
+    end
+    if line =~ DEFAULT_THEN_T
+      failures << "#{path}:#{number}: `default:` before `| t` passes the value to t — branch on blank instead"
+    end
+  end
+
+  mix_vars = source.scan(/assign\s+(\w+)\s*=[^\n]*\|\s*color_mix:/).flatten
+  mix_vars.each do |var|
+    source.each_line.with_index(1) do |line, number|
+      next unless line =~ /\b#{Regexp.escape(var)}\.(red|green|blue|rgb)\b/
+      failures << "#{path}:#{number}: color_mix returns a string — use color_extract, not .#{$1}"
+    end
   end
 
   begin

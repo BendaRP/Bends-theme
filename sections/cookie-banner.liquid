@@ -21,7 +21,7 @@
           {% render 'icon', icon: 'cookie', class: 'cookie-banner__icon' %}
           <div>
             <h2 class="h6" id="CookieBannerTitle">
-              {{- section.settings.heading | default: 'compliance.cookies.title' | t -}}
+              {%- if section.settings.heading != blank -%}{{ section.settings.heading }}{%- else -%}{{ 'compliance.cookies.title' | t }}{%- endif -%}
             </h2>
             <p class="text-small" id="CookieBannerBody">
               {%- if section.settings.body != blank -%}

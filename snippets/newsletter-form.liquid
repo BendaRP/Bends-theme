@@ -33,7 +33,7 @@
         required
       >
       <button type="submit" class="button newsletter-form__button">
-        {{ button_label | default: 'newsletter.button_label' | t }}
+        {% if button_label != blank %}{{ button_label }}{% else %}{{ 'newsletter.button_label' | t }}{% endif %}
       </button>
     </div>
     {%- if form.errors -%}

@@ -52,7 +52,7 @@
                   {%- if block.settings.products != blank -%}
                     <div class="cart-upsell">
                       <h3 class="cart-upsell__title h6">
-                        {{- block.settings.heading | default: 'cart.upsell.title' | t -}}
+                        {%- if block.settings.heading != blank -%}{{ block.settings.heading }}{%- else -%}{{ 'cart.upsell.title' | t }}{%- endif -%}
                       </h3>
                       <ul class="cart-upsell__list">
                         {%- for upsell_product in block.settings.products limit: block.settings.limit -%}
@@ -113,7 +113,7 @@
                   >
                     {% render 'icon', icon: 'clock' %}
                     <div>
-                      <strong class="text-small">{{ block.settings.heading | default: 'cart.countdown.title' | t }}</strong>
+                      <strong class="text-small">{% if block.settings.heading != blank %}{{ block.settings.heading }}{% else %}{{ 'cart.countdown.title' | t }}{% endif %}</strong>
                       <p class="text-tiny text-muted">{{ 'cart.countdown.body_html' | t }}</p>
                     </div>
                   </div>
