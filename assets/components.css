@@ -93,7 +93,8 @@
 
 .header__nav {
   min-width: 0;
-  overflow: visible;
+  /* Without this the nav overflows its grid cell instead of shrinking. */
+  overflow: hidden;
 }
 
 .header__nav .nav__link {
@@ -108,6 +109,10 @@
   align-items: center;
   gap: 0.25rem;
   justify-self: end;
+  flex: none;
+  position: relative;
+  z-index: 2;
+  background-color: inherit;
 }
 
 .header__action {
@@ -159,9 +164,17 @@
   display: flex;
   align-items: center;
   gap: 0.1rem;
-  /* Hebrew menu labels run long; wrapping pushed the header to two rows. */
+  /* Hebrew menu labels run long. Keeping one row and scrolling the overflow
+     beats both wrapping to two rows and spilling over the header actions. */
   flex-wrap: nowrap;
   min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.nav::-webkit-scrollbar {
+  display: none;
 }
 
 .nav__item {

@@ -127,6 +127,8 @@
   {%- endif %}
 }
 
+{%- render 'color-defaults' -%}
+
 {% for scheme in settings.color_schemes -%}
   {%- liquid
     assign scheme_class = '.color-' | append: scheme.id
@@ -143,6 +145,8 @@
     assign control_border_b = control_border | color_extract: 'blue'
   -%}
   {{ scheme_class }} {
+    --color-background-raw: {{ scheme.settings.background }};
+    --color-text-raw: {{ scheme.settings.text }};
     --color-background: {{ scheme.settings.background.red }} {{ scheme.settings.background.green }} {{ scheme.settings.background.blue }};
     --color-text: {{ scheme.settings.text.red }} {{ scheme.settings.text.green }} {{ scheme.settings.text.blue }};
     --color-text-muted: {{ scheme.settings.text_muted.red }} {{ scheme.settings.text_muted.green }} {{ scheme.settings.text_muted.blue }};

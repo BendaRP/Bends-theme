@@ -29,6 +29,7 @@ body {
   color: rgb(var(--color-text));
   background-color: rgb(var(--color-background));
   -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
 }
@@ -112,6 +113,14 @@ hr {
 .color-scheme-5 {
   color: rgb(var(--color-text));
   background-color: rgb(var(--color-background));
+}
+
+/* The raw colour is a direct value rather than a triplet, so it survives even
+   when the channel properties resolve empty. Declared second, so it wins when
+   present and simply does not apply when it is not. */
+[class*='color-scheme-'] {
+  color: var(--color-text-raw, rgb(var(--color-text)));
+  background-color: var(--color-background-raw, rgb(var(--color-background)));
 }
 
 [class*='color-scheme-'][data-gradient='true'] {
