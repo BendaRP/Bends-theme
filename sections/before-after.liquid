@@ -1,0 +1,276 @@
+{%- style -%}
+  {%- render 'section-styles', section_id: section.id, s: section.settings -%}
+{%- endstyle -%}
+
+<div class="section-wrapper color-{{ section.settings.color_scheme }}{% if section.settings.hide_on_mobile %} hide-mobile{% endif %}{% if section.settings.hide_on_desktop %} hide-desktop{% endif %}">
+  <div class="section">
+    <div class="{{ section.settings.width }}">
+      {%- render 'section-header', s: section.settings -%}
+
+      <before-after
+        class="before-after"
+        data-start="{{ section.settings.start_position }}"
+        style="--ba-position: {{ section.settings.start_position }}%;"
+        data-reveal
+      >
+        <div class="frame before-after__frame" data-ratio="{{ section.settings.ratio }}">
+          <div class="before-after__layer before-after__layer--after">
+            {%- if section.settings.after_image != blank -%}
+              {%- render 'responsive-image', image: section.settings.after_image, sizes: '(min-width: 990px) 60vw, 100vw' -%}
+            {%- else -%}
+              <div class="media-placeholder">{{ 'lifestyle-2' | placeholder_svg_tag }}</div>
+            {%- endif -%}
+            <span class="before-after__tag before-after__tag--after">{{ section.settings.after_label }}</span>
+          </div>
+
+          <div class="before-after__layer before-after__layer--before" data-ba-overlay>
+            {%- if section.settings.before_image != blank -%}
+              {%- render 'responsive-image', image: section.settings.before_image, sizes: '(min-width: 990px) 60vw, 100vw' -%}
+            {%- else -%}
+              <div class="media-placeholder">{{ 'lifestyle-1' | placeholder_svg_tag }}</div>
+            {%- endif -%}
+            <span class="before-after__tag before-after__tag--before">{{ section.settings.before_label }}</span>
+          </div>
+
+          <span class="before-after__divider" aria-hidden="true">
+            <span class="before-after__knob">{% render 'icon', icon: 'sort' %}</span>
+          </span>
+
+          <label class="visually-hidden" for="BeforeAfter-{{ section.id }}">
+            {{- 'sections.before_after.label' | t -}}
+          </label>
+          <input
+            id="BeforeAfter-{{ section.id }}"
+            class="before-after__range"
+            type="range"
+            min="0"
+            max="100"
+            step="0.5"
+            value="{{ section.settings.start_position }}"
+            data-ba-handle
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="{{ section.settings.start_position }}"
+          >
+        </div>
+      </before-after>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Before and after",
+  "tag": "section",
+  "class": "section-before-after",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Colour scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "Page width"
+        },
+        {
+          "value": "page-width page-width--narrow",
+          "label": "Narrow"
+        },
+        {
+          "value": "page-width page-width--wide",
+          "label": "Wide"
+        },
+        {
+          "value": "page-width page-width--full",
+          "label": "Full bleed"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "image_picker",
+      "id": "before_image",
+      "label": "Before image"
+    },
+    {
+      "type": "image_picker",
+      "id": "after_image",
+      "label": "After image"
+    },
+    {
+      "type": "text",
+      "id": "before_label",
+      "label": "Before label",
+      "default": "Before"
+    },
+    {
+      "type": "text",
+      "id": "after_label",
+      "label": "After label",
+      "default": "After"
+    },
+    {
+      "type": "range",
+      "id": "start_position",
+      "min": 10,
+      "max": 90,
+      "step": 5,
+      "unit": "%",
+      "label": "Starting position",
+      "default": 50
+    },
+    {
+      "type": "select",
+      "id": "ratio",
+      "label": "Ratio",
+      "options": [
+        {
+          "value": "landscape",
+          "label": "4:3"
+        },
+        {
+          "value": "wide",
+          "label": "16:9"
+        },
+        {
+          "value": "square",
+          "label": "Square"
+        },
+        {
+          "value": "portrait",
+          "label": "Portrait"
+        }
+      ],
+      "default": "landscape"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": ""
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "See the difference"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Heading size",
+      "options": [
+        {
+          "value": "h4",
+          "label": "Extra small"
+        },
+        {
+          "value": "h3",
+          "label": "Small"
+        },
+        {
+          "value": "h2",
+          "label": "Medium"
+        },
+        {
+          "value": "h1",
+          "label": "Large"
+        },
+        {
+          "value": "h0",
+          "label": "Display"
+        }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "checkbox",
+      "id": "ink_heading",
+      "label": "Underline the last word with the ink accent",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": ""
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Alignment",
+      "options": [
+        {
+          "value": "start",
+          "label": "Start of line"
+        },
+        {
+          "value": "center",
+          "label": "Centre"
+        },
+        {
+          "value": "end",
+          "label": "End of line"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 56
+    },
+    {
+      "type": "header",
+      "content": "Visibility"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_mobile",
+      "label": "Hide on mobile",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_desktop",
+      "label": "Hide on desktop",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "Before and after"
+    }
+  ]
+}
+{% endschema %}

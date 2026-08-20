@@ -1,0 +1,185 @@
+{%- if section.settings.enabled -%}
+  <site-popup
+    class="popup popup--large color-{{ section.settings.color_scheme }}"
+    data-popup-id="spin-{{ section.id }}"
+    data-trigger="{{ section.settings.trigger }}"
+    data-delay="{{ section.settings.delay }}"
+    data-scroll-percent="40"
+    hidden
+  >
+    <div class="popup__scrim" data-popup-close></div>
+
+    <div class="popup__panel" data-popup-panel role="dialog" aria-modal="true" aria-labelledby="SpinTitle-{{ section.id }}">
+      <button class="popup__close tap-target" type="button" data-popup-close aria-label="{{ 'sections.popup.close' | t }}">
+        {% render 'icon', icon: 'close', class: 'icon--large' %}
+      </button>
+
+      <spin-wheel class="spin">
+        <div class="spin__wheel-wrap">
+          <span class="spin__pointer" aria-hidden="true">{% render 'icon', icon: 'chevron-down' %}</span>
+          <div class="spin__wheel" data-wheel style="--segments: {{ section.blocks.size }};">
+            {%- for block in section.blocks -%}
+              {%- assign rotation = 360 | divided_by: section.blocks.size | times: forloop.index0 -%}
+              <span class="spin__segment" style="--rotation: {{ rotation }}deg;">
+                <span class="spin__segment-label">{{ block.settings.label }}</span>
+              </span>
+            {%- endfor -%}
+          </div>
+        </div>
+
+        <div class="spin__body">
+          <h2 class="h3" id="SpinTitle-{{ section.id }}">{{ section.settings.heading }}</h2>
+          {%- if section.settings.text != blank -%}
+            <div class="rte text-small">{{ section.settings.text }}</div>
+          {%- endif -%}
+
+          <div class="field">
+            <label class="visually-hidden" for="SpinEmail-{{ section.id }}">{{ 'newsletter.label' | t }}</label>
+            <input
+              id="SpinEmail-{{ section.id }}"
+              type="email"
+              placeholder="{{ 'sections.spin.email_first' | t | escape }}"
+              autocomplete="email"
+              required
+              data-spin-email
+            >
+          </div>
+
+          <button class="button button--full" type="button" data-spin>{{ 'sections.spin.spin' | t }}</button>
+
+          <div class="spin__result" data-spin-result hidden>
+            <p class="h5" data-spin-title></p>
+            <span class="field__label">{{ 'sections.spin.your_code' | t }}</span>
+            <button class="discount-code__button" type="button" data-spin-code data-copy=""></button>
+          </div>
+
+          {%- if section.settings.disclaimer != blank -%}
+            <div class="rte text-tiny text-muted">{{ section.settings.disclaimer }}</div>
+          {%- endif -%}
+        </div>
+
+        <script type="application/json" data-prizes>
+          [
+            {%- for block in section.blocks -%}
+              {
+                "label": {{ block.settings.label | json }},
+                "code": {{ block.settings.code | json }},
+                "weight": {{ block.settings.weight }}
+              }{%- unless forloop.last -%},{%- endunless -%}
+            {%- endfor -%}
+          ]
+        </script>
+      </spin-wheel>
+    </div>
+  </site-popup>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Spin to win",
+  "tag": "section",
+  "class": "section-spin",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enabled",
+      "label": "Show the wheel",
+      "default": false
+    },
+    {
+      "type": "paragraph",
+      "content": "Create each prize as a real discount code in your admin first, then enter the codes below. Weight decides how often a prize comes up."
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Colour scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "trigger",
+      "label": "Show it",
+      "options": [
+        {
+          "value": "delay",
+          "label": "After a delay"
+        },
+        {
+          "value": "scroll",
+          "label": "After scrolling"
+        },
+        {
+          "value": "exit",
+          "label": "When the visitor looks like they are leaving"
+        }
+      ],
+      "default": "delay"
+    },
+    {
+      "type": "range",
+      "id": "delay",
+      "min": 3,
+      "max": 60,
+      "step": 1,
+      "unit": "s",
+      "label": "Delay",
+      "default": 12
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Spin to win"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>One spin per visitor. Your code lasts seven days.</p>"
+    },
+    {
+      "type": "richtext",
+      "id": "disclaimer",
+      "label": "Small print",
+      "default": "<p>By playing you agree to receive our emails. Unsubscribe any time.</p>"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "prize",
+      "name": "Prize",
+      "limit": 8,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "10% off"
+        },
+        {
+          "type": "text",
+          "id": "code",
+          "label": "Discount code",
+          "default": "SPIN10"
+        },
+        {
+          "type": "range",
+          "id": "weight",
+          "min": 1,
+          "max": 20,
+          "step": 1,
+          "label": "Weight",
+          "default": 5,
+          "info": "Higher means it comes up more often."
+        }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "groups": [
+      "overlay"
+    ]
+  }
+}
+{% endschema %}

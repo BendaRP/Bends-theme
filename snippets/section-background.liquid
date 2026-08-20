@@ -1,0 +1,38 @@
+{%- comment -%}
+  A section background: an uploaded video, an image, a gradient or a colour,
+  with an optional readability overlay.
+
+  Accepts:
+  - s: {Object} section.settings
+{%- endcomment -%}
+{%- liquid
+  assign overlay_opacity = s.overlay_opacity | default: 0 | divided_by: 100.0
+-%}
+{%- if s.background_type == 'video' and s.background_video != blank -%}
+  <div class="section-background section-background--video" aria-hidden="true">
+    {{
+      s.background_video
+      | video_tag:
+        image_size: '1600x',
+        autoplay: true,
+        loop: true,
+        muted: true,
+        controls: false,
+        playsinline: true
+    }}
+  </div>
+{%- elsif s.background_type == 'image' and s.background_image != blank -%}
+  <div class="section-background section-background--image" aria-hidden="true">
+    {%- render 'responsive-image', image: s.background_image, sizes: '100vw' -%}
+  </div>
+{%- elsif s.background_type == 'gradient' and s.background_gradient != blank -%}
+  <div class="section-background" style="background: {{ s.background_gradient }};" aria-hidden="true"></div>
+{%- endif -%}
+
+{%- if s.background_type != 'none' and overlay_opacity > 0 -%}
+  <div
+    class="section-background__overlay"
+    style="--overlay-opacity: {{ overlay_opacity }}; --overlay-color: {{ s.overlay_color.red }} {{ s.overlay_color.green }} {{ s.overlay_color.blue }};"
+    aria-hidden="true"
+  ></div>
+{%- endif -%}

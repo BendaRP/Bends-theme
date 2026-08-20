@@ -1,0 +1,141 @@
+{%- style -%}
+  {%- render 'section-styles', section_id: section.id, s: section.settings -%}
+{%- endstyle -%}
+
+<div class="section-wrapper color-{{ section.settings.color_scheme }}{% if section.settings.hide_on_mobile %} hide-mobile{% endif %}{% if section.settings.hide_on_desktop %} hide-desktop{% endif %}">
+  <div class="section section--divider">
+    <div class="divider divider--{{ section.settings.style }}" style="--divider-height: {{ section.settings.height }}px;" aria-hidden="true">
+      {%- case section.settings.style -%}
+        {%- when 'wave' -%}
+          <svg class="section-divider" viewBox="0 0 1200 60" preserveAspectRatio="none" focusable="false">
+            <path d="M0 30c150-40 300 40 450 20s300-60 450-30 300 40 300 40V0H0z" fill="currentColor"/>
+          </svg>
+        {%- when 'arch' -%}
+          <svg class="section-divider" viewBox="0 0 1200 60" preserveAspectRatio="none" focusable="false">
+            <path d="M0 60C0 20 300 0 600 0s600 20 600 60z" fill="currentColor"/>
+          </svg>
+        {%- when 'angle' -%}
+          <svg class="section-divider" viewBox="0 0 1200 60" preserveAspectRatio="none" focusable="false">
+            <path d="M0 60 1200 0v60z" fill="currentColor"/>
+          </svg>
+        {%- when 'line' -%}
+          <hr class="divider__rule">
+        {%- when 'dots' -%}
+          <span class="divider__dots">
+            <span></span><span></span><span></span>
+          </span>
+        {%- when 'mark' -%}
+          <span class="divider__mark">{{ section.settings.mark }}</span>
+      {%- endcase -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Divider",
+  "tag": "section",
+  "class": "section-divider-wrapper",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Colour scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "Style",
+      "options": [
+        {
+          "value": "line",
+          "label": "Rule"
+        },
+        {
+          "value": "dots",
+          "label": "Dots"
+        },
+        {
+          "value": "mark",
+          "label": "Character"
+        },
+        {
+          "value": "wave",
+          "label": "Wave"
+        },
+        {
+          "value": "arch",
+          "label": "Arch"
+        },
+        {
+          "value": "angle",
+          "label": "Angle"
+        }
+      ],
+      "default": "line"
+    },
+    {
+      "type": "text",
+      "id": "mark",
+      "label": "Character",
+      "default": "✦"
+    },
+    {
+      "type": "range",
+      "id": "height",
+      "min": 8,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Height",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Visibility"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_mobile",
+      "label": "Hide on mobile",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_desktop",
+      "label": "Hide on desktop",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "Divider"
+    }
+  ]
+}
+{% endschema %}

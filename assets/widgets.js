@@ -784,6 +784,196 @@
     }
   }
 
+
+  /* -------------------------------------------------------- video facade */
+
+  /* A poster image stands in for the embed until the visitor presses play,
+     so an external player never costs anything on first load. */
+  class VideoFacade extends HTMLElement {
+    connectedCallback() {
+      var button = this.querySelector('[data-video-play]');
+      var template = this.querySelector('[data-video-embed]');
+      if (!button || !template) return;
+
+      button.addEventListener('click', function () {
+        var frame = this.querySelector('.frame');
+        if (!frame) return;
+        frame.innerHTML = template.innerHTML;
+        var iframe = frame.querySelector('iframe');
+        if (iframe) iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
+        this.classList.add('is-playing');
+      }.bind(this));
+    }
+  }
+
+  /* ---------------------------------------------------------- sticky cta */
+
+  class StickyCta extends HTMLElement {
+    connectedCallback() {
+      this.key = 'bends:sticky-cta:dismissed';
+      if (utils.storage.get(this.key, false)) return;
+
+      var threshold = parseInt(this.dataset.scrollPercent, 10) || 0;
+      var close = this.querySelector('[data-sticky-cta-close]');
+
+      if (close) {
+        close.addEventListener('click', function () {
+          utils.storage.set(this.key, true);
+          this.hidden = true;
+        }.bind(this));
+      }
+
+      var onScroll = function () {
+        var height = document.documentElement.scrollHeight - window.innerHeight;
+        var percent = height > 0 ? (window.scrollY / height) * 100 : 100;
+        this.hidden = percent < threshold;
+      }.bind(this);
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    }
+  }
+
+  /* ------------------------------------------------------------- marquee */
+
+  /* Duplicates the track so the loop is seamless, and stops entirely when the
+     visitor has asked for reduced motion. */
+  function initMarquees(scope) {
+    Array.prototype.forEach.call((scope || document).querySelectorAll('[data-marquee]'), function (marquee) {
+      var track = marquee.querySelector('[data-marquee-track]');
+      if (!track || track.dataset.cloned === 'true') return;
+
+      if (utils.prefersReducedMotion()) {
+        marquee.classList.add('is-static');
+        return;
+      }
+
+      track.dataset.cloned = 'true';
+      var clone = track.cloneNode(true);
+      clone.setAttribute('aria-hidden', 'true');
+      clone.removeAttribute('data-marquee-track');
+      marquee.appendChild(clone);
+
+      var speed = parseInt(marquee.dataset.speed, 10) || 30;
+      marquee.style.setProperty('--marquee-duration', speed + 's');
+    });
+  }
+
+  /* ----------------------------------------------------------- accordion */
+
+  function initAccordions(scope) {
+    Array.prototype.forEach.call((scope || document).querySelectorAll('[data-accordion]'), function (group) {
+      if (group.dataset.single !== 'true') return;
+
+      Array.prototype.forEach.call(group.querySelectorAll('details'), function (item) {
+        item.addEventListener('toggle', function () {
+          if (!item.open) return;
+          Array.prototype.forEach.call(group.querySelectorAll('details'), function (other) {
+            if (other !== item) other.open = false;
+          });
+        });
+      });
+    });
+  }
+
+  /* -------------------------------------------------------------- facets */
+
+  function initFacets(scope) {
+    Array.prototype.forEach.call((scope || document).querySelectorAll('[data-facets]'), function (facets) {
+      var form = facets.querySelector('[data-facet-form]');
+      if (!form) return;
+
+      /* With scripting on, changing a filter applies it straight away and the
+         explicit Apply button becomes redundant. */
+      var apply = facets.querySelector('.facets__apply');
+      if (apply) apply.hidden = true;
+
+      var submit = utils.debounce(function () {
+        var params = new URLSearchParams(new FormData(form));
+        var url = form.action + '?' + params.toString();
+        navigate(url, facets);
+      }, 350);
+
+      form.addEventListener('change', submit);
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        submit();
+      });
+    });
+
+    Array.prototype.forEach.call((scope || document).querySelectorAll('[data-facet-toggle]'), function (toggle) {
+      var panel = document.getElementById(toggle.getAttribute('aria-controls'));
+      if (!panel) return;
+      toggle.addEventListener('click', function () {
+        var open = panel.classList.toggle('is-open');
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (panel.closest('.collection-layout--drawer')) utils.lockScroll(open);
+      });
+    });
+  }
+
+  /* Swap the grid and the filter panel without a full page load. */
+  function navigate(url, facets) {
+    var grid = document.querySelector('[data-collection-grid]');
+    if (grid) grid.classList.add('is-loading');
+
+    utils.fetchSection(url)
+      .then(function (html) {
+        var doc = utils.parseHTML(html);
+
+        var freshGrid = doc.querySelector('[data-collection-grid]');
+        if (grid && freshGrid) grid.innerHTML = freshGrid.innerHTML;
+
+        var freshFacets = doc.querySelector('[data-facets]');
+        if (facets && freshFacets) {
+          facets.innerHTML = freshFacets.innerHTML;
+          initFacets(facets.parentElement || document);
+        }
+
+        var freshChips = doc.querySelector('.facets__active');
+        var chips = document.querySelector('.facets__active');
+        if (chips && freshChips) chips.innerHTML = freshChips.innerHTML;
+        else if (chips && !freshChips) chips.remove();
+
+        window.history.replaceState({}, '', url);
+        Theme.initReveals(grid || document);
+        syncWishlistButtons(grid || document);
+      })
+      .catch(function () { window.location.href = url; })
+      .then(function () { if (grid) grid.classList.remove('is-loading'); });
+  }
+
+  /* ------------------------------------------------------------- hotspots */
+
+  function initHotspots(scope) {
+    Array.prototype.forEach.call((scope || document).querySelectorAll('[data-hotspot-toggle]'), function (button) {
+      button.addEventListener('click', function () {
+        var hotspot = button.closest('.shoppable__hotspot');
+        if (!hotspot) return;
+        var open = hotspot.classList.toggle('is-open');
+        button.setAttribute('aria-expanded', open ? 'true' : 'false');
+
+        if (!open) return;
+        Array.prototype.forEach.call(document.querySelectorAll('.shoppable__hotspot.is-open'), function (other) {
+          if (other === hotspot) return;
+          other.classList.remove('is-open');
+          var otherButton = other.querySelector('[data-hotspot-toggle]');
+          if (otherButton) otherButton.setAttribute('aria-expanded', 'false');
+        });
+      });
+    });
+  }
+
+  /* ------------------------------------------------------ confirm actions */
+
+  function initConfirmations() {
+    document.addEventListener('click', function (event) {
+      var target = event.target.closest('[data-confirm]');
+      if (!target) return;
+      if (!window.confirm(target.dataset.confirm)) event.preventDefault();
+    });
+  }
+
   /* --------------------------------------------------------------- boot */
 
   function defineElement(name, constructor) {
@@ -796,12 +986,18 @@
   defineElement('media-slider', MediaSlider);
   defineElement('site-popup', SitePopup);
   defineElement('spin-wheel', SpinWheel);
+  defineElement('video-facade', VideoFacade);
+  defineElement('sticky-cta', StickyCta);
 
   function boot(scope) {
     initHandleLists(scope);
     initUnitSwitch(scope);
     initNativeShare(scope);
     initCounters(scope);
+    initMarquees(scope);
+    initAccordions(scope);
+    initFacets(scope);
+    initHotspots(scope);
   }
 
   if (document.readyState === 'loading') {
@@ -809,12 +1005,14 @@
       initWishlist();
       initModals();
       initCopyButtons();
+      initConfirmations();
       boot();
     });
   } else {
     initWishlist();
     initModals();
     initCopyButtons();
+    initConfirmations();
     boot();
   }
 

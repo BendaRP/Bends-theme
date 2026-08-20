@@ -1,0 +1,400 @@
+{%- style -%}
+  {%- render 'section-styles', section_id: section.id, s: section.settings -%}
+{%- endstyle -%}
+
+<div class="section-wrapper color-{{ section.settings.color_scheme }}{% if section.settings.hide_on_mobile %} hide-mobile{% endif %}{% if section.settings.hide_on_desktop %} hide-desktop{% endif %}">
+  <div class="section">
+    <div class="{{ section.settings.width }}">
+      {%- render 'section-header', s: section.settings -%}
+
+      {%- if section.blocks.size > 0 -%}
+        {%- liquid
+          assign is_slider = false
+          if section.settings.layout == 'slider'
+            assign is_slider = true
+          endif
+        -%}
+        <media-slider
+          class="testimonials testimonials--{{ section.settings.layout }}"
+          {% if is_slider %}data-slider data-autoplay="{{ section.settings.autoplay }}" data-speed="{{ section.settings.speed | times: 1000 }}"{% endif %}
+        >
+          <div
+            class="{% if is_slider %}slider__track slider__track--testimonials{% else %}grid grid--{{ section.settings.columns }}{% endif %}"
+            style="--grid-mobile: 1;"
+            {% if is_slider %}data-slider-track{% endif %}
+          >
+        {%- for block in section.blocks -%}
+          <figure
+            class="testimonial"
+            data-reveal
+            style="--reveal-delay: calc(var(--stagger) * {{ forloop.index0 }});"
+            {{ block.shopify_attributes }}
+          >
+            {%- if block.settings.rating > 0 -%}
+              <div class="rating" role="img" aria-label="{{ 'accessibility.star_rating' | t: rating: block.settings.rating, scale: 5 }}">
+                <span class="rating__stars" aria-hidden="true">
+                  {%- for i in (1..5) -%}
+                    {%- if i <= block.settings.rating -%}
+                      {% render 'icon', icon: 'star-filled', class: 'rating__star rating__star--on' %}
+                    {%- else -%}
+                      {% render 'icon', icon: 'star', class: 'rating__star' %}
+                    {%- endif -%}
+                  {%- endfor -%}
+                </span>
+              </div>
+            {%- endif -%}
+
+            {%- if section.settings.show_quote_mark -%}
+              {% render 'icon', icon: 'quote', class: 'testimonial__mark' %}
+            {%- endif -%}
+
+            <blockquote class="testimonial__quote">{{ block.settings.quote }}</blockquote>
+
+            <figcaption class="testimonial__author">
+              {%- if block.settings.image != blank -%}
+                <span class="testimonial__avatar">
+                  {%- render 'responsive-image', image: block.settings.image, widths: '48,72,96,144', sizes: '44px', max_width: 144 -%}
+                </span>
+              {%- endif -%}
+              <span>
+                <strong class="text-small">{{ block.settings.author }}</strong>
+                {%- if block.settings.detail != blank -%}
+                  <span class="text-tiny text-muted">{{ block.settings.detail }}</span>
+                {%- endif -%}
+                {%- if block.settings.verified -%}
+                  <span class="text-tiny text-success">
+                    {% render 'icon', icon: 'check-circle' %}
+                    {{ 'sections.testimonials.verified' | t }}
+                  </span>
+                {%- endif -%}
+              </span>
+            </figcaption>
+
+            {%- if block.settings.product != blank -%}
+              <a class="testimonial__product text-tiny link" href="{{ block.settings.product.url }}">
+                {{ block.settings.product.title }}
+              </a>
+            {%- endif -%}
+          </figure>
+        {%- endfor -%}
+          </div>
+
+          {%- if is_slider -%}
+            <div class="slider__controls">
+              <button class="slider__arrow tap-target" type="button" data-slider-prev aria-label="{{ 'accessibility.previous_slide' | t }}">
+                {% render 'icon', icon: 'chevron-left' %}
+              </button>
+              <button class="slider__arrow tap-target" type="button" data-slider-next aria-label="{{ 'accessibility.next_slide' | t }}">
+                {% render 'icon', icon: 'chevron-right' %}
+              </button>
+            </div>
+          {%- endif -%}
+        </media-slider>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Testimonials",
+  "tag": "section",
+  "class": "section-testimonials",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Colour scheme",
+      "default": "scheme-2"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "Page width"
+        },
+        {
+          "value": "page-width page-width--narrow",
+          "label": "Narrow"
+        },
+        {
+          "value": "page-width page-width--wide",
+          "label": "Wide"
+        },
+        {
+          "value": "page-width page-width--full",
+          "label": "Full bleed"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        {
+          "value": "grid",
+          "label": "Grid"
+        },
+        {
+          "value": "slider",
+          "label": "Slider"
+        }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "label": "Columns",
+      "default": 3
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Move automatically",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 3,
+      "max": 15,
+      "step": 1,
+      "unit": "s",
+      "label": "Seconds per slide",
+      "default": 6
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quote_mark",
+      "label": "Show a quote mark",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Reviews"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "What people tell us"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Heading size",
+      "options": [
+        {
+          "value": "h4",
+          "label": "Extra small"
+        },
+        {
+          "value": "h3",
+          "label": "Small"
+        },
+        {
+          "value": "h2",
+          "label": "Medium"
+        },
+        {
+          "value": "h1",
+          "label": "Large"
+        },
+        {
+          "value": "h0",
+          "label": "Display"
+        }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "checkbox",
+      "id": "ink_heading",
+      "label": "Underline the last word with the ink accent",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": ""
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Alignment",
+      "options": [
+        {
+          "value": "start",
+          "label": "Start of line"
+        },
+        {
+          "value": "center",
+          "label": "Centre"
+        },
+        {
+          "value": "end",
+          "label": "End of line"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        {
+          "value": "",
+          "label": "Primary"
+        },
+        {
+          "value": "button--secondary",
+          "label": "Secondary"
+        },
+        {
+          "value": "button--ghost",
+          "label": "Ghost"
+        },
+        {
+          "value": "button--link",
+          "label": "Link"
+        }
+      ],
+      "default": "button--secondary"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 56
+    },
+    {
+      "type": "header",
+      "content": "Visibility"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_mobile",
+      "label": "Hide on mobile",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_desktop",
+      "label": "Hide on desktop",
+      "default": false
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "range",
+          "id": "rating",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "label": "Stars",
+          "default": 5
+        },
+        {
+          "type": "richtext",
+          "id": "quote",
+          "label": "Quote",
+          "default": "<p>Second one I have bought. The first is three years old and still looks new.</p>"
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Name",
+          "default": "A. Customer"
+        },
+        {
+          "type": "text",
+          "id": "detail",
+          "label": "Detail",
+          "default": "Verified buyer"
+        },
+        {
+          "type": "checkbox",
+          "id": "verified",
+          "label": "Mark as a verified purchase",
+          "default": true
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Photo"
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product bought"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Testimonials",
+      "blocks": [
+        {
+          "type": "testimonial"
+        },
+        {
+          "type": "testimonial"
+        },
+        {
+          "type": "testimonial"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

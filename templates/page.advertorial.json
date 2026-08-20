@@ -1,0 +1,82 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "color_scheme": "scheme-3",
+        "height": "medium",
+        "heading": "The jacket people keep for ten years",
+        "heading_size": "h1",
+        "eyebrow": "Why it lasts",
+        "text": "<p>Three things make the difference, and none of them are obvious from a photograph.</p>",
+        "button_label": "Read on",
+        "background_type": "image",
+        "overlay_opacity": 40,
+        "text_alignment": "center"
+      }
+    },
+    "story": {
+      "type": "multirow",
+      "blocks": {
+        "s1": { "type": "row", "settings": { "eyebrow": "One", "heading": "The cloth is woven, not knitted" } },
+        "s2": { "type": "row", "settings": { "eyebrow": "Two", "heading": "Every seam is doubled" } },
+        "s3": { "type": "row", "settings": { "eyebrow": "Three", "heading": "We repair it, for as long as you own it" } }
+      },
+      "block_order": ["s1", "s2", "s3"],
+      "settings": { "heading": "What actually makes it last", "alternate": true }
+    },
+    "stats": {
+      "type": "stats",
+      "blocks": {
+        "n1": { "type": "stat", "settings": { "value": "12000", "suffix": "+", "label": "Orders shipped" } },
+        "n2": { "type": "stat", "settings": { "value": "4.8", "suffix": "", "label": "Average rating", "animate": false } },
+        "n3": { "type": "stat", "settings": { "value": "1400", "suffix": "+", "label": "Repairs made" } }
+      },
+      "block_order": ["n1", "n2", "n3"],
+      "settings": { "heading": "The numbers", "color_scheme": "scheme-3" }
+    },
+    "comparison": {
+      "type": "comparison-table",
+      "blocks": {
+        "r1": { "type": "row", "settings": { "label": "Free lifetime repairs", "value_1": "yes", "value_2": "no" } },
+        "r2": { "type": "row", "settings": { "label": "Traceable to the mill", "value_1": "yes", "value_2": "no" } },
+        "r3": { "type": "row", "settings": { "label": "Returns window", "value_1": "30 days", "value_2": "14 days" } }
+      },
+      "block_order": ["r1", "r2", "r3"],
+      "settings": { "heading": "How we compare" }
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "blocks": {
+        "t1": { "type": "testimonial", "settings": { "author": "Noa L." } },
+        "t2": { "type": "testimonial", "settings": { "author": "Daniel R." } }
+      },
+      "block_order": ["t1", "t2"],
+      "settings": { "heading": "In their words", "columns": 2, "color_scheme": "scheme-2" }
+    },
+    "featured-product": {
+      "type": "featured-product",
+      "blocks": {
+        "title": { "type": "title", "settings": {} },
+        "rating": { "type": "rating", "settings": {} },
+        "price": { "type": "price", "settings": {} },
+        "description": { "type": "description", "settings": {} },
+        "variant_picker": { "type": "variant_picker", "settings": {} },
+        "buy_buttons": { "type": "buy_buttons", "settings": {} },
+        "icon_row": { "type": "icon_row", "settings": {} }
+      },
+      "block_order": ["title", "rating", "price", "description", "variant_picker", "buy_buttons", "icon_row"],
+      "settings": {}
+    },
+    "faq": {
+      "type": "collapsible-content",
+      "blocks": {
+        "q1": { "type": "row", "settings": { "heading": "How do I choose a size?" } },
+        "q2": { "type": "row", "settings": { "heading": "What if it does not fit?" } }
+      },
+      "block_order": ["q1", "q2"],
+      "settings": { "heading": "Before you buy", "eyebrow": "FAQ" }
+    }
+  },
+  "order": ["hero", "story", "stats", "comparison", "testimonials", "featured-product", "faq"]
+}

@@ -1,13 +1,189 @@
 {
   "sections": {
-    "icon-bar": {
-      "type": "icon-bar",
+    "hero": {
+      "type": "hero",
       "blocks": {
-        "i1": { "type": "item", "settings": { "icon": "truck", "heading": "Fast delivery" } }
+        "proof-1": { "type": "proof", "settings": { "icon": "truck", "text": "Free shipping over 250" } },
+        "proof-2": { "type": "proof", "settings": { "icon": "return", "text": "30-day returns" } },
+        "proof-3": { "type": "proof", "settings": { "icon": "leaf", "text": "Traceable materials" } }
       },
-      "block_order": ["i1"],
-      "settings": {}
+      "block_order": ["proof-1", "proof-2", "proof-3"],
+      "settings": {
+        "color_scheme": "scheme-3",
+        "height": "large",
+        "content_position": "center",
+        "heading": "Made for the long run",
+        "heading_size": "h0",
+        "eyebrow": "New season",
+        "text": "<p>Small batches, honest materials, and nothing you will want to replace next year.</p>",
+        "button_label": "Shop the edit",
+        "button_2_label": "Read our story",
+        "background_type": "image",
+        "overlay_opacity": 35,
+        "text_alignment": "center"
+      }
+    },
+    "featured-collection": {
+      "type": "featured-collection",
+      "settings": {
+        "heading": "This week's edit",
+        "eyebrow": "Just in",
+        "layout": "grid",
+        "columns": 4,
+        "products_to_show": 8,
+        "offset_grid": true
+      }
+    },
+    "image-with-text": {
+      "type": "image-with-text",
+      "blocks": {
+        "point-1": {
+          "type": "point",
+          "settings": { "icon": "scissors", "heading": "Cut and sewn in house", "text": "One workshop, one team, no middlemen." }
+        },
+        "point-2": {
+          "type": "point",
+          "settings": { "icon": "leaf", "heading": "Traceable materials", "text": "We can tell you which mill every metre came from." }
+        },
+        "point-3": {
+          "type": "point",
+          "settings": { "icon": "return", "heading": "Repaired, not replaced", "text": "Send it back and we will mend it, for as long as you own it." }
+        }
+      },
+      "block_order": ["point-1", "point-2", "point-3"],
+      "settings": {
+        "heading": "Built by people who use it",
+        "eyebrow": "Our workshop",
+        "layout": "overlap",
+        "media_position": "start",
+        "color_scheme": "scheme-2"
+      }
+    },
+    "collection-list": {
+      "type": "collection-list",
+      "blocks": {
+        "c1": { "type": "collection", "settings": {} },
+        "c2": { "type": "collection", "settings": {} },
+        "c3": { "type": "collection", "settings": {} }
+      },
+      "block_order": ["c1", "c2", "c3"],
+      "settings": { "heading": "Browse the shop", "columns": 3, "offset_grid": true }
+    },
+    "ticker": {
+      "type": "ticker",
+      "blocks": {
+        "t1": { "type": "item", "settings": { "text": "Free shipping over 250" } },
+        "t2": { "type": "item", "settings": { "text": "Repaired for life" } },
+        "t3": { "type": "item", "settings": { "text": "Made in small batches" } }
+      },
+      "block_order": ["t1", "t2", "t3"],
+      "settings": { "color_scheme": "scheme-4", "text_size": 2 }
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "blocks": {
+        "r1": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "<p>Second one I have bought. The first is three years old and still looks new.</p>",
+            "author": "Noa L.",
+            "rating": 5
+          }
+        },
+        "r2": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "<p>Ordered on Sunday, wearing it on Tuesday. The fit guide was spot on.</p>",
+            "author": "Daniel R.",
+            "rating": 5
+          }
+        },
+        "r3": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "<p>They mended a torn pocket free of charge, eighteen months after I bought it.</p>",
+            "author": "Maya T.",
+            "rating": 5
+          }
+        }
+      },
+      "block_order": ["r1", "r2", "r3"],
+      "settings": { "heading": "What people tell us", "eyebrow": "Reviews", "color_scheme": "scheme-2" }
+    },
+    "logo-list": {
+      "type": "logo-list",
+      "blocks": {
+        "l1": { "type": "logo", "settings": { "name": "Publication" } },
+        "l2": { "type": "logo", "settings": { "name": "Magazine" } },
+        "l3": { "type": "logo", "settings": { "name": "Journal" } },
+        "l4": { "type": "logo", "settings": { "name": "Weekly" } }
+      },
+      "block_order": ["l1", "l2", "l3", "l4"],
+      "settings": { "heading": "As seen in", "scroll": true }
+    },
+    "ugc-gallery": {
+      "type": "ugc-gallery",
+      "blocks": {
+        "u1": { "type": "photo", "settings": {} },
+        "u2": { "type": "photo", "settings": {} },
+        "u3": { "type": "photo", "settings": {} },
+        "u4": { "type": "photo", "settings": {} },
+        "u5": { "type": "photo", "settings": {} }
+      },
+      "block_order": ["u1", "u2", "u3", "u4", "u5"],
+      "settings": { "heading": "Worn by you", "columns": 5 }
+    },
+    "collapsible-content": {
+      "type": "collapsible-content",
+      "blocks": {
+        "q1": {
+          "type": "row",
+          "settings": {
+            "heading": "How long does delivery take?",
+            "text": "<p>Two to five working days across the country, and we email tracking the moment it leaves us.</p>",
+            "icon": "truck"
+          }
+        },
+        "q2": {
+          "type": "row",
+          "settings": {
+            "heading": "What if it does not fit?",
+            "text": "<p>Send it back within 30 days. Returns are free and we refund the moment it reaches us.</p>",
+            "icon": "return"
+          }
+        },
+        "q3": {
+          "type": "row",
+          "settings": {
+            "heading": "Do you really repair things?",
+            "text": "<p>Yes. Email us a photo and we will tell you whether to post it in.</p>",
+            "icon": "scissors"
+          }
+        }
+      },
+      "block_order": ["q1", "q2", "q3"],
+      "settings": { "heading": "Questions, answered", "eyebrow": "FAQ", "anchor_id": "faq" }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "Join the list",
+        "text": "<p>New arrivals and quiet offers, never noise.</p>",
+        "layout": "stacked",
+        "color_scheme": "scheme-3"
+      }
     }
   },
-  "order": ["icon-bar"]
+  "order": [
+    "hero",
+    "featured-collection",
+    "image-with-text",
+    "collection-list",
+    "ticker",
+    "testimonials",
+    "logo-list",
+    "ugc-gallery",
+    "collapsible-content",
+    "newsletter"
+  ]
 }

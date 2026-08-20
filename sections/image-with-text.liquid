@@ -1,0 +1,435 @@
+{%- style -%}
+  {%- render 'section-styles', section_id: section.id, s: section.settings -%}
+{%- endstyle -%}
+
+<div class="section-wrapper color-{{ section.settings.color_scheme }}{% if section.settings.hide_on_mobile %} hide-mobile{% endif %}{% if section.settings.hide_on_desktop %} hide-desktop{% endif %}">
+  <div class="section">
+    <div class="{{ section.settings.width }}">
+      <div class="image-with-text image-with-text--{{ section.settings.layout }} image-with-text--media-{{ section.settings.media_position }}">
+        <div class="image-with-text__media" data-reveal>
+          {%- if section.settings.video != blank -%}
+            <div class="frame" data-ratio="{{ section.settings.image_ratio }}">
+              {{ section.settings.video | video_tag: image_size: '1200x', controls: true, muted: true, playsinline: true }}
+            </div>
+          {%- elsif section.settings.image != blank -%}
+            <div class="frame" data-ratio="{{ section.settings.image_ratio }}">
+              {%- render 'responsive-image', image: section.settings.image, sizes: '(min-width: 750px) 50vw, 100vw' -%}
+            </div>
+          {%- else -%}
+            <div class="frame" data-ratio="{{ section.settings.image_ratio }}">
+              <div class="media-placeholder">{{ 'lifestyle-1' | placeholder_svg_tag }}</div>
+            </div>
+          {%- endif -%}
+
+          {%- if section.settings.secondary_image != blank -%}
+            <div class="frame frame--soft image-with-text__inset" data-ratio="square">
+              {%- render 'responsive-image', image: section.settings.secondary_image, sizes: '200px', max_width: 600 -%}
+            </div>
+          {%- endif -%}
+        </div>
+
+        <div class="image-with-text__body" data-reveal>
+          {%- render 'section-header', s: section.settings -%}
+
+          {%- if section.blocks.size > 0 -%}
+            <ul class="image-with-text__list">
+              {%- for block in section.blocks -%}
+                <li class="image-with-text__item" {{ block.shopify_attributes }}>
+                  {%- case block.type -%}
+                    {%- when 'point' -%}
+                      {%- if block.settings.icon != 'none' -%}
+                        {% render 'icon', icon: block.settings.icon, class: 'icon--large' %}
+                      {%- endif -%}
+                      <div>
+                        {%- if block.settings.heading != blank -%}
+                          <strong class="image-with-text__item-heading">{{ block.settings.heading }}</strong>
+                        {%- endif -%}
+                        {%- if block.settings.text != blank -%}
+                          <span class="text-small text-muted">{{ block.settings.text }}</span>
+                        {%- endif -%}
+                      </div>
+                    {%- when 'stat' -%}
+                      <div class="image-with-text__stat">
+                        <b class="h3" data-counter="{{ block.settings.value }}">{{ block.settings.value }}</b>
+                        <span class="text-small text-muted">{{ block.settings.label }}</span>
+                      </div>
+                  {%- endcase -%}
+                </li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Image with text",
+  "tag": "section",
+  "class": "section-image-with-text",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Colour scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "Page width"
+        },
+        {
+          "value": "page-width page-width--narrow",
+          "label": "Narrow"
+        },
+        {
+          "value": "page-width page-width--wide",
+          "label": "Wide"
+        },
+        {
+          "value": "page-width page-width--full",
+          "label": "Full bleed"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "header",
+      "content": "Media"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Video",
+      "info": "Replaces the image. Upload an MP4 to your files."
+    },
+    {
+      "type": "image_picker",
+      "id": "secondary_image",
+      "label": "Inset image",
+      "info": "A small second image tucked over the corner of the first."
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Image ratio",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "Adapt to image"
+        },
+        {
+          "value": "square",
+          "label": "Square"
+        },
+        {
+          "value": "portrait",
+          "label": "Portrait"
+        },
+        {
+          "value": "landscape",
+          "label": "Landscape"
+        },
+        {
+          "value": "tall",
+          "label": "Tall"
+        }
+      ],
+      "default": "portrait"
+    },
+    {
+      "type": "select",
+      "id": "media_position",
+      "label": "Media position",
+      "options": [
+        {
+          "value": "start",
+          "label": "Start of line"
+        },
+        {
+          "value": "end",
+          "label": "End of line"
+        }
+      ],
+      "default": "start"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Proportions",
+      "options": [
+        {
+          "value": "even",
+          "label": "Equal halves"
+        },
+        {
+          "value": "media",
+          "label": "Media larger"
+        },
+        {
+          "value": "text",
+          "label": "Text larger"
+        },
+        {
+          "value": "overlap",
+          "label": "Overlapping"
+        }
+      ],
+      "default": "even"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Our workshop"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Built by people who use it"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Heading size",
+      "options": [
+        {
+          "value": "h4",
+          "label": "Extra small"
+        },
+        {
+          "value": "h3",
+          "label": "Small"
+        },
+        {
+          "value": "h2",
+          "label": "Medium"
+        },
+        {
+          "value": "h1",
+          "label": "Large"
+        },
+        {
+          "value": "h0",
+          "label": "Display"
+        }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "checkbox",
+      "id": "ink_heading",
+      "label": "Underline the last word with the ink accent",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Every piece is cut, sewn and checked by the same small team. If something is not right, we hear about it directly — and we fix it.</p>"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Alignment",
+      "options": [
+        {
+          "value": "start",
+          "label": "Start of line"
+        },
+        {
+          "value": "center",
+          "label": "Centre"
+        },
+        {
+          "value": "end",
+          "label": "End of line"
+        }
+      ],
+      "default": "start"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        {
+          "value": "",
+          "label": "Primary"
+        },
+        {
+          "value": "button--secondary",
+          "label": "Secondary"
+        },
+        {
+          "value": "button--ghost",
+          "label": "Ghost"
+        },
+        {
+          "value": "button--link",
+          "label": "Link"
+        }
+      ],
+      "default": "button--secondary"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 56
+    },
+    {
+      "type": "header",
+      "content": "Visibility"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_mobile",
+      "label": "Hide on mobile",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_desktop",
+      "label": "Hide on desktop",
+      "default": false
+    }
+  ],
+  "blocks": [
+    {
+      "type": "point",
+      "name": "Point",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "leaf",
+              "label": "Sustainable"
+            },
+            {
+              "value": "award",
+              "label": "Award"
+            },
+            {
+              "value": "scissors",
+              "label": "Handmade"
+            },
+            {
+              "value": "shield-check",
+              "label": "Guaranteed"
+            },
+            {
+              "value": "truck",
+              "label": "Delivery"
+            },
+            {
+              "value": "heart",
+              "label": "Heart"
+            },
+            {
+              "value": "globe",
+              "label": "Worldwide"
+            }
+          ],
+          "default": "leaf"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Traceable materials"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "We can tell you which mill every metre came from."
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "name": "Statistic",
+      "settings": [
+        {
+          "type": "text",
+          "id": "value",
+          "label": "Value",
+          "default": "12000"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Orders shipped"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image with text",
+      "blocks": [
+        {
+          "type": "point"
+        },
+        {
+          "type": "point"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

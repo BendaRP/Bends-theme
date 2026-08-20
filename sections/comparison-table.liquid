@@ -1,0 +1,283 @@
+{%- style -%}
+  {%- render 'section-styles', section_id: section.id, s: section.settings -%}
+{%- endstyle -%}
+
+<div class="section-wrapper color-{{ section.settings.color_scheme }}{% if section.settings.hide_on_mobile %} hide-mobile{% endif %}{% if section.settings.hide_on_desktop %} hide-desktop{% endif %}">
+  <div class="section">
+    <div class="{{ section.settings.width }}">
+      {%- render 'section-header', s: section.settings -%}
+
+      {%- if section.blocks.size > 0 -%}
+        <div class="table-scroll" data-reveal>
+          <table class="comparison-table comparison-table--section">
+            <thead>
+              <tr>
+                <th scope="col">{{ section.settings.column_0 }}</th>
+                <th scope="col" class="comparison-table__highlight">{{ section.settings.column_1 }}</th>
+                <th scope="col">{{ section.settings.column_2 }}</th>
+                {%- if section.settings.column_3 != blank -%}
+                  <th scope="col">{{ section.settings.column_3 }}</th>
+                {%- endif -%}
+              </tr>
+            </thead>
+            <tbody>
+              {%- for block in section.blocks -%}
+                <tr {{ block.shopify_attributes }}>
+                  <th scope="row">
+                    {{ block.settings.label }}
+                    {%- if block.settings.help != blank -%}
+                      <span class="comparison-table__help text-tiny text-muted">{{ block.settings.help }}</span>
+                    {%- endif -%}
+                  </th>
+                  <td class="comparison-table__highlight">{%- render 'comparison-cell', value: block.settings.value_1 -%}</td>
+                  <td>{%- render 'comparison-cell', value: block.settings.value_2 -%}</td>
+                  {%- if section.settings.column_3 != blank -%}
+                    <td>{%- render 'comparison-cell', value: block.settings.value_3 -%}</td>
+                  {%- endif -%}
+                </tr>
+              {%- endfor -%}
+            </tbody>
+          </table>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Comparison table",
+  "tag": "section",
+  "class": "section-comparison-table",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Colour scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "Page width"
+        },
+        {
+          "value": "page-width page-width--narrow",
+          "label": "Narrow"
+        },
+        {
+          "value": "page-width page-width--wide",
+          "label": "Wide"
+        },
+        {
+          "value": "page-width page-width--full",
+          "label": "Full bleed"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "header",
+      "content": "Columns"
+    },
+    {
+      "type": "text",
+      "id": "column_0",
+      "label": "First column",
+      "default": ""
+    },
+    {
+      "type": "text",
+      "id": "column_1",
+      "label": "Second column",
+      "default": "Ours"
+    },
+    {
+      "type": "text",
+      "id": "column_2",
+      "label": "Third column",
+      "default": "High street"
+    },
+    {
+      "type": "text",
+      "id": "column_3",
+      "label": "Fourth column",
+      "info": "Leave empty for a three-column table."
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": ""
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "How we compare"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Heading size",
+      "options": [
+        {
+          "value": "h4",
+          "label": "Extra small"
+        },
+        {
+          "value": "h3",
+          "label": "Small"
+        },
+        {
+          "value": "h2",
+          "label": "Medium"
+        },
+        {
+          "value": "h1",
+          "label": "Large"
+        },
+        {
+          "value": "h0",
+          "label": "Display"
+        }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "checkbox",
+      "id": "ink_heading",
+      "label": "Underline the last word with the ink accent",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": ""
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Alignment",
+      "options": [
+        {
+          "value": "start",
+          "label": "Start of line"
+        },
+        {
+          "value": "center",
+          "label": "Centre"
+        },
+        {
+          "value": "end",
+          "label": "End of line"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 56
+    },
+    {
+      "type": "header",
+      "content": "Visibility"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_mobile",
+      "label": "Hide on mobile",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_desktop",
+      "label": "Hide on desktop",
+      "default": false
+    }
+  ],
+  "blocks": [
+    {
+      "type": "row",
+      "name": "Row",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Row label",
+          "default": "Free returns"
+        },
+        {
+          "type": "text",
+          "id": "help",
+          "label": "Help text"
+        },
+        {
+          "type": "text",
+          "id": "value_1",
+          "label": "Second column",
+          "default": "yes",
+          "info": "Write yes or no to get a tick or a cross. Anything else prints as written."
+        },
+        {
+          "type": "text",
+          "id": "value_2",
+          "label": "Third column",
+          "default": "14 days"
+        },
+        {
+          "type": "text",
+          "id": "value_3",
+          "label": "Fourth column",
+          "default": "no"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Comparison table",
+      "blocks": [
+        {
+          "type": "row"
+        },
+        {
+          "type": "row"
+        },
+        {
+          "type": "row"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

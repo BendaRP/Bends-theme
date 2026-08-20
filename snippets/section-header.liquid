@@ -1,0 +1,44 @@
+{%- comment -%}
+  The eyebrow / heading / text / button group most sections share.
+
+  Accepts:
+  - s:      {Object} section.settings
+  - anchor: {String} optional id for jump links
+{%- endcomment -%}
+{%- liquid
+  assign has_content = false
+  if s.eyebrow != blank or s.heading != blank or s.text != blank or s.button_label != blank
+    assign has_content = true
+  endif
+  assign header_tag = s.heading_tag | default: 'h2'
+  assign header_size = s.heading_size | default: 'h2'
+-%}
+{%- if has_content -%}
+  <div
+    class="section-header text-{{ s.text_alignment | default: 'start' }}"
+    {% if anchor != blank %}id="{{ anchor }}" data-anchor="{{ anchor }}"{% endif %}
+    data-reveal
+  >
+    {%- if s.eyebrow != blank -%}
+      <span class="eyebrow">{{ s.eyebrow }}</span>
+    {%- endif -%}
+
+    {%- render 'heading',
+      text: s.heading,
+      tag: header_tag,
+      size: header_size,
+      ink: s.ink_heading
+    -%}
+
+    {%- if s.text != blank -%}
+      <div class="rte section-header__text text-muted">{{ s.text }}</div>
+    {%- endif -%}
+
+    {%- if s.button_label != blank -%}
+      <a class="button {{ s.button_style }}" href="{{ s.button_link | default: '#' }}">
+        {{ s.button_label }}
+        {% render 'icon', icon: 'arrow-right' %}
+      </a>
+    {%- endif -%}
+  </div>
+{%- endif -%}

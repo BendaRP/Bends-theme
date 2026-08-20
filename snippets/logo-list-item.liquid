@@ -1,0 +1,20 @@
+{%- comment -%}
+  The contents of one logo in the "featured on" list.
+
+  Accepts:
+  - block: {Object}
+{%- endcomment -%}
+{%- if block.settings.image != blank -%}
+  {%- render 'responsive-image',
+    image: block.settings.image,
+    widths: '120,180,240,360',
+    sizes: 'var(--logo-width)',
+    max_width: 360,
+    alt: block.settings.name
+  -%}
+{%- else -%}
+  <span class="logo-list__name">{{ block.settings.name }}</span>
+{%- endif -%}
+{%- if block.settings.quote != blank -%}
+  <span class="logo-list__quote text-tiny text-muted">{{ block.settings.quote }}</span>
+{%- endif -%}

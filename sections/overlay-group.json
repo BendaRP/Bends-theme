@@ -4,9 +4,33 @@
   "sections": {
     "cart-drawer": { "type": "cart-drawer", "settings": {} },
     "quick-view": { "type": "quick-view", "settings": {} },
+    "popup": { "type": "popup", "settings": { "enabled": false } },
+    "spin-to-win": {
+      "type": "spin-to-win",
+      "blocks": {
+        "p1": { "type": "prize", "settings": { "label": "10% off", "code": "SPIN10", "weight": 8 } },
+        "p2": { "type": "prize", "settings": { "label": "Free shipping", "code": "SPINSHIP", "weight": 6 } },
+        "p3": { "type": "prize", "settings": { "label": "15% off", "code": "SPIN15", "weight": 4 } },
+        "p4": { "type": "prize", "settings": { "label": "Free gift", "code": "SPINGIFT", "weight": 2 } },
+        "p5": { "type": "prize", "settings": { "label": "5% off", "code": "SPIN5", "weight": 10 } },
+        "p6": { "type": "prize", "settings": { "label": "20% off", "code": "SPIN20", "weight": 1 } }
+      },
+      "block_order": ["p1", "p2", "p3", "p4", "p5", "p6"],
+      "settings": { "enabled": false }
+    },
+    "sticky-cta": { "type": "sticky-cta", "settings": { "enabled": false } },
     "cookie-banner": { "type": "cookie-banner", "settings": {} },
     "accessibility-widget": { "type": "accessibility-widget", "settings": {} },
     "back-to-top": { "type": "back-to-top", "settings": {} }
   },
-  "order": ["cart-drawer", "quick-view", "cookie-banner", "accessibility-widget", "back-to-top"]
+  "order": [
+    "cart-drawer",
+    "quick-view",
+    "popup",
+    "spin-to-win",
+    "sticky-cta",
+    "cookie-banner",
+    "accessibility-widget",
+    "back-to-top"
+  ]
 }
