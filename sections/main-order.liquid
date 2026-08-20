@@ -1,0 +1,118 @@
+{%- style -%}
+  {%- render 'section-styles', section_id: section.id, s: section.settings -%}
+{%- endstyle -%}
+
+<div class="section-wrapper color-{{ section.settings.color_scheme }}">
+  <div class="section">
+    <div class="page-width">
+      <a class="button button--link" href="{{ routes.account_url }}">
+        {% render 'icon', icon: 'arrow-left' %}
+        <span>{{ 'customer.account.return' | t }}</span>
+      </a>
+
+      <h1 class="h2">{{ 'customer.order.title' | t: name: order.name }}</h1>
+      <p class="text-muted">{{ 'customer.order.date_html' | t: date: order.created_at | date: format: 'date' }}</p>
+
+      {%- if order.cancelled -%}
+        <p class="form-status form-status--error">
+          {{ 'customer.order.cancelled_html' | t: date: order.cancelled_at | date: format: 'date' }}
+          {%- if order.cancel_reason -%}
+            {{ 'customer.order.cancelled_reason' | t: reason: order.cancel_reason_label }}
+          {%- endif -%}
+        </p>
+      {%- endif -%}
+
+      <div class="table-scroll">
+        <table class="account-table">
+          <thead>
+            <tr>
+              <th scope="col">{{ 'customer.order.product' | t }}</th>
+              <th scope="col">{{ 'customer.order.sku' | t }}</th>
+              <th scope="col">{{ 'customer.order.price' | t }}</th>
+              <th scope="col">{{ 'customer.order.quantity' | t }}</th>
+              <th scope="col">{{ 'customer.order.total' | t }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {%- for line_item in order.line_items -%}
+              <tr>
+                <th scope="row">
+                  <a class="link" href="{{ line_item.product.url }}">{{ line_item.title }}</a>
+                  {%- if line_item.fulfillment -%}
+                    <br>
+                    <span class="text-tiny text-muted">
+                      {%- if line_item.fulfillment.tracking_url -%}
+                        <a class="link" href="{{ line_item.fulfillment.tracking_url }}" target="_blank" rel="noopener">
+                          {{ 'customer.order.track_shipment' | t }}
+                        </a>
+                      {%- endif -%}
+                    </span>
+                  {%- endif -%}
+                </th>
+                <td>{{ line_item.sku }}</td>
+                <td>{{ line_item.original_price | money }}</td>
+                <td>{{ line_item.quantity }}</td>
+                <td>{{ line_item.final_line_price | money }}</td>
+              </tr>
+            {%- endfor -%}
+          </tbody>
+          <tfoot>
+            <tr>
+              <th scope="row" colspan="4">{{ 'customer.order.subtotal' | t }}</th>
+              <td>{{ order.line_items_subtotal_price | money }}</td>
+            </tr>
+            {%- for discount_application in order.discount_applications -%}
+              <tr>
+                <th scope="row" colspan="4">{{ discount_application.title }}</th>
+                <td>−{{ discount_application.total_allocated_amount | money }}</td>
+              </tr>
+            {%- endfor -%}
+            {%- for shipping_method in order.shipping_methods -%}
+              <tr>
+                <th scope="row" colspan="4">{{ 'customer.order.shipping' | t }} ({{ shipping_method.title }})</th>
+                <td>{{ shipping_method.price | money }}</td>
+              </tr>
+            {%- endfor -%}
+            {%- for tax_line in order.tax_lines -%}
+              <tr>
+                <th scope="row" colspan="4">{{ 'customer.order.tax' | t }} ({{ tax_line.title }})</th>
+                <td>{{ tax_line.price | money }}</td>
+              </tr>
+            {%- endfor -%}
+            <tr>
+              <th scope="row" colspan="4">{{ 'customer.order.total' | t }}</th>
+              <td><strong>{{ order.total_price | money }}</strong></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="account-addresses">
+        <div>
+          <h2 class="h6">{{ 'customer.order.billing_address' | t }}</h2>
+          <p class="text-small text-muted">{{ 'customer.order.payment_status' | t }}: {{ order.financial_status_label }}</p>
+          {{ order.billing_address | format_address }}
+        </div>
+        <div>
+          <h2 class="h6">{{ 'customer.order.shipping_address' | t }}</h2>
+          <p class="text-small text-muted">{{ 'customer.order.fulfillment_status' | t }}: {{ order.fulfillment_status_label }}</p>
+          {{ order.shipping_address | format_address }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Order",
+  "tag": "section",
+  "class": "section-main-order",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-1" },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Top padding", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Bottom padding", "default": 64 }
+  ]
+}
+{% endschema %}

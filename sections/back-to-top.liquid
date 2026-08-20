@@ -1,0 +1,32 @@
+{%- if section.settings.enabled -%}
+  <button
+    class="back-to-top back-to-top--{{ section.settings.position }}"
+    type="button"
+    data-back-to-top
+    aria-label="{{ 'general.back_to_top' | t }}"
+    hidden
+  >
+    {% render 'icon', icon: 'arrow-up' %}
+  </button>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Back to top",
+  "settings": [
+    { "type": "checkbox", "id": "enabled", "label": "Show the back to top button", "default": true },
+    {
+      "type": "select",
+      "id": "position",
+      "label": "Position",
+      "options": [
+        { "value": "end", "label": "End of the line" },
+        { "value": "start", "label": "Start of the line" },
+        { "value": "center", "label": "Centre" }
+      ],
+      "default": "end"
+    }
+  ],
+  "enabled_on": { "groups": ["overlay"] }
+}
+{% endschema %}

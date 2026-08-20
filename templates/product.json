@@ -1,0 +1,61 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "breadcrumbs": { "type": "breadcrumbs", "settings": {} },
+        "vendor": { "type": "vendor", "settings": {} },
+        "title": { "type": "title", "settings": {} },
+        "rating": { "type": "rating", "settings": {} },
+        "price": { "type": "price", "settings": {} },
+        "inventory": { "type": "inventory", "settings": {} },
+        "variant_picker": { "type": "variant_picker", "settings": {} },
+        "volume_pricing": { "type": "volume_pricing", "settings": {} },
+        "quantity": { "type": "quantity_selector", "settings": {} },
+        "buy_buttons": { "type": "buy_buttons", "settings": {} },
+        "urgency": { "type": "urgency", "settings": {} },
+        "shipping_estimate": { "type": "shipping_estimate", "settings": {} },
+        "pickup": { "type": "pickup", "settings": {} },
+        "icon_row": { "type": "icon_row", "settings": {} },
+        "payment_badges": { "type": "payment_badges", "settings": {} },
+        "benefits": { "type": "benefits", "settings": {} },
+        "size_chart": { "type": "size_chart", "settings": {} },
+        "complementary": { "type": "complementary", "settings": {} },
+        "collapsible_shipping": {
+          "type": "collapsible_row",
+          "settings": { "heading": "Shipping and returns", "icon": "truck" }
+        },
+        "collapsible_care": {
+          "type": "collapsible_row",
+          "settings": { "heading": "Care", "icon": "leaf" }
+        },
+        "share": { "type": "share", "settings": {} }
+      },
+      "block_order": [
+        "breadcrumbs",
+        "vendor",
+        "title",
+        "rating",
+        "price",
+        "inventory",
+        "variant_picker",
+        "volume_pricing",
+        "quantity",
+        "buy_buttons",
+        "urgency",
+        "shipping_estimate",
+        "pickup",
+        "icon_row",
+        "payment_badges",
+        "benefits",
+        "size_chart",
+        "complementary",
+        "collapsible_shipping",
+        "collapsible_care",
+        "share"
+      ],
+      "settings": {}
+    }
+  },
+  "order": ["main"]
+}

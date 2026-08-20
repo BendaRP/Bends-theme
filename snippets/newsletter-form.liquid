@@ -1,0 +1,38 @@
+{%- comment -%}
+  Email capture, posted to the Shopify customer list.
+
+  Accepts:
+  - context:      {String} keeps ids unique
+  - button_label: {String} overrides the default button wording
+  - class:        {String} extra class names
+{%- endcomment -%}
+{%- form 'customer', class: 'newsletter-form ' | append: class, id: 'newsletter-' | append: context -%}
+  <input type="hidden" name="contact[tags]" value="newsletter">
+  {%- if form.posted_successfully? -%}
+    <p class="form-status form-status--success" tabindex="-1" data-form-status>
+      {% render 'icon', icon: 'check-circle' %}
+      <span>{{ 'newsletter.success' | t }}</span>
+    </p>
+  {%- else -%}
+    <div class="newsletter-form__field">
+      <label class="visually-hidden" for="newsletter-email-{{ context }}">{{ 'newsletter.label' | t }}</label>
+      <input
+        id="newsletter-email-{{ context }}"
+        type="email"
+        name="contact[email]"
+        class="newsletter-form__input"
+        placeholder="{{ 'newsletter.placeholder' | t | escape }}"
+        autocomplete="email"
+        required
+      >
+      <button type="submit" class="button newsletter-form__button">
+        {{ button_label | default: 'newsletter.button_label' | t }}
+      </button>
+    </div>
+    {%- if form.errors -%}
+      <p class="form-status form-status--error" tabindex="-1" data-form-status>
+        {{ form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email }}
+      </p>
+    {%- endif -%}
+  {%- endif -%}
+{%- endform -%}

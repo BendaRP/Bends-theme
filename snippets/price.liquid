@@ -1,0 +1,78 @@
+{%- comment -%}
+  Renders the price for a product or variant, including compare-at price,
+  unit price and the saving.
+
+  Accepts:
+  - target:      {Product|Variant} what to price
+  - show_savings:{Boolean} show the amount or percentage saved
+  - class:       {String} extra class names
+  - show_from:   {Boolean} prefix with "From" when the product has a price range
+{%- endcomment -%}
+{%- liquid
+  assign price_target = target
+  assign is_product = false
+  if price_target.variants
+    assign is_product = true
+  endif
+
+  assign current_price = price_target.price
+  assign compare_price = price_target.compare_at_price
+
+  if is_product
+    assign current_price = price_target.price_min
+    assign compare_price = price_target.compare_at_price_max
+  endif
+
+  assign on_sale = false
+  if compare_price > current_price
+    assign on_sale = true
+  endif
+
+  assign show_range = false
+  if is_product and price_target.price_varies and show_from
+    assign show_range = true
+  endif
+-%}
+<div class="price {{ class }}{% if on_sale %} price--on-sale{% endif %}">
+  <div class="price__row">
+    {%- if show_range -%}
+      {%- assign from_money = current_price | money -%}
+      <span class="price__current">{{ 'products.product.price.from_price_html' | t: price: from_money }}</span>
+    {%- else -%}
+      <span class="visually-hidden">{{ 'products.product.price.sale_price' | t }}</span>
+      <span class="price__current">{{ current_price | money }}</span>
+    {%- endif -%}
+
+    {%- if on_sale -%}
+      <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
+      <s class="price__compare">{{ compare_price | money }}</s>
+    {%- endif -%}
+  </div>
+
+  {%- if on_sale and show_savings -%}
+    {%- liquid
+      assign saved_amount = compare_price | minus: current_price
+      assign saved_percent = saved_amount | times: 100.0 | divided_by: compare_price | round
+    -%}
+    <span class="price__savings text-sale text-tiny">
+      {%- if settings.badge_sale_format == 'amount' -%}
+        {%- assign saved_money = saved_amount | money -%}
+        {{ 'products.product.save_amount' | t: amount: saved_money }}
+      {%- else -%}
+        {{ 'products.product.save_percent' | t: percent: saved_percent }}
+      {%- endif -%}
+    </span>
+  {%- endif -%}
+
+  {%- if price_target.unit_price_measurement -%}
+    <div class="price__unit text-tiny text-muted">
+      <span class="visually-hidden">{{ 'products.product.price.unit_price' | t }}</span>
+      {{ price_target.unit_price | money }}
+      <span aria-hidden="true">/</span>
+      {%- if price_target.unit_price_measurement.reference_value != 1 -%}
+        {{ price_target.unit_price_measurement.reference_value }}
+      {%- endif -%}
+      {{ price_target.unit_price_measurement.reference_unit }}
+    </div>
+  {%- endif -%}
+</div>

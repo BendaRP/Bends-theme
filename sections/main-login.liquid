@@ -1,0 +1,84 @@
+{%- style -%}
+  {%- render 'section-styles', section_id: section.id, s: section.settings -%}
+{%- endstyle -%}
+
+<div class="section-wrapper color-{{ section.settings.color_scheme }}">
+  <div class="section">
+    <div class="page-width page-width--narrow">
+      <div class="account-forms">
+        <div class="account-form" id="RecoverPassword" style="display: none;">
+          <h1 class="h3">{{ 'customer.recover_password.title' | t }}</h1>
+          <p class="text-muted">{{ 'customer.recover_password.subtext' | t }}</p>
+          {%- form 'recover_customer_password' -%}
+            {%- if form.posted_successfully? -%}
+              <p class="form-status form-status--success" tabindex="-1">
+                {{ 'customer.recover_password.success' | t }}
+              </p>
+            {%- endif -%}
+            <div class="field">
+              <label class="field__label" for="RecoverEmail">{{ 'customer.login.email' | t }}</label>
+              <input id="RecoverEmail" type="email" name="email" autocomplete="email" required>
+            </div>
+            <button type="submit" class="button button--full">{{ 'customer.recover_password.submit' | t }}</button>
+            <button type="button" class="button button--link" data-account-toggle="login">
+              {{ 'customer.recover_password.cancel' | t }}
+            </button>
+          {%- endform -%}
+        </div>
+
+        <div class="account-form" id="LoginForm">
+          <h1 class="h3">{{ 'customer.login.title' | t }}</h1>
+          {%- form 'customer_login' -%}
+            {%- if form.errors -%}
+              <p class="form-status form-status--error" tabindex="-1">
+                {{ form.errors.messages.form }}
+              </p>
+            {%- endif -%}
+            <div class="field">
+              <label class="field__label" for="LoginEmail">{{ 'customer.login.email' | t }}</label>
+              <input id="LoginEmail" type="email" name="customer[email]" autocomplete="email" required>
+            </div>
+            <div class="field">
+              <label class="field__label" for="LoginPassword">{{ 'customer.login.password' | t }}</label>
+              <input id="LoginPassword" type="password" name="customer[password]" autocomplete="current-password" required>
+            </div>
+            <button type="submit" class="button button--full">{{ 'customer.login.submit' | t }}</button>
+            <button type="button" class="button button--link" data-account-toggle="recover">
+              {{ 'customer.login.forgot_password' | t }}
+            </button>
+          {%- endform -%}
+
+          <p class="text-small text-muted account-form__alt">
+            {{ 'customer.login.no_account' | t }}
+            <a class="link" href="{{ routes.account_register_url }}">{{ 'customer.login.create_account' | t }}</a>
+          </p>
+        </div>
+
+        {%- if section.settings.show_guest_checkout -%}
+          <aside class="account-guest">
+            <h2 class="h5">{{ 'customer.login.guest_title' | t }}</h2>
+            <p class="text-small text-muted">{{ 'customer.login.guest_body' | t }}</p>
+            <a class="button button--secondary" href="{{ routes.cart_url }}">
+              {{ 'customer.login.guest_continue' | t }}
+            </a>
+          </aside>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Login",
+  "tag": "section",
+  "class": "section-main-login",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-1" },
+    { "type": "checkbox", "id": "show_guest_checkout", "label": "Offer checkout without an account", "default": true, "info": "Forcing sign-up is one of the biggest causes of abandoned carts." },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Top padding", "default": 64 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Bottom padding", "default": 64 }
+  ]
+}
+{% endschema %}

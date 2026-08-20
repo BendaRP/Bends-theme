@@ -1,0 +1,52 @@
+{%- comment -%}
+  Breadcrumb trail. Matches the BreadcrumbList structured data emitted in the head.
+{%- endcomment -%}
+<nav class="breadcrumbs" aria-label="{{ 'general.breadcrumbs.label' | t }}">
+  <ol class="breadcrumbs__list">
+    <li class="breadcrumbs__item">
+      <a class="breadcrumbs__link" href="{{ routes.root_url }}">{{ 'general.breadcrumbs.home' | t }}</a>
+    </li>
+    {%- case request.page_type -%}
+      {%- when 'product' -%}
+        {%- if collection.url -%}
+          <li class="breadcrumbs__item">
+            {% render 'icon', icon: 'chevron-right', class: 'breadcrumbs__divider' %}
+            <a class="breadcrumbs__link" href="{{ collection.url }}">{{ collection.title }}</a>
+          </li>
+        {%- endif -%}
+        <li class="breadcrumbs__item">
+          {% render 'icon', icon: 'chevron-right', class: 'breadcrumbs__divider' %}
+          <span aria-current="page">{{ product.title }}</span>
+        </li>
+      {%- when 'collection' -%}
+        <li class="breadcrumbs__item">
+          {% render 'icon', icon: 'chevron-right', class: 'breadcrumbs__divider' %}
+          <span aria-current="page">{{ collection.title }}</span>
+        </li>
+      {%- when 'article' -%}
+        <li class="breadcrumbs__item">
+          {% render 'icon', icon: 'chevron-right', class: 'breadcrumbs__divider' %}
+          <a class="breadcrumbs__link" href="{{ blog.url }}">{{ blog.title }}</a>
+        </li>
+        <li class="breadcrumbs__item">
+          {% render 'icon', icon: 'chevron-right', class: 'breadcrumbs__divider' %}
+          <span aria-current="page">{{ article.title }}</span>
+        </li>
+      {%- when 'blog' -%}
+        <li class="breadcrumbs__item">
+          {% render 'icon', icon: 'chevron-right', class: 'breadcrumbs__divider' %}
+          <span aria-current="page">{{ blog.title }}</span>
+        </li>
+      {%- when 'page' -%}
+        <li class="breadcrumbs__item">
+          {% render 'icon', icon: 'chevron-right', class: 'breadcrumbs__divider' %}
+          <span aria-current="page">{{ page.title }}</span>
+        </li>
+      {%- when 'search' -%}
+        <li class="breadcrumbs__item">
+          {% render 'icon', icon: 'chevron-right', class: 'breadcrumbs__divider' %}
+          <span aria-current="page">{{ 'general.search.search' | t }}</span>
+        </li>
+    {%- endcase -%}
+  </ol>
+</nav>

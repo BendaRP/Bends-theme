@@ -1,0 +1,184 @@
+{%- comment -%}
+  schema.org markup so search engines can show rich results for products,
+  articles, breadcrumbs and the shop itself.
+{%- endcomment -%}
+{%- if settings.seo_organization_data -%}
+  {%- liquid
+    assign org_name = settings.brand_name | default: shop.name
+    assign org_description = settings.brand_description | strip_html | strip | default: shop.description
+  -%}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": {{ org_name | json }},
+      "url": {{ shop.url | append: routes.root_url | json }}
+      {%- if org_description != blank -%},
+      "description": {{ org_description | json }}
+      {%- endif -%}
+      {%- if settings.logo != blank -%},
+      "logo": {{ settings.logo | image_url: width: 512 | prepend: 'https:' | json }}
+      {%- endif -%}
+      {%- assign social_links = '' -%}
+      {%- assign social_settings = settings.social_instagram_link | append: ',' | append: settings.social_facebook_link | append: ',' | append: settings.social_tiktok_link | append: ',' | append: settings.social_youtube_link | append: ',' | append: settings.social_x_link | append: ',' | append: settings.social_pinterest_link | append: ',' | append: settings.social_linkedin_link -%}
+      {%- assign social_list = social_settings | split: ',' -%}
+      {%- for link in social_list -%}
+        {%- assign trimmed = link | strip -%}
+        {%- if trimmed != blank -%}
+          {%- if social_links != blank -%}{%- assign social_links = social_links | append: ',' -%}{%- endif -%}
+          {%- assign social_links = social_links | append: trimmed -%}
+        {%- endif -%}
+      {%- endfor -%}
+      {%- if social_links != blank -%},
+      "sameAs": {{ social_links | split: ',' | json }}
+      {%- endif -%}
+    }
+  </script>
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": {{ org_name | json }},
+      "url": {{ shop.url | append: routes.root_url | json }},
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": {{ shop.url | append: routes.search_url | append: '?q={search_term_string}' | json }}
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+  </script>
+{%- endif -%}
+
+{%- if settings.seo_structured_data and request.page_type == 'product' and product != blank -%}
+  {%- liquid
+    assign product_rating = product.metafields.reviews.rating.value
+    assign product_rating_count = product.metafields.reviews.rating_count.value | plus: 0
+    assign product_description = product.description | strip_html | truncate: 1200
+  -%}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": {{ product.title | json }},
+      "url": {{ shop.url | append: product.url | json }},
+      {%- if product_description != blank -%}
+      "description": {{ product_description | json }},
+      {%- endif -%}
+      {%- if product.featured_media -%}
+      "image": [
+        {%- for media in product.media limit: 5 -%}
+          {%- if media.media_type == 'image' -%}
+            {{ media | image_url: width: 1200 | prepend: 'https:' | json }}{%- unless forloop.last -%},{%- endunless -%}
+          {%- endif -%}
+        {%- endfor -%}
+      ],
+      {%- endif -%}
+      {%- if product.vendor != blank -%}
+      "brand": { "@type": "Brand", "name": {{ product.vendor | json }} },
+      {%- endif -%}
+      {%- if product.type != blank -%}
+      "category": {{ product.type | json }},
+      {%- endif -%}
+      {%- if product_rating and product_rating_count > 0 -%}
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": {{ product_rating.rating | json }},
+        "bestRating": {{ product_rating.scale_max | json }},
+        "worstRating": {{ product_rating.scale_min | json }},
+        "ratingCount": {{ product_rating_count | json }}
+      },
+      {%- endif -%}
+      "offers": [
+        {%- for variant in product.variants -%}
+          {
+            "@type": "Offer",
+            "name": {{ variant.title | json }},
+            "url": {{ shop.url | append: variant.url | json }},
+            "price": {{ variant.price | divided_by: 100.0 | json }},
+            "priceCurrency": {{ cart.currency.iso_code | json }},
+            "availability": {% if variant.available %}"https://schema.org/InStock"{% else %}"https://schema.org/OutOfStock"{% endif %},
+            {%- if variant.sku != blank -%}
+            "sku": {{ variant.sku | json }},
+            {%- endif -%}
+            {%- if variant.barcode != blank -%}
+            "gtin": {{ variant.barcode | json }},
+            {%- endif -%}
+            "itemCondition": "https://schema.org/NewCondition"
+          }{%- unless forloop.last -%},{%- endunless -%}
+        {%- endfor -%}
+      ]
+    }
+  </script>
+{%- endif -%}
+
+{%- if settings.seo_structured_data and request.page_type == 'article' and article != blank -%}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": {{ article.title | json }},
+      "articleBody": {{ article.content | strip_html | json }},
+      "datePublished": {{ article.published_at | date: '%Y-%m-%dT%H:%M:%SZ' | json }},
+      "dateModified": {{ article.updated_at | date: '%Y-%m-%dT%H:%M:%SZ' | json }},
+      "author": { "@type": "Person", "name": {{ article.author | json }} },
+      "publisher": {
+        "@type": "Organization",
+        "name": {{ shop.name | json }}
+        {%- if settings.logo != blank -%},
+        "logo": {
+          "@type": "ImageObject",
+          "url": {{ settings.logo | image_url: width: 512 | prepend: 'https:' | json }}
+        }
+        {%- endif -%}
+      },
+      "mainEntityOfPage": { "@type": "WebPage", "@id": {{ shop.url | append: article.url | json }} }
+      {%- if article.image -%},
+      "image": [{{ article.image | image_url: width: 1200 | prepend: 'https:' | json }}]
+      {%- endif -%}
+    }
+  </script>
+{%- endif -%}
+
+{%- if settings.seo_breadcrumb_data -%}
+  {%- capture breadcrumb_items -%}
+    {%- case request.page_type -%}
+      {%- when 'product' -%}
+        {%- if collection.url -%}
+          {"@type":"ListItem","position":2,"name":{{ collection.title | json }},"item":{{ shop.url | append: collection.url | json }}},
+          {"@type":"ListItem","position":3,"name":{{ product.title | json }},"item":{{ shop.url | append: product.url | json }}}
+        {%- else -%}
+          {"@type":"ListItem","position":2,"name":{{ product.title | json }},"item":{{ shop.url | append: product.url | json }}}
+        {%- endif -%}
+      {%- when 'collection' -%}
+        {"@type":"ListItem","position":2,"name":{{ collection.title | json }},"item":{{ shop.url | append: collection.url | json }}}
+      {%- when 'article' -%}
+        {"@type":"ListItem","position":2,"name":{{ blog.title | json }},"item":{{ shop.url | append: blog.url | json }}},
+        {"@type":"ListItem","position":3,"name":{{ article.title | json }},"item":{{ shop.url | append: article.url | json }}}
+      {%- when 'blog' -%}
+        {"@type":"ListItem","position":2,"name":{{ blog.title | json }},"item":{{ shop.url | append: blog.url | json }}}
+      {%- when 'page' -%}
+        {"@type":"ListItem","position":2,"name":{{ page.title | json }},"item":{{ shop.url | append: page.url | json }}}
+    {%- endcase -%}
+  {%- endcapture -%}
+  {%- if breadcrumb_items != blank -%}
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": {{ 'general.breadcrumbs.home' | t | json }},
+            "item": {{ shop.url | append: routes.root_url | json }}
+          },
+          {{ breadcrumb_items }}
+        ]
+      }
+    </script>
+  {%- endif -%}
+{%- endif -%}

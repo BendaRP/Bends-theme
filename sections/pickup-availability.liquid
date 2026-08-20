@@ -1,0 +1,60 @@
+{%- comment -%}
+  Local pickup availability for the selected variant, fetched over AJAX.
+{%- endcomment -%}
+<div data-pickup-content>
+  {%- liquid
+    assign pickup_variant = product.selected_or_first_available_variant
+    assign pick_up_availabilities = pickup_variant.store_availabilities | where: 'pick_up_enabled', true
+  -%}
+  {%- if pick_up_availabilities.size > 0 -%}
+    {%- assign closest = pick_up_availabilities.first -%}
+    <div class="pickup__summary">
+      {% render 'icon', icon: 'store' %}
+      <div>
+        <p class="text-small">
+          {%- if closest.available -%}
+            {{ 'products.product.pickup.available_at_html' | t: location: closest.location.name }}
+          {%- else -%}
+            {{ 'products.product.pickup.unavailable_at_html' | t: location: closest.location.name }}
+          {%- endif -%}
+        </p>
+        <p class="text-tiny text-muted">{{ closest.pick_up_time }}</p>
+        {%- if pick_up_availabilities.size > 1 -%}
+          <button class="button button--link text-tiny" type="button" data-modal-open="pickup-locations">
+            {{ 'products.product.pickup.check_other_stores' | t }}
+          </button>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- if pick_up_availabilities.size > 1 -%}
+      {%- capture pickup_body -%}
+        <ul class="pickup__list">
+          {%- for availability in pick_up_availabilities -%}
+            <li class="pickup__location">
+              <strong>{{ availability.location.name }}</strong>
+              <span class="text-tiny {% if availability.available %}text-success{% else %}text-muted{% endif %}">
+                {%- if availability.available -%}
+                  {{ 'products.product.pickup.pick_up_available' | t }} — {{ availability.pick_up_time }}
+                {%- else -%}
+                  {{ 'products.product.inventory.unavailable' | t }}
+                {%- endif -%}
+              </span>
+              {%- if availability.location.address != blank -%}
+                <address class="text-tiny text-muted">{{ availability.location.address | format_address }}</address>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- endcapture -%}
+      {%- assign pickup_title = 'products.product.pickup.view_store_info' | t -%}
+      {%- render 'modal', modal_id: 'pickup-locations', title: pickup_title, body: pickup_body -%}
+    {%- endif -%}
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Pickup availability"
+}
+{% endschema %}

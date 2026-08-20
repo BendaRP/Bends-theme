@@ -1,0 +1,8 @@
+# Bends theme — quality gate
+# Acceptance criterion: `shopify theme check --fail-level warning` must exit clean.
+extends: theme-check:recommended
+
+ignore:
+  - .dev/**
+  - node_modules/**
+  - "*.md"

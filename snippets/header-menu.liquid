@@ -1,0 +1,131 @@
+{%- comment -%}
+  Desktop navigation, with a mega menu panel wherever the header has a block
+  whose menu item matches a top-level link.
+
+  Accepts:
+  - menu:       {Linklist}
+  - blocks:     {Array} the header section blocks
+  - section_id: {String}
+  - split:      {String} all | first | second — used by the centred logo layout
+{%- endcomment -%}
+{%- liquid
+  assign links = menu.links
+  assign total = links.size
+  assign half = total | divided_by: 2
+  if total > 0 and total | modulo: 2 != 0
+    assign half = half | plus: 1
+  endif
+-%}
+<ul class="nav">
+  {%- for link in links -%}
+    {%- liquid
+      assign show_link = true
+      if split == 'first' and forloop.index > half
+        assign show_link = false
+      endif
+      if split == 'second' and forloop.index <= half
+        assign show_link = false
+      endif
+    -%}
+    {%- if show_link -%}
+      {%- liquid
+        assign mega = nil
+        for block in blocks
+          if block.settings.menu_item != blank and block.settings.menu_item == link.title
+            assign mega = block
+            break
+          endif
+        endfor
+      -%}
+      <li class="nav__item{% if mega %} nav__item--mega{% elsif link.links.size > 0 %} nav__item--has-children{% endif %}">
+        {%- if mega -%}
+          <details class="nav__details" data-nav-details>
+            <summary class="nav__link" aria-haspopup="true">
+              <span>{{ link.title }}</span>
+              {% render 'icon', icon: 'chevron-down', class: 'nav__chevron' %}
+            </summary>
+            <div class="mega-menu color-scheme-1" {{ mega.shopify_attributes }}>
+              <div class="page-width mega-menu__inner" data-columns="{{ mega.settings.columns }}">
+                {%- if mega.settings.menu != blank -%}
+                  <div class="mega-menu__columns" style="--mega-columns: {{ mega.settings.columns }};">
+                    {%- for column in mega.settings.menu.links -%}
+                      <div class="mega-menu__column">
+                        <a class="mega-menu__column-title" href="{{ column.url }}">{{ column.title }}</a>
+                        {%- if column.links.size > 0 -%}
+                          <ul class="mega-menu__list">
+                            {%- for child in column.links -%}
+                              <li><a class="mega-menu__link" href="{{ child.url }}">{{ child.title }}</a></li>
+                            {%- endfor -%}
+                          </ul>
+                        {%- endif -%}
+                      </div>
+                    {%- endfor -%}
+                  </div>
+                {%- endif -%}
+
+                {%- if mega.settings.image != blank or mega.settings.featured_product != blank -%}
+                  <div class="mega-menu__feature">
+                    {%- if mega.settings.featured_product != blank -%}
+                      {%- render 'product-card',
+                        product: mega.settings.featured_product,
+                        sizes: '280px',
+                        show_quick_add: false,
+                        class: 'product-card--compact'
+                      -%}
+                    {%- elsif mega.settings.image != blank -%}
+                      <a class="mega-menu__feature-link" href="{{ mega.settings.link | default: link.url }}">
+                        <div class="frame" data-ratio="landscape">
+                          {%- render 'responsive-image',
+                            image: mega.settings.image,
+                            sizes: '320px',
+                            max_width: 720
+                          -%}
+                        </div>
+                        {%- if mega.settings.heading != blank -%}
+                          <span class="mega-menu__feature-heading h5">{{ mega.settings.heading }}</span>
+                        {%- endif -%}
+                        {%- if mega.settings.text != blank -%}
+                          <span class="text-small text-muted">{{ mega.settings.text }}</span>
+                        {%- endif -%}
+                        {%- if mega.settings.link_label != blank -%}
+                          <span class="link text-small">{{ mega.settings.link_label }}</span>
+                        {%- endif -%}
+                      </a>
+                    {%- endif -%}
+                  </div>
+                {%- endif -%}
+              </div>
+            </div>
+          </details>
+        {%- elsif link.links.size > 0 -%}
+          <details class="nav__details" data-nav-details>
+            <summary class="nav__link" aria-haspopup="true">
+              <span>{{ link.title }}</span>
+              {% render 'icon', icon: 'chevron-down', class: 'nav__chevron' %}
+            </summary>
+            <div class="nav__dropdown color-scheme-1">
+              <ul class="nav__dropdown-list">
+                {%- for child in link.links -%}
+                  <li class="nav__dropdown-item">
+                    <a class="nav__dropdown-link" href="{{ child.url }}">{{ child.title }}</a>
+                    {%- if child.links.size > 0 -%}
+                      <ul class="nav__dropdown-sublist">
+                        {%- for grandchild in child.links -%}
+                          <li><a class="nav__dropdown-link nav__dropdown-link--sub" href="{{ grandchild.url }}">{{ grandchild.title }}</a></li>
+                        {%- endfor -%}
+                      </ul>
+                    {%- endif -%}
+                  </li>
+                {%- endfor -%}
+              </ul>
+            </div>
+          </details>
+        {%- else -%}
+          <a class="nav__link" href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>
+            <span>{{ link.title }}</span>
+          </a>
+        {%- endif -%}
+      </li>
+    {%- endif -%}
+  {%- endfor -%}
+</ul>

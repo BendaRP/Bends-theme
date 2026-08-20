@@ -1,0 +1,92 @@
+{%- comment -%}
+  The gift card a customer receives. Rendered without a layout so it prints
+  cleanly and reads well on a phone.
+{%- endcomment -%}
+{% layout none %}
+<!doctype html>
+{%- liquid
+  assign rtl_locales = 'ar,arc,ckb,dv,fa,ha,he,khw,ks,ps,sd,ug,ur,uz-AF,yi' | split: ','
+  assign text_direction = 'ltr'
+  if rtl_locales contains request.locale.iso_code
+    assign text_direction = 'rtl'
+  endif
+-%}
+<html lang="{{ request.locale.iso_code }}" dir="{{ text_direction }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ 'gift_cards.issued.title' | t: value: gift_card.initial_value | money }}</title>
+    {%- if settings.favicon != blank -%}
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+    {%- endif -%}
+    <style data-bends-tokens>
+      {%- render 'css-variables' -%}
+    </style>
+    {{ 'base.css' | asset_url | stylesheet_tag }}
+    {{ 'components.css' | asset_url | stylesheet_tag }}
+    <script src="{{ 'widgets.js' | asset_url }}" defer="defer"></script>
+  </head>
+
+  <body class="template-gift-card color-scheme-1">
+    <main class="gift-card" role="main">
+      <div class="gift-card__panel">
+        <header class="gift-card__head">
+          {%- if settings.logo != blank -%}
+            <div style="--gift-logo-width: {{ settings.logo_width }}px;">
+              {%- render 'responsive-image',
+                image: settings.logo,
+                widths: '120,180,260,360',
+                sizes: 'var(--gift-logo-width)',
+                max_width: 360,
+                alt: shop.name,
+                priority: true
+              -%}
+            </div>
+          {%- else -%}
+            <span class="h4">{{ shop.name }}</span>
+          {%- endif -%}
+          <span class="eyebrow">{{ 'gift_cards.issued.subtext' | t }}</span>
+        </header>
+
+        <p class="gift-card__value h0">{{ gift_card.initial_value | money }}</p>
+
+        {%- if gift_card.balance != gift_card.initial_value -%}
+          <p class="text-small text-muted">
+            {{- 'gift_cards.issued.remaining_html' | t: balance: gift_card.balance | money -}}
+          </p>
+        {%- endif -%}
+
+        <div class="gift-card__qr">
+          <img
+            src="{{ gift_card.qr_identifier | image_url: width: 240, height: 240 }}"
+            alt="{{ 'gift_cards.issued.qr_image_alt' | t }}"
+            width="240"
+            height="240"
+            loading="lazy"
+          >
+        </div>
+
+        <div class="gift-card__code">
+          <span class="field__label">{{ 'gift_cards.issued.code' | t }}</span>
+          <button class="discount-code__button" type="button" data-copy="{{ gift_card.code }}">
+            <span class="discount-code__value">{{ gift_card.code | format_code }}</span>
+            <span class="visually-hidden">{{ 'gift_cards.issued.copy_code' | t }}</span>
+          </button>
+        </div>
+
+        {%- if gift_card.expires_on -%}
+          <p class="text-tiny text-muted">
+            {{- 'gift_cards.issued.expires_on' | t: date: gift_card.expires_on | date: format: 'date' -}}
+          </p>
+        {%- endif -%}
+
+        <div class="gift-card__actions">
+          <a class="button" href="{{ shop.url }}">{{ 'gift_cards.issued.shop_link' | t }}</a>
+          <button class="button button--secondary no-print" type="button" onclick="window.print()">
+            {{ 'gift_cards.issued.print' | t }}
+          </button>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,64 @@
+{%- style -%}
+  {%- render 'section-styles', section_id: section.id, s: section.settings -%}
+{%- endstyle -%}
+
+<div class="section-wrapper color-{{ section.settings.color_scheme }}">
+  <div class="section">
+    <div class="page-width page-width--narrow">
+      <div class="account-form">
+        <h1 class="h3">{{ 'customer.register.title' | t }}</h1>
+        {%- form 'create_customer' -%}
+          {%- if form.errors -%}
+            <p class="form-status form-status--error" tabindex="-1">{{ form.errors.messages.form }}</p>
+          {%- endif -%}
+          <div class="account-form__row">
+            <div class="field">
+              <label class="field__label" for="RegisterFirstName">{{ 'customer.register.first_name' | t }}</label>
+              <input id="RegisterFirstName" type="text" name="customer[first_name]" autocomplete="given-name">
+            </div>
+            <div class="field">
+              <label class="field__label" for="RegisterLastName">{{ 'customer.register.last_name' | t }}</label>
+              <input id="RegisterLastName" type="text" name="customer[last_name]" autocomplete="family-name">
+            </div>
+          </div>
+          <div class="field">
+            <label class="field__label" for="RegisterEmail">{{ 'customer.register.email' | t }}</label>
+            <input id="RegisterEmail" type="email" name="customer[email]" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label class="field__label" for="RegisterPassword">{{ 'customer.register.password' | t }}</label>
+            <input id="RegisterPassword" type="password" name="customer[password]" autocomplete="new-password" required>
+          </div>
+          {%- if section.settings.show_newsletter_optin -%}
+            <label class="checkbox text-small">
+              <input type="checkbox" name="customer[accepts_marketing]" value="true">
+              <span>{{ section.settings.newsletter_label }}</span>
+            </label>
+          {%- endif -%}
+          <button type="submit" class="button button--full">{{ 'customer.register.submit' | t }}</button>
+        {%- endform -%}
+
+        <p class="text-small text-muted account-form__alt">
+          {{ 'customer.register.has_account' | t }}
+          <a class="link" href="{{ routes.account_login_url }}">{{ 'customer.register.login' | t }}</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Register",
+  "tag": "section",
+  "class": "section-main-register",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-1" },
+    { "type": "checkbox", "id": "show_newsletter_optin", "label": "Offer newsletter sign-up", "default": true },
+    { "type": "text", "id": "newsletter_label", "label": "Sign-up label", "default": "Email me new arrivals and offers" },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Top padding", "default": 64 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Bottom padding", "default": 64 }
+  ]
+}
+{% endschema %}

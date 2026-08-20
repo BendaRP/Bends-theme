@@ -1,0 +1,51 @@
+{%- comment -%}
+  The mobile navigation. Nested levels open as accordions so the whole tree is
+  reachable with a keyboard and a screen reader.
+
+  Accepts:
+  - menu: {Linklist}
+{%- endcomment -%}
+<ul class="mobile-menu">
+  {%- for link in menu.links -%}
+    <li class="mobile-menu__item">
+      {%- if link.links.size > 0 -%}
+        <details class="mobile-menu__details">
+          <summary class="mobile-menu__summary">
+            <span>{{ link.title }}</span>
+            {% render 'icon', icon: 'chevron-down', class: 'mobile-menu__chevron' %}
+          </summary>
+          <ul class="mobile-menu__sublist">
+            <li>
+              <a class="mobile-menu__link mobile-menu__link--all" href="{{ link.url }}">
+                {{ 'collections.general.view_all' | t }}
+              </a>
+            </li>
+            {%- for child in link.links -%}
+              <li>
+                {%- if child.links.size > 0 -%}
+                  <details class="mobile-menu__details mobile-menu__details--nested">
+                    <summary class="mobile-menu__summary mobile-menu__summary--nested">
+                      <span>{{ child.title }}</span>
+                      {% render 'icon', icon: 'chevron-down', class: 'mobile-menu__chevron' %}
+                    </summary>
+                    <ul class="mobile-menu__sublist">
+                      {%- for grandchild in child.links -%}
+                        <li><a class="mobile-menu__link" href="{{ grandchild.url }}">{{ grandchild.title }}</a></li>
+                      {%- endfor -%}
+                    </ul>
+                  </details>
+                {%- else -%}
+                  <a class="mobile-menu__link" href="{{ child.url }}">{{ child.title }}</a>
+                {%- endif -%}
+              </li>
+            {%- endfor -%}
+          </ul>
+        </details>
+      {%- else -%}
+        <a class="mobile-menu__link mobile-menu__link--top" href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>
+          {{ link.title }}
+        </a>
+      {%- endif -%}
+    </li>
+  {%- endfor -%}
+</ul>

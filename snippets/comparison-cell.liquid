@@ -1,0 +1,17 @@
+{%- comment -%}
+  One cell in a comparison table. A cell of "yes" or "no" becomes a tick or a
+  cross so the table scans at a glance; anything else prints as written.
+
+  Accepts:
+  - value: {String}
+{%- endcomment -%}
+{%- assign cell = value | strip | downcase -%}
+{%- if cell == 'yes' or cell == 'true' or cell == 'v' or cell == 'כן' -%}
+  {% render 'icon', icon: 'check', class: 'comparison-table__yes' %}
+  <span class="visually-hidden">{{ value | strip }}</span>
+{%- elsif cell == 'no' or cell == 'false' or cell == 'x' or cell == 'לא' -%}
+  {% render 'icon', icon: 'close', class: 'comparison-table__no' %}
+  <span class="visually-hidden">{{ value | strip }}</span>
+{%- else -%}
+  {{ value | strip }}
+{%- endif -%}

@@ -1,0 +1,41 @@
+{
+  "type": "header",
+  "name": "Header",
+  "sections": {
+    "announcement-bar": {
+      "type": "announcement-bar",
+      "blocks": {
+        "announcement-1": {
+          "type": "announcement",
+          "settings": {
+            "text": "Free shipping over 250",
+            "icon": "truck"
+          }
+        },
+        "announcement-2": {
+          "type": "announcement",
+          "settings": {
+            "text": "30-day returns, no questions",
+            "icon": "return"
+          }
+        }
+      },
+      "block_order": ["announcement-1", "announcement-2"],
+      "settings": {
+        "color_scheme": "scheme-3",
+        "autorotate": true,
+        "autorotate_speed": 5
+      }
+    },
+    "header": {
+      "type": "header",
+      "settings": {
+        "menu": "main-menu",
+        "layout": "logo_start",
+        "color_scheme": "scheme-1",
+        "sticky": true
+      }
+    }
+  },
+  "order": ["announcement-bar", "header"]
+}

@@ -1,0 +1,27 @@
+{%- comment -%}
+  One colour swatch. Uses the merchant's swatch value from the product option
+  when it exists, and falls back to reading the option name as a CSS colour.
+
+  Accepts:
+  - value:    {String} the option value
+  - swatch:   {Swatch} the option's swatch object when available
+  - selected: {Boolean}
+  - class:    {String}
+{%- endcomment -%}
+{%- liquid
+  assign swatch_style = ''
+  if swatch.image
+    assign swatch_url = swatch.image | image_url: width: 100
+    assign swatch_style = 'background-image:url(' | append: swatch_url | append: ')'
+  elsif swatch.color
+    assign swatch_style = 'background-color:' | append: swatch.color
+  else
+    assign fallback = value | handle | replace: '-', ''
+    assign swatch_style = 'background-color:' | append: fallback
+  endif
+-%}
+<span
+  class="swatch {{ class }}{% if selected %} swatch--selected{% endif %}"
+  style="{{ swatch_style }}"
+  title="{{ value | escape }}"
+></span>

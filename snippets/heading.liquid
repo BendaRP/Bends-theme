@@ -1,0 +1,34 @@
+{%- comment -%}
+  A section heading with the optional ink accent on its final word.
+
+  Accepts:
+  - text:    {String} the heading text
+  - size:    {String} h0 | h1 | h2 | h3 | h4
+  - tag:     {String} the HTML element to use
+  - ink:     {Boolean} underline the last word with the ink accent
+  - class:   {String} extra class names
+{%- endcomment -%}
+{%- liquid
+  assign heading_tag = tag | default: 'h2'
+  assign heading_size = size | default: 'h2'
+  assign heading_class = class | default: ''
+  assign words = text | split: ' '
+  assign word_count = words | size
+-%}
+{%- if text != blank -%}
+  <{{ heading_tag }} class="{{ heading_size }} {{ heading_class }}">
+    {%- if ink and word_count > 1 -%}
+      {%- for word in words -%}
+        {%- if forloop.last -%}
+          <span class="ink-accent">{{ word }}</span>
+        {%- else -%}
+          {{ word }}{{ ' ' }}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- elsif ink -%}
+      <span class="ink-accent">{{ text }}</span>
+    {%- else -%}
+      {{ text }}
+    {%- endif -%}
+  </{{ heading_tag }}>
+{%- endif -%}

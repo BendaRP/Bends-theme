@@ -1,0 +1,155 @@
+{%- comment -%}
+  The product card used by every grid in the theme.
+
+  Accepts:
+  - product:       {Product}
+  - index:         {Number} position in the grid, used to stagger the reveal
+  - image_ratio:   {String} overrides the theme setting
+  - show_quick_add:{Boolean} overrides the theme setting
+  - sizes:         {String} the sizes attribute for the image
+  - class:         {String} extra class names
+{%- endcomment -%}
+{%- liquid
+  assign card_ratio = image_ratio | default: settings.card_image_ratio
+  assign card_sizes = sizes | default: '(min-width: 990px) 25vw, (min-width: 750px) 33vw, 50vw'
+  assign delay = index | default: 0 | times: 1
+  assign quick_add = settings.card_show_quick_add
+  if show_quick_add != nil
+    assign quick_add = show_quick_add
+  endif
+  assign variant = product.selected_or_first_available_variant
+  assign second_image = product.images[1]
+-%}
+{%- if product == blank -%}
+  <div class="product-card product-card--placeholder {{ class }}">
+    <div class="frame" data-ratio="{{ card_ratio }}">
+      <div class="media-placeholder">{{ 'product-1' | placeholder_svg_tag }}</div>
+    </div>
+    <div class="product-card__info">
+      <p class="product-card__title">{{ 'onboarding.product_title' | t }}</p>
+      <div class="price"><span class="price__current">{{ 1999 | money }}</span></div>
+    </div>
+  </div>
+{%- else -%}
+  <div
+    class="product-card {{ class }}"
+    data-product-card
+    data-product-handle="{{ product.handle }}"
+    data-product-id="{{ product.id }}"
+    data-reveal
+    style="--reveal-delay: calc(var(--stagger) * {{ delay }});"
+  >
+    <div class="product-card__media">
+      <a class="product-card__link" href="{{ product.url }}" aria-label="{{ product.title | escape }}">
+        <div class="frame" data-ratio="{{ card_ratio }}">
+          {%- if product.featured_media -%}
+            {%- render 'responsive-image',
+              image: product.featured_media.preview_image,
+              sizes: card_sizes,
+              class: 'product-card__image product-card__image--primary'
+            -%}
+            {%- if settings.card_show_second_image and second_image -%}
+              {%- render 'responsive-image',
+                image: second_image,
+                sizes: card_sizes,
+                class: 'product-card__image product-card__image--secondary'
+              -%}
+            {%- endif -%}
+          {%- else -%}
+            <div class="media-placeholder">{{ 'product-1' | placeholder_svg_tag }}</div>
+          {%- endif -%}
+        </div>
+      </a>
+
+      {%- render 'product-badges', product: product -%}
+
+      {%- if settings.card_show_wishlist -%}
+        <div class="product-card__wishlist">
+          {%- render 'wishlist-button', product: product -%}
+        </div>
+      {%- endif -%}
+
+      {%- if quick_add or settings.card_show_quick_view -%}
+        <div class="product-card__actions">
+          {%- if settings.card_show_quick_view -%}
+            <button
+              type="button"
+              class="button button--secondary button--small product-card__quick-view"
+              data-quick-view
+              data-product-url="{{ product.url }}"
+              aria-haspopup="dialog"
+            >
+              {% render 'icon', icon: 'eye' %}
+              <span>{{ 'products.product.quick_view' | t }}</span>
+            </button>
+          {%- endif -%}
+
+          {%- if quick_add -%}
+            {%- if product.available == false -%}
+              <button type="button" class="button button--small product-card__quick-add" disabled>
+                {{ 'products.product.sold_out' | t }}
+              </button>
+            {%- elsif product.has_only_default_variant -%}
+              <product-quick-add class="product-card__quick-add-wrapper">
+                <form action="{{ routes.cart_add_url }}" method="post" data-quick-add-form>
+                  <input type="hidden" name="id" value="{{ variant.id }}">
+                  <input type="hidden" name="quantity" value="1">
+                  <button type="submit" class="button button--small button--full product-card__quick-add">
+                    {% render 'icon', icon: 'plus' %}
+                    <span>{{ 'products.product.quick_add' | t }}</span>
+                  </button>
+                </form>
+              </product-quick-add>
+            {%- else -%}
+              <button
+                type="button"
+                class="button button--small product-card__quick-add"
+                data-quick-view
+                data-product-url="{{ product.url }}"
+                aria-haspopup="dialog"
+              >
+                {% render 'icon', icon: 'plus' %}
+                <span>{{ 'products.product.choose_options' | t }}</span>
+              </button>
+            {%- endif -%}
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="product-card__info">
+      {%- if settings.card_show_vendor and product.vendor != blank -%}
+        <span class="product-card__vendor eyebrow">{{ product.vendor }}</span>
+      {%- endif -%}
+
+      <a class="product-card__title-link" href="{{ product.url }}">
+        <span class="product-card__title">{{ product.title }}</span>
+      </a>
+
+      {%- if settings.card_show_rating -%}
+        {%- render 'rating', product: product, show_count: true, class: 'product-card__rating' -%}
+      {%- endif -%}
+
+      {%- render 'price', target: product, show_savings: true, show_from: true, class: 'product-card__price' -%}
+
+      {%- if settings.card_show_swatches -%}
+        {%- for option in product.options_with_values -%}
+          {%- assign option_name = option.name | downcase -%}
+          {%- if option_name contains 'color' or option_name contains 'colour' or option_name contains 'צבע' -%}
+            <div class="product-card__swatches" aria-label="{{ option.name | escape }}">
+              {%- for value in option.values limit: settings.card_swatch_limit -%}
+                {%- render 'color-swatch', value: value, swatch: value.swatch -%}
+              {%- endfor -%}
+              {%- assign value_count = option.values | size -%}
+              {%- if value_count > settings.card_swatch_limit -%}
+                {%- assign remainder = value_count | minus: settings.card_swatch_limit -%}
+                <span class="product-card__swatch-more text-tiny text-muted">+{{ remainder }}</span>
+              {%- endif -%}
+            </div>
+            {%- break -%}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+  </div>
+{%- endif -%}

@@ -1,0 +1,128 @@
+{%- comment -%}
+  A floating panel of display aids. Real accessibility lives in the markup —
+  this sits on top of semantic HTML, keyboard navigation and visible focus,
+  it does not replace them, and it is not a substitute for an audit.
+{%- endcomment -%}
+{%- if settings.accessibility_widget_enabled -%}
+  <accessibility-tools class="a11y-tools a11y-tools--{{ settings.accessibility_widget_position }}">
+    <button
+      class="a11y-tools__trigger"
+      type="button"
+      data-a11y-toggle
+      aria-expanded="false"
+      aria-controls="AccessibilityPanel"
+      aria-label="{{ 'compliance.accessibility.open' | t }}"
+    >
+      {% render 'icon', icon: 'accessibility', class: 'icon--large' %}
+    </button>
+
+    <div
+      class="a11y-tools__panel color-{{ section.settings.color_scheme }}"
+      id="AccessibilityPanel"
+      role="dialog"
+      aria-label="{{ 'compliance.accessibility.title' | t }}"
+      hidden
+    >
+      <div class="a11y-tools__head">
+        <h2 class="h6">{{ 'compliance.accessibility.title' | t }}</h2>
+        <button class="tap-target" type="button" data-a11y-close aria-label="{{ 'general.close' | t }}">
+          {% render 'icon', icon: 'close' %}
+        </button>
+      </div>
+
+      <div class="a11y-tools__group">
+        <span class="eyebrow">{{ 'compliance.accessibility.text_size' | t }}</span>
+        <div class="a11y-tools__row">
+          <button class="a11y-tools__button" type="button" data-a11y-text="down" aria-label="{{ 'compliance.accessibility.decrease_text' | t }}">
+            {% render 'icon', icon: 'minus' %}
+          </button>
+          <span class="a11y-tools__value" data-a11y-text-value>100%</span>
+          <button class="a11y-tools__button" type="button" data-a11y-text="up" aria-label="{{ 'compliance.accessibility.increase_text' | t }}">
+            {% render 'icon', icon: 'plus' %}
+          </button>
+        </div>
+      </div>
+
+      <ul class="a11y-tools__options">
+        <li>
+          <button class="a11y-tools__option" type="button" data-a11y-toggle-class="a11y-contrast" aria-pressed="false">
+            {% render 'icon', icon: 'contrast' %}
+            <span>{{ 'compliance.accessibility.contrast_high' | t }}</span>
+          </button>
+        </li>
+        <li>
+          <button class="a11y-tools__option" type="button" data-a11y-toggle-class="a11y-invert" aria-pressed="false">
+            {% render 'icon', icon: 'contrast' %}
+            <span>{{ 'compliance.accessibility.contrast_invert' | t }}</span>
+          </button>
+        </li>
+        <li>
+          <button class="a11y-tools__option" type="button" data-a11y-toggle-class="a11y-grayscale" aria-pressed="false">
+            {% render 'icon', icon: 'eye' %}
+            <span>{{ 'compliance.accessibility.grayscale' | t }}</span>
+          </button>
+        </li>
+        <li>
+          <button class="a11y-tools__option" type="button" data-a11y-toggle-class="a11y-links" aria-pressed="false">
+            {% render 'icon', icon: 'link' %}
+            <span>{{ 'compliance.accessibility.highlight_links' | t }}</span>
+          </button>
+        </li>
+        <li>
+          <button class="a11y-tools__option" type="button" data-a11y-toggle-class="a11y-readable" aria-pressed="false">
+            {% render 'icon', icon: 'text-size' %}
+            <span>{{ 'compliance.accessibility.readable_font' | t }}</span>
+          </button>
+        </li>
+        <li>
+          <button class="a11y-tools__option" type="button" data-a11y-motion aria-pressed="false">
+            {% render 'icon', icon: 'pause-circle' %}
+            <span>{{ 'compliance.accessibility.stop_animations' | t }}</span>
+          </button>
+        </li>
+        <li>
+          <button class="a11y-tools__option" type="button" data-a11y-toggle-class="a11y-cursor" aria-pressed="false">
+            {% render 'icon', icon: 'cursor' %}
+            <span>{{ 'compliance.accessibility.big_cursor' | t }}</span>
+          </button>
+        </li>
+        <li>
+          <button class="a11y-tools__option" type="button" data-a11y-guide aria-pressed="false">
+            {% render 'icon', icon: 'list' %}
+            <span>{{ 'compliance.accessibility.reading_guide' | t }}</span>
+          </button>
+        </li>
+      </ul>
+
+      <div class="a11y-tools__foot">
+        <button class="button button--secondary button--small button--full" type="button" data-a11y-reset>
+          {% render 'icon', icon: 'refresh' %}
+          <span>{{ 'compliance.accessibility.reset' | t }}</span>
+        </button>
+        {%- if settings.accessibility_statement_url != blank -%}
+          <a class="link text-tiny" href="{{ settings.accessibility_statement_url }}">
+            {{ 'compliance.accessibility.statement' | t }}
+          </a>
+        {%- endif -%}
+        {%- if settings.accessibility_contact != blank -%}
+          <p class="text-tiny text-muted">
+            {{- 'compliance.accessibility.coordinator' | t: contact: settings.accessibility_contact -}}
+          </p>
+        {%- endif -%}
+      </div>
+    </div>
+
+    <div class="a11y-reading-guide" data-a11y-reading-guide hidden></div>
+  </accessibility-tools>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Accessibility tools",
+  "settings": [
+    { "type": "paragraph", "content": "Turn this on and link your accessibility statement under Compliance in Theme settings. These are display aids on top of a keyboard-navigable, semantic storefront — they do not replace a real accessibility audit." },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-1" }
+  ],
+  "enabled_on": { "groups": ["overlay"] }
+}
+{% endschema %}

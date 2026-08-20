@@ -1,0 +1,107 @@
+{%- comment -%}
+  Progress towards free shipping, plus any extra reward milestones.
+  Amounts come from the theme settings; the discounts themselves are set up in
+  the Shopify admin, so the bar never promises something checkout won't honour.
+{%- endcomment -%}
+{%- if settings.cart_free_shipping_enabled -%}
+  {%- liquid
+    assign threshold_major = settings.cart_free_shipping_threshold | plus: 0
+    assign threshold = threshold_major | times: 100
+    assign milestones = threshold | append: ''
+    if settings.cart_milestones_enabled
+      assign m2 = settings.cart_milestone_2_amount | plus: 0 | times: 100
+      assign m3 = settings.cart_milestone_3_amount | plus: 0 | times: 100
+      if m2 > 0
+        assign milestones = milestones | append: ',' | append: m2
+      endif
+      if m3 > 0
+        assign milestones = milestones | append: ',' | append: m3
+      endif
+    endif
+    assign milestone_list = milestones | split: ','
+    assign top_target = milestone_list | last | plus: 0
+    assign progress = 0
+    if top_target > 0
+      assign progress = cart.total_price | times: 100.0 | divided_by: top_target
+      if progress > 100
+        assign progress = 100
+      endif
+    endif
+    assign remaining = threshold | minus: cart.total_price
+  -%}
+  {%- if threshold > 0 -%}
+    <div class="shipping-bar" data-shipping-bar data-threshold="{{ threshold }}" data-total="{{ cart.total_price }}">
+      <p class="shipping-bar__message text-small" data-shipping-message aria-live="polite">
+        {%- if remaining > 0 -%}
+          {%- assign remaining_money = remaining | money -%}
+          {{ 'cart.shipping.free_progress_html' | t: amount: remaining_money }}
+        {%- else -%}
+          {% render 'icon', icon: 'check-circle' %}
+          <span>{{ 'cart.shipping.free_unlocked' | t }}</span>
+        {%- endif -%}
+      </p>
+
+      <div
+        class="shipping-bar__track"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="{{ progress | round }}"
+        aria-label="{{ 'accessibility.progress_bar' | t }}"
+      >
+        <span class="shipping-bar__fill" data-shipping-fill style="--progress: {{ progress }}%;"></span>
+
+        {%- if settings.cart_milestones_enabled and milestone_list.size > 1 -%}
+          {%- for milestone in milestone_list -%}
+            {%- liquid
+              assign milestone_value = milestone | plus: 0
+              assign position = milestone_value | times: 100.0 | divided_by: top_target
+              assign reached = false
+              if cart.total_price >= milestone_value
+                assign reached = true
+              endif
+            -%}
+            <span
+              class="shipping-bar__milestone{% if reached %} is-reached{% endif %}"
+              style="--position: {{ position }}%;"
+              aria-hidden="true"
+            >
+              {%- if reached -%}
+                {% render 'icon', icon: 'check' %}
+              {%- else -%}
+                {% render 'icon', icon: 'gift' %}
+              {%- endif -%}
+            </span>
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+
+      {%- if settings.cart_milestones_enabled -%}
+        <ul class="shipping-bar__rewards text-tiny text-muted">
+          {%- if settings.cart_milestone_2_label != blank -%}
+            {%- assign m2_value = settings.cart_milestone_2_amount | plus: 0 | times: 100 -%}
+            <li class="{% if cart.total_price >= m2_value %}is-reached{% endif %}">
+              {%- if cart.total_price >= m2_value -%}
+                {{ 'cart.shipping.milestone_unlocked' | t: reward: settings.cart_milestone_2_label }}
+              {%- else -%}
+                {%- assign m2_remaining = m2_value | minus: cart.total_price | money -%}
+                {{ 'cart.shipping.milestone_progress_html' | t: amount: m2_remaining, reward: settings.cart_milestone_2_label }}
+              {%- endif -%}
+            </li>
+          {%- endif -%}
+          {%- if settings.cart_milestone_3_label != blank -%}
+            {%- assign m3_value = settings.cart_milestone_3_amount | plus: 0 | times: 100 -%}
+            <li class="{% if cart.total_price >= m3_value %}is-reached{% endif %}">
+              {%- if cart.total_price >= m3_value -%}
+                {{ 'cart.shipping.milestone_unlocked' | t: reward: settings.cart_milestone_3_label }}
+              {%- else -%}
+                {%- assign m3_remaining = m3_value | minus: cart.total_price | money -%}
+                {{ 'cart.shipping.milestone_progress_html' | t: amount: m3_remaining, reward: settings.cart_milestone_3_label }}
+              {%- endif -%}
+            </li>
+          {%- endif -%}
+        </ul>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+{%- endif -%}

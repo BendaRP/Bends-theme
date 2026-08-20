@@ -1,0 +1,39 @@
+{%- comment -%}
+  Renders one responsive image with width, height, srcset and lazy loading.
+
+  Accepts:
+  - image:      {Image} the image to render
+  - sizes:      {String} the sizes attribute (defaults to full viewport width)
+  - widths:     {String} comma-separated srcset widths
+  - max_width:  {Number} largest width to request from the CDN
+  - alt:        {String} overrides the image alt text
+  - class:      {String} extra class names
+  - priority:   {Boolean} true for above-the-fold images, which skips lazy loading
+{%- endcomment -%}
+{%- liquid
+  assign img_widths = widths | default: '246,366,534,720,900,1080,1296,1512,1728,2048'
+  assign img_sizes = sizes | default: '100vw'
+  assign img_max = max_width | default: 2048
+  assign img_class = class | default: ''
+  assign img_alt = alt | default: image.alt | escape
+  assign img_loading = 'lazy'
+  assign img_fetchpriority = 'auto'
+  if priority
+    assign img_loading = 'eager'
+    assign img_fetchpriority = 'high'
+  endif
+-%}
+{%- if image != blank -%}
+  {{
+    image
+    | image_url: width: img_max
+    | image_tag:
+      loading: img_loading,
+      fetchpriority: img_fetchpriority,
+      decoding: 'async',
+      widths: img_widths,
+      sizes: img_sizes,
+      alt: img_alt,
+      class: img_class
+  }}
+{%- endif -%}

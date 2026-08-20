@@ -1,0 +1,44 @@
+{%- comment -%}
+  The product view rendered inside the quick view dialog. Fetched by JS with
+  ?section_id=quick-view-product, so it stays in step with the real product page.
+{%- endcomment -%}
+<div class="quick-view-product" data-quick-view-content>
+  <div class="quick-view-product__media">
+    {%- render 'product-gallery', product: product, compact: true -%}
+  </div>
+  <div class="quick-view-product__info">
+    {%- render 'product-badges', product: product, position: 'top-start' -%}
+    <h2 class="h4">{{ product.title }}</h2>
+    {%- render 'rating', product: product, show_count: true -%}
+    {%- render 'price', target: product.selected_or_first_available_variant, show_savings: true, class: 'price--large' -%}
+    {%- render 'variant-picker', product: product, block: section, context: 'quick_view' -%}
+    {%- render 'buy-buttons', product: product, block: section, context: 'quick_view' -%}
+    {%- if product.description != blank -%}
+      <div class="rte text-small quick-view-product__excerpt">
+        {{ product.description | strip_html | truncate: 220 }}
+      </div>
+    {%- endif -%}
+    <a class="link text-small" href="{{ product.url }}">{{ 'products.product.view_full_details' | t }}</a>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Quick view product",
+  "settings": [
+    { "type": "checkbox", "id": "show_dynamic_checkout", "label": "Show the dynamic checkout buttons", "default": false },
+    { "type": "checkbox", "id": "show_wishlist", "label": "Show the wishlist button", "default": true },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "Variant picker style",
+      "options": [
+        { "value": "swatches", "label": "Swatches and buttons" },
+        { "value": "buttons", "label": "Buttons" },
+        { "value": "dropdown", "label": "Dropdowns" }
+      ],
+      "default": "swatches"
+    }
+  ]
+}
+{% endschema %}

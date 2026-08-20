@@ -1,0 +1,12 @@
+{
+  "type": "overlay",
+  "name": "Overlays and widgets",
+  "sections": {
+    "cart-drawer": { "type": "cart-drawer", "settings": {} },
+    "quick-view": { "type": "quick-view", "settings": {} },
+    "cookie-banner": { "type": "cookie-banner", "settings": {} },
+    "accessibility-widget": { "type": "accessibility-widget", "settings": {} },
+    "back-to-top": { "type": "back-to-top", "settings": {} }
+  },
+  "order": ["cart-drawer", "quick-view", "cookie-banner", "accessibility-widget", "back-to-top"]
+}

@@ -1,0 +1,237 @@
+{%- liquid
+  assign menu = section.settings.menu
+  assign sticky_class = ''
+  if section.settings.sticky
+    assign sticky_class = ' header--sticky'
+  endif
+  assign transparent = false
+  if section.settings.transparent_on_home and request.page_type == 'index'
+    assign transparent = true
+  endif
+  assign header_logo = settings.logo
+  if transparent and settings.logo_inverted != blank
+    assign header_logo = settings.logo_inverted
+  endif
+-%}
+
+{%- style -%}
+  {%- render 'section-styles', section_id: section.id, s: section.settings -%}
+  #shopify-section-{{ section.id }} {
+    --header-logo-width: {{ settings.logo_width_mobile }}px;
+  }
+  @media screen and (min-width: 990px) {
+    #shopify-section-{{ section.id }} {
+      --header-logo-width: {{ settings.logo_width }}px;
+    }
+  }
+{%- endstyle -%}
+
+<site-header
+  class="header-wrapper{{ sticky_class }}{% if transparent %} header--transparent{% endif %} color-{{ section.settings.color_scheme }}"
+  data-sticky="{{ section.settings.sticky }}"
+  data-reveal-on-scroll="{{ settings.animation_sticky_reveal }}"
+>
+  <header class="header header--{{ section.settings.layout }} page-width" role="banner">
+    <button
+      class="header__action header__menu-toggle hide-desktop"
+      type="button"
+      data-menu-toggle
+      aria-expanded="false"
+      aria-controls="MobileNav-{{ section.id }}"
+      aria-label="{{ 'accessibility.open_menu' | t }}"
+    >
+      {% render 'icon', icon: 'menu', class: 'icon--large' %}
+    </button>
+
+    {%- if section.settings.layout == 'logo_center' -%}
+      <nav class="header__nav header__nav--start hide-mobile" aria-label="{{ 'sections.header.menu' | t }}">
+        {%- render 'header-menu', menu: menu, blocks: section.blocks, section_id: section.id, split: 'first' -%}
+      </nav>
+    {%- endif -%}
+
+    <div class="header__brand">
+      {%- if request.page_type == 'index' -%}
+        <h1 class="header__logo">
+      {%- else -%}
+        <div class="header__logo">
+      {%- endif -%}
+      <a href="{{ routes.root_url }}" class="header__logo-link">
+        {%- if header_logo != blank -%}
+          {%- render 'responsive-image',
+            image: header_logo,
+            widths: '120,180,260,360,520',
+            sizes: 'var(--header-logo-width)',
+            max_width: 520,
+            alt: shop.name,
+            class: 'header__logo-image',
+            priority: true
+          -%}
+        {%- else -%}
+          <span class="header__logo-text h4">{{ shop.name }}</span>
+        {%- endif -%}
+      </a>
+      {%- if request.page_type == 'index' -%}
+        </h1>
+      {%- else -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- if section.settings.layout == 'logo_center' -%}
+      <nav class="header__nav header__nav--end hide-mobile" aria-label="{{ 'sections.header.menu' | t }}">
+        {%- render 'header-menu', menu: menu, blocks: section.blocks, section_id: section.id, split: 'second' -%}
+      </nav>
+    {%- else -%}
+      <nav class="header__nav hide-mobile" aria-label="{{ 'sections.header.menu' | t }}">
+        {%- render 'header-menu', menu: menu, blocks: section.blocks, section_id: section.id, split: 'all' -%}
+      </nav>
+    {%- endif -%}
+
+    <div class="header__actions">
+      {%- if section.settings.show_localization -%}
+        {%- render 'localization-form', context: 'header', class: 'localization--header hide-mobile' -%}
+      {%- endif -%}
+
+      {%- if section.settings.show_search -%}
+        <button
+          class="header__action"
+          type="button"
+          data-search-toggle
+          aria-expanded="false"
+          aria-controls="SearchPanel-{{ section.id }}"
+          aria-label="{{ 'sections.header.search' | t }}"
+        >
+          {% render 'icon', icon: 'search', class: 'icon--large' %}
+        </button>
+      {%- endif -%}
+
+      {%- if section.settings.show_account and shop.customer_accounts_enabled -%}
+        <a
+          class="header__action hide-mobile"
+          href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}"
+          aria-label="{{ 'sections.header.account' | t }}"
+        >
+          {% render 'icon', icon: 'user', class: 'icon--large' %}
+        </a>
+      {%- endif -%}
+
+      {%- if section.settings.show_wishlist and settings.wishlist_enabled -%}
+        <a
+          class="header__action header__wishlist"
+          href="{{ settings.wishlist_page | default: routes.root_url }}"
+          aria-label="{{ 'sections.header.wishlist' | t }}"
+        >
+          {% render 'icon', icon: 'heart', class: 'icon--large' %}
+          <span class="header__badge" data-wishlist-count hidden>0</span>
+        </a>
+      {%- endif -%}
+
+      {%- render 'cart-count' -%}
+    </div>
+  </header>
+
+  {%- if section.settings.show_search -%}
+    <div class="header__search-panel" id="SearchPanel-{{ section.id }}" data-search-panel hidden>
+      <div class="page-width">
+        {%- render 'predictive-search', context: 'header' -%}
+      </div>
+    </div>
+  {%- endif -%}
+
+  <div class="mobile-nav" id="MobileNav-{{ section.id }}" data-mobile-nav hidden>
+    <div class="mobile-nav__panel color-{{ section.settings.color_scheme }}">
+      <div class="mobile-nav__head">
+        <span class="eyebrow">{{ 'sections.header.menu' | t }}</span>
+        <button
+          class="mobile-nav__close tap-target"
+          type="button"
+          data-menu-close
+          aria-label="{{ 'accessibility.close_menu' | t }}"
+        >
+          {% render 'icon', icon: 'close', class: 'icon--large' %}
+        </button>
+      </div>
+
+      <nav class="mobile-nav__body" aria-label="{{ 'sections.header.menu' | t }}">
+        {%- render 'mobile-menu', menu: menu -%}
+      </nav>
+
+      <div class="mobile-nav__foot">
+        {%- if section.settings.show_account and shop.customer_accounts_enabled -%}
+          <a class="mobile-nav__link" href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}">
+            {% render 'icon', icon: 'user' %}
+            <span>{% if customer %}{{ 'customer.account.title' | t }}{% else %}{{ 'customer.log_in' | t }}{% endif %}</span>
+          </a>
+        {%- endif -%}
+        {%- if section.settings.show_localization -%}
+          {%- render 'localization-form', context: 'mobile', class: 'localization--mobile' -%}
+        {%- endif -%}
+      </div>
+    </div>
+    <button class="mobile-nav__scrim" type="button" data-menu-close tabindex="-1" aria-hidden="true"></button>
+  </div>
+</site-header>
+
+{% schema %}
+{
+  "name": "Header",
+  "class": "section-header",
+  "tag": "section",
+  "settings": [
+    { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        { "value": "logo_start", "label": "Logo at the start, menu beside it" },
+        { "value": "logo_center", "label": "Logo centred, menu split either side" },
+        { "value": "logo_stacked", "label": "Logo above a centred menu" }
+      ],
+      "default": "logo_start"
+    },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-1" },
+    { "type": "checkbox", "id": "sticky", "label": "Keep the header visible while scrolling", "default": true },
+    { "type": "checkbox", "id": "transparent_on_home", "label": "Sit the header over the first section on the home page", "default": false, "info": "Pairs with a full-bleed hero. Set a logo for dark backgrounds in the Brand settings." },
+    { "type": "header", "content": "Actions" },
+    { "type": "checkbox", "id": "show_search", "label": "Show search", "default": true },
+    { "type": "checkbox", "id": "show_account", "label": "Show the account link", "default": true },
+    { "type": "checkbox", "id": "show_wishlist", "label": "Show the wishlist link", "default": true },
+    { "type": "checkbox", "id": "show_localization", "label": "Show the country and language pickers", "default": true },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 48, "step": 2, "unit": "px", "label": "Top padding", "default": 14 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 48, "step": 2, "unit": "px", "label": "Bottom padding", "default": 14 }
+  ],
+  "blocks": [
+    {
+      "type": "mega_menu",
+      "name": "Mega menu",
+      "limit": 8,
+      "settings": [
+        { "type": "text", "id": "menu_item", "label": "Menu item", "info": "Type the exact wording of the top-level menu item this panel belongs to." },
+        { "type": "link_list", "id": "menu", "label": "Columns", "info": "Each top-level link in this menu becomes a column." },
+        {
+          "type": "select",
+          "id": "columns",
+          "label": "Columns",
+          "options": [
+            { "value": "2", "label": "2" },
+            { "value": "3", "label": "3" },
+            { "value": "4", "label": "4" },
+            { "value": "5", "label": "5" }
+          ],
+          "default": "4"
+        },
+        { "type": "header", "content": "Feature" },
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "heading", "label": "Heading" },
+        { "type": "text", "id": "text", "label": "Text" },
+        { "type": "text", "id": "link_label", "label": "Link label" },
+        { "type": "url", "id": "link", "label": "Link" },
+        { "type": "product", "id": "featured_product", "label": "Featured product", "info": "Shown beside the columns. Leave empty to show only the image." }
+      ]
+    }
+  ],
+  "enabled_on": { "groups": ["header"] }
+}
+{% endschema %}

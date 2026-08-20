@@ -1,0 +1,91 @@
+{%- style -%}
+  {%- render 'section-styles', section_id: section.id, s: section.settings -%}
+  #shopify-section-{{ section.id }} { --grid-mobile: {{ section.settings.columns_mobile }}; }
+{%- endstyle -%}
+
+<div class="section-wrapper color-{{ section.settings.color_scheme }}">
+  <div class="section">
+    <div class="page-width">
+      {%- render 'heading', text: page_title, tag: 'h1', size: 'h1', ink: section.settings.ink_heading -%}
+
+      {%- liquid
+        assign collection_list = collections
+        if section.settings.source == 'selected' and section.settings.collections != blank
+          assign collection_list = section.settings.collections
+        endif
+      -%}
+
+      <div class="grid grid--{{ section.settings.columns }}{% if section.settings.offset_grid %} grid--offset{% endif %}">
+        {%- for list_collection in collection_list -%}
+          {%- render 'collection-card',
+            collection: list_collection,
+            index: forloop.index0,
+            show_count: section.settings.show_count,
+            ratio: section.settings.image_ratio
+          -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Collections list",
+  "tag": "section",
+  "class": "section-main-list-collections",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-1" },
+    { "type": "checkbox", "id": "ink_heading", "label": "Underline the last word with the ink accent", "default": true },
+    {
+      "type": "select",
+      "id": "source",
+      "label": "Collections shown",
+      "options": [
+        { "value": "all", "label": "All collections" },
+        { "value": "selected", "label": "Only the ones I choose" }
+      ],
+      "default": "all"
+    },
+    { "type": "collection_list", "id": "collections", "label": "Collections", "limit": 24, "info": "Used when the setting above is set to only the ones I choose." },
+    { "type": "checkbox", "id": "show_count", "label": "Show the product count", "default": true },
+    { "type": "checkbox", "id": "offset_grid", "label": "Stagger alternate cards", "default": true },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Image ratio",
+      "options": [
+        { "value": "square", "label": "Square" },
+        { "value": "portrait", "label": "Portrait" },
+        { "value": "landscape", "label": "Landscape" },
+        { "value": "tall", "label": "Tall" }
+      ],
+      "default": "portrait"
+    },
+    {
+      "type": "select",
+      "id": "columns",
+      "label": "Columns",
+      "options": [
+        { "value": "2", "label": "2" },
+        { "value": "3", "label": "3" },
+        { "value": "4", "label": "4" }
+      ],
+      "default": "3"
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Columns on mobile",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "2"
+    },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Top padding", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Bottom padding", "default": 64 }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,18 @@
+{%- comment -%}
+  The cart icon with its live item count.
+{%- endcomment -%}
+<a
+  class="header__action header__cart"
+  href="{{ routes.cart_url }}"
+  data-cart-trigger
+  aria-label="{{ 'cart.general.count_label' | t: count: cart.item_count }}"
+>
+  {%- if settings.cart_icon == 'text' -%}
+    <span class="header__action-text">{{ 'sections.header.cart' | t }}</span>
+  {%- else -%}
+    {% render 'icon', icon: settings.cart_icon, class: 'icon--large' %}
+  {%- endif -%}
+  <span class="header__cart-count{% if cart.item_count == 0 %} is-empty{% endif %}" data-cart-count>
+    {{- cart.item_count -}}
+  </span>
+</a>

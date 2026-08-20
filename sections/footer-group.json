@@ -1,0 +1,29 @@
+{
+  "type": "footer",
+  "name": "Footer",
+  "sections": {
+    "trust-bar": {
+      "type": "icon-bar",
+      "blocks": {
+        "icon-1": { "type": "item", "settings": { "icon": "truck", "heading": "Fast delivery", "text": "Dispatched within one working day" } },
+        "icon-2": { "type": "item", "settings": { "icon": "return", "heading": "Easy returns", "text": "30 days to change your mind" } },
+        "icon-3": { "type": "item", "settings": { "icon": "shield-check", "heading": "Secure payment", "text": "Encrypted from cart to checkout" } },
+        "icon-4": { "type": "item", "settings": { "icon": "chat", "heading": "Real people", "text": "We answer every message" } }
+      },
+      "block_order": ["icon-1", "icon-2", "icon-3", "icon-4"],
+      "settings": { "color_scheme": "scheme-2" }
+    },
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "brand": { "type": "brand", "settings": {} },
+        "menu": { "type": "menu", "settings": { "heading": "Shop" } },
+        "help": { "type": "text", "settings": { "heading": "Help" } },
+        "newsletter": { "type": "newsletter", "settings": {} }
+      },
+      "block_order": ["brand", "menu", "help", "newsletter"],
+      "settings": { "color_scheme": "scheme-3" }
+    }
+  },
+  "order": ["trust-bar", "footer"]
+}

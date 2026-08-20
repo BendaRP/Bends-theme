@@ -1,0 +1,55 @@
+{%- comment -%}
+  Share links, with the device share sheet where the browser offers one.
+
+  Accepts:
+  - share_url:   {String} path to share
+  - share_title: {String}
+  - context:     {String} keeps ids unique
+{%- endcomment -%}
+{%- if settings.share_enabled -%}
+  {%- liquid
+    assign full_url = shop.url | append: share_url
+    assign encoded_url = full_url | url_encode
+    assign encoded_title = share_title | url_encode
+  -%}
+  <share-buttons class="share" data-share data-url="{{ full_url }}" data-title="{{ share_title | escape }}" data-native="{{ settings.share_native }}">
+    <span class="field__label">{{ 'general.share.title' | t }}</span>
+    <ul class="share__list">
+      <li>
+        <a class="share__link tap-target" href="https://api.whatsapp.com/send?text={{ encoded_title }}%20{{ encoded_url }}" target="_blank" rel="noopener" aria-label="{{ 'general.share.share_on' | t: platform: 'WhatsApp' }}">
+          {% render 'icon', icon: 'whatsapp' %}
+        </a>
+      </li>
+      <li>
+        <a class="share__link tap-target" href="https://www.facebook.com/sharer/sharer.php?u={{ encoded_url }}" target="_blank" rel="noopener" aria-label="{{ 'general.share.share_on' | t: platform: 'Facebook' }}">
+          {% render 'icon', icon: 'facebook' %}
+        </a>
+      </li>
+      <li>
+        <a class="share__link tap-target" href="https://twitter.com/intent/tweet?url={{ encoded_url }}&text={{ encoded_title }}" target="_blank" rel="noopener" aria-label="{{ 'general.share.share_on' | t: platform: 'X' }}">
+          {% render 'icon', icon: 'x-social' %}
+        </a>
+      </li>
+      <li>
+        <a class="share__link tap-target" href="https://pinterest.com/pin/create/button/?url={{ encoded_url }}&description={{ encoded_title }}" target="_blank" rel="noopener" aria-label="{{ 'general.share.share_on' | t: platform: 'Pinterest' }}">
+          {% render 'icon', icon: 'pinterest' %}
+        </a>
+      </li>
+      <li>
+        <a class="share__link tap-target" href="mailto:?subject={{ encoded_title }}&body={{ encoded_url }}" aria-label="{{ 'general.share.share_on' | t: platform: 'Email' }}">
+          {% render 'icon', icon: 'mail' %}
+        </a>
+      </li>
+      <li>
+        <button class="share__link tap-target" type="button" data-copy="{{ full_url }}" aria-label="{{ 'general.share.copy_link' | t }}">
+          {% render 'icon', icon: 'link' %}
+        </button>
+      </li>
+      <li class="share__native" hidden>
+        <button class="share__link tap-target" type="button" data-share-native aria-label="{{ 'general.share.title' | t }}">
+          {% render 'icon', icon: 'share' %}
+        </button>
+      </li>
+    </ul>
+  </share-buttons>
+{%- endif -%}

@@ -1,0 +1,44 @@
+{%- style -%}
+  {%- render 'section-styles', section_id: section.id, s: section.settings -%}
+{%- endstyle -%}
+
+<div class="section-wrapper color-{{ section.settings.color_scheme }}">
+  <div class="section">
+    <div class="page-width page-width--narrow">
+      <div class="account-form">
+        <h1 class="h3">{{ 'customer.activate_account.title' | t }}</h1>
+        <p class="text-muted">{{ 'customer.activate_account.subtext' | t }}</p>
+
+        {%- form 'activate_customer_password' -%}
+          {%- if form.errors -%}
+            <p class="form-status form-status--error" tabindex="-1">{{ form.errors.messages.form }}</p>
+          {%- endif -%}
+          <div class="field">
+            <label class="field__label" for="ActivatePassword">{{ 'customer.activate_account.password' | t }}</label>
+            <input id="ActivatePassword" type="password" name="customer[password]" autocomplete="new-password" required>
+          </div>
+          <div class="field">
+            <label class="field__label" for="ActivatePasswordConfirm">{{ 'customer.activate_account.password_confirm' | t }}</label>
+            <input id="ActivatePasswordConfirm" type="password" name="customer[password_confirmation]" autocomplete="new-password" required>
+          </div>
+          <button type="submit" class="button button--full">{{ 'customer.activate_account.submit' | t }}</button>
+          <button type="submit" name="decline" class="button button--link button--full">
+            {{ 'customer.activate_account.decline' | t }}
+          </button>
+        {%- endform -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Activate account",
+  "tag": "section",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-1" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Top padding", "default": 64 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Bottom padding", "default": 64 }
+  ]
+}
+{% endschema %}

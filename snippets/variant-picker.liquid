@@ -1,0 +1,116 @@
+{%- comment -%}
+  Variant selection. Swatches for colour-like options, buttons or dropdowns for
+  the rest. Combinations that don't exist are struck through rather than hidden
+  by default, so shoppers can still see the full range and ask to be told when
+  stock returns.
+
+  Accepts:
+  - product: {Product}
+  - block:   {Object}
+  - context: {String} main | quick_view
+{%- endcomment -%}
+{%- liquid
+  assign picker_style = block.settings.style | default: settings.variant_picker_style
+  assign form_id = 'product-form-' | append: product.id | append: '-' | append: context
+-%}
+{%- unless product.has_only_default_variant -%}
+  <variant-picker
+    class="variant-picker"
+    data-picker-style="{{ picker_style }}"
+    data-url="{{ product.url }}"
+    data-update-url="{{ settings.variant_update_url }}"
+    data-hide-unavailable="{{ settings.variant_hide_unavailable }}"
+    data-form="{{ form_id }}"
+  >
+    {%- for option in product.options_with_values -%}
+      {%- liquid
+        assign option_name = option.name | downcase
+        assign is_colour = false
+        if option_name contains 'color' or option_name contains 'colour' or option_name contains 'צבע'
+          assign is_colour = true
+        endif
+        assign use_swatches = false
+        if picker_style == 'swatches' and is_colour
+          assign use_swatches = true
+        endif
+        assign option_index = forloop.index
+      -%}
+      <div class="variant-picker__option" data-option-index="{{ option_index }}">
+        <div class="variant-picker__label">
+          <span class="field__label">{{ option.name }}</span>
+          {%- if use_swatches or picker_style == 'buttons' -%}
+            <span class="variant-picker__value text-small" data-option-value="{{ option_index }}">
+              {{- option.selected_value -}}
+            </span>
+          {%- endif -%}
+        </div>
+
+        {%- if picker_style == 'dropdown' -%}
+          <label class="visually-hidden" for="option-{{ block.id }}-{{ option_index }}">{{ option.name }}</label>
+          <select
+            id="option-{{ block.id }}-{{ option_index }}"
+            class="variant-picker__select"
+            data-option-select
+            data-index="{{ option_index }}"
+          >
+            {%- for value in option.values -%}
+              <option value="{{ value | escape }}" {% if value == option.selected_value %}selected{% endif %}>
+                {{ value }}
+              </option>
+            {%- endfor -%}
+          </select>
+        {%- else -%}
+          <fieldset class="variant-picker__values{% if use_swatches %} variant-picker__values--swatches{% endif %}">
+            <legend class="visually-hidden">{{ option.name }}</legend>
+            {%- for value in option.values -%}
+              {%- liquid
+                assign input_id = 'option-' | append: block.id | append: '-' | append: option_index | append: '-' | append: forloop.index
+              -%}
+              <input
+                type="radio"
+                class="visually-hidden variant-picker__input"
+                id="{{ input_id }}"
+                name="option-{{ block.id }}-{{ option_index }}"
+                value="{{ value | escape }}"
+                data-option-input
+                data-index="{{ option_index }}"
+                {% if value == option.selected_value %}checked{% endif %}
+              >
+              <label
+                class="variant-picker__button{% if use_swatches %} variant-picker__button--swatch{% endif %}"
+                for="{{ input_id }}"
+                data-option-label="{{ value | escape }}"
+              >
+                {%- if use_swatches -%}
+                  {%- render 'color-swatch', value: value, swatch: value.swatch -%}
+                  <span class="visually-hidden">{{ value }}</span>
+                {%- else -%}
+                  <span>{{ value }}</span>
+                {%- endif -%}
+              </label>
+            {%- endfor -%}
+          </fieldset>
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+
+    <script type="application/json" data-variant-data>
+      [
+        {%- for variant in product.variants -%}
+          {
+            "id": {{ variant.id }},
+            "available": {{ variant.available | json }},
+            "options": {{ variant.options | json }},
+            "price": {{ variant.price }},
+            "compare_at_price": {{ variant.compare_at_price | default: 0 }},
+            "sku": {{ variant.sku | json }},
+            "inventory_quantity": {{ variant.inventory_quantity | default: 0 }},
+            "inventory_management": {{ variant.inventory_management | json }},
+            "featured_media_id": {{ variant.featured_media.id | default: 0 }},
+            "title": {{ variant.title | json }}
+          }{%- unless forloop.last -%},{%- endunless -%}
+        {%- endfor -%}
+      ]
+    </script>
+  </variant-picker>
+{%- endunless -%}

@@ -1,0 +1,29 @@
+{%- comment -%}
+  Emits the per-section CSS custom properties that the section settings drive:
+  padding, colour scheme, content width, background treatment and divider.
+
+  Accepts:
+  - section_id: {String} the section id, used to scope the rule
+  - s:          {Object} the settings object (section.settings or block.settings)
+{%- endcomment -%}
+{%- liquid
+  assign scope = '#shopify-section-' | append: section_id
+  assign pad_top = s.padding_top | default: 56
+  assign pad_bottom = s.padding_bottom | default: 56
+  assign pad_top_mobile = s.padding_top_mobile | default: pad_top
+  assign pad_bottom_mobile = s.padding_bottom_mobile | default: pad_bottom
+-%}
+{{ scope }} .section {
+  --section-padding-block: 0;
+  padding-block-start: calc({{ pad_top_mobile }}px * var(--spacing-scale));
+  padding-block-end: calc({{ pad_bottom_mobile }}px * var(--spacing-scale));
+}
+@media screen and (min-width: 750px) {
+  {{ scope }} .section {
+    padding-block-start: calc({{ pad_top }}px * var(--spacing-scale));
+    padding-block-end: calc({{ pad_bottom }}px * var(--spacing-scale));
+  }
+}
+{%- if s.color_scheme_gradient -%}
+  {{ scope }} .section-wrapper { background-image: var(--gradient-background); }
+{%- endif -%}

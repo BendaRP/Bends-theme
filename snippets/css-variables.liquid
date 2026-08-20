@@ -1,0 +1,177 @@
+{%- comment -%}
+  Bridges the theme settings into CSS custom properties.
+
+  Everything visual in Bends reads from these tokens, which is what makes the
+  whole storefront respond to the theme editor without touching code.
+{%- endcomment -%}
+{%- liquid
+  assign heading_font = settings.type_heading_font
+  assign body_font = settings.type_body_font
+  assign body_bold = body_font | font_modify: 'weight', 'bold'
+  assign body_italic = body_font | font_modify: 'style', 'italic'
+  assign body_bold_italic = body_bold | font_modify: 'style', 'italic'
+  assign heading_bold = heading_font | font_modify: 'weight', 'bolder'
+
+  assign spacing = settings.layout_spacing_scale | divided_by: 100.0
+  assign heading_scale = settings.type_heading_scale | divided_by: 100.0
+  assign body_scale = settings.type_body_scale | divided_by: 100.0
+  assign heading_tracking = settings.type_heading_tracking | divided_by: 100.0
+  assign body_tracking = settings.type_body_tracking | divided_by: 100.0
+  assign eyebrow_tracking = settings.type_eyebrow_tracking | divided_by: 100.0
+  assign button_tracking = settings.button_tracking | divided_by: 100.0
+  assign heading_line_height = settings.type_heading_line_height | divided_by: 100.0
+  assign body_line_height = settings.type_body_line_height | divided_by: 100.0
+  assign eyebrow_scale = settings.type_eyebrow_scale | divided_by: 100.0
+  assign shadow_alpha = settings.shadow_opacity | divided_by: 100.0
+  assign ink_alpha = settings.ink_opacity | divided_by: 100.0
+-%}
+{{ heading_font | font_face: font_display: 'swap' }}
+{{ heading_bold | font_face: font_display: 'swap' }}
+{{ body_font | font_face: font_display: 'swap' }}
+{{ body_bold | font_face: font_display: 'swap' }}
+{{ body_italic | font_face: font_display: 'swap' }}
+{{ body_bold_italic | font_face: font_display: 'swap' }}
+
+:root {
+  --font-heading-stack: {% if settings.type_heading_stack != blank %}{{ settings.type_heading_stack }}, {% endif %}{{ heading_font.family }}, {{ heading_font.fallback_families }};
+  --font-heading-weight: {{ settings.type_heading_weight }};
+  --font-heading-style: {{ heading_font.style }};
+  --font-body-stack: {% if settings.type_body_stack != blank %}{{ settings.type_body_stack }}, {% endif %}{{ body_font.family }}, {{ body_font.fallback_families }};
+  --font-body-weight: {{ body_font.weight }};
+  --font-body-style: {{ body_font.style }};
+  --font-body-weight-bold: {{ body_bold.weight | default: 700 }};
+
+  --type-scale-heading: {{ heading_scale }};
+  --type-scale-body: {{ body_scale }};
+  --type-tracking-heading: {{ heading_tracking }}em;
+  --type-tracking-body: {{ body_tracking }}em;
+  --type-tracking-eyebrow: {{ eyebrow_tracking }}em;
+  --type-tracking-button: {{ button_tracking }}em;
+  --type-leading-heading: {{ heading_line_height }};
+  --type-leading-body: {{ body_line_height }};
+  --type-transform-heading: {{ settings.type_heading_transform }};
+  --type-transform-eyebrow: {{ settings.type_eyebrow_transform }};
+  --type-transform-button: {{ settings.button_transform }};
+  --type-size-eyebrow: {{ eyebrow_scale }};
+
+  --page-width: {{ settings.layout_page_width }}px;
+  --narrow-width: {{ settings.layout_narrow_width }}px;
+  --gutter: {{ settings.layout_gutter }}px;
+  --grid-gap: {{ settings.layout_grid_gap }}px;
+  --spacing-scale: {{ spacing }};
+
+  --radius: {{ settings.radius_base }}px;
+  --radius-card: {{ settings.radius_card }}px;
+  --radius-button: {{ settings.radius_button }}px;
+  --radius-input: {{ settings.radius_input }}px;
+  --border-width: {{ settings.border_width }}px;
+
+  --frame-arch: {{ settings.shape_arch_depth }}%;
+  --frame-notch: {{ settings.shape_notch_size }}px;
+
+  --button-padding-block: {{ settings.button_padding_y }}px;
+  --button-padding-inline: {{ settings.button_padding_x }}px;
+  --button-weight: {{ settings.button_weight }};
+
+  --ink-thickness: {{ settings.ink_thickness }}px;
+  --ink-opacity: {{ ink_alpha }};
+
+  --duration: {% if settings.animations_enabled %}{{ settings.animation_duration }}ms{% else %}0ms{% endif %};
+  --stagger: {% if settings.animations_enabled %}{{ settings.animation_stagger }}ms{% else %}0ms{% endif %};
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --color-sale: {{ settings.color_sale.red }} {{ settings.color_sale.green }} {{ settings.color_sale.blue }};
+  --color-success: {{ settings.color_success.red }} {{ settings.color_success.green }} {{ settings.color_success.blue }};
+  --color-warning: {{ settings.color_warning.red }} {{ settings.color_warning.green }} {{ settings.color_warning.blue }};
+  --color-error: {{ settings.color_error.red }} {{ settings.color_error.green }} {{ settings.color_error.blue }};
+
+  --shadow-alpha: {{ shadow_alpha }};
+  {%- case settings.shadow_style -%}
+    {%- when 'none' -%}
+      --shadow: none;
+      --shadow-lifted: none;
+    {%- when 'soft' -%}
+      --shadow: 0 1px 2px rgb(var(--color-shadow) / calc(var(--shadow-alpha) * 0.6)), 0 8px 24px -12px rgb(var(--color-shadow) / var(--shadow-alpha));
+      --shadow-lifted: 0 2px 4px rgb(var(--color-shadow) / calc(var(--shadow-alpha) * 0.6)), 0 18px 40px -16px rgb(var(--color-shadow) / calc(var(--shadow-alpha) * 1.4));
+    {%- when 'lifted' -%}
+      --shadow: 0 10px 30px -12px rgb(var(--color-shadow) / calc(var(--shadow-alpha) * 1.6));
+      --shadow-lifted: 0 24px 56px -18px rgb(var(--color-shadow) / calc(var(--shadow-alpha) * 2));
+    {%- when 'hard' -%}
+      --shadow: {{ settings.border_width | at_least: 1 }}px {{ settings.border_width | at_least: 1 | times: 4 }}px 0 rgb(var(--color-shadow) / var(--shadow-alpha));
+      --shadow-lifted: {{ settings.border_width | at_least: 1 | times: 2 }}px {{ settings.border_width | at_least: 1 | times: 7 }}px 0 rgb(var(--color-shadow) / var(--shadow-alpha));
+  {%- endcase %}
+
+  {%- case settings.shape_signature -%}
+    {%- when 'arch' -%}
+      --frame-radius: 50% 50% var(--radius-card) var(--radius-card) / var(--frame-arch) var(--frame-arch) var(--radius-card) var(--radius-card);
+      --frame-clip: none;
+    {%- when 'pill' -%}
+      --frame-radius: 50% / var(--frame-arch);
+      --frame-clip: none;
+    {%- when 'notch' -%}
+      --frame-radius: var(--radius-card);
+      --frame-clip: polygon(0 0, calc(100% - var(--frame-notch)) 0, 100% var(--frame-notch), 100% 100%, 0 100%);
+    {%- when 'square' -%}
+      --frame-radius: 0;
+      --frame-clip: none;
+    {%- else -%}
+      --frame-radius: var(--radius-card);
+      --frame-clip: none;
+  {%- endcase %}
+}
+
+[dir='rtl'] {
+  {%- if settings.shape_signature == 'notch' %}
+  --frame-clip: polygon(var(--frame-notch) 0, 100% 0, 100% 100%, 0 100%, 0 var(--frame-notch));
+  {%- endif %}
+}
+
+{% for scheme in settings.color_schemes -%}
+  {%- assign scheme_class = '.color-' | append: scheme.id %}
+  {{ scheme_class }} {
+    --color-background: {{ scheme.settings.background.red }} {{ scheme.settings.background.green }} {{ scheme.settings.background.blue }};
+    --color-text: {{ scheme.settings.text.red }} {{ scheme.settings.text.green }} {{ scheme.settings.text.blue }};
+    --color-text-muted: {{ scheme.settings.text_muted.red }} {{ scheme.settings.text_muted.green }} {{ scheme.settings.text_muted.blue }};
+    --color-accent: {{ scheme.settings.accent.red }} {{ scheme.settings.accent.green }} {{ scheme.settings.accent.blue }};
+    --color-button: {{ scheme.settings.button.red }} {{ scheme.settings.button.green }} {{ scheme.settings.button.blue }};
+    --color-button-text: {{ scheme.settings.button_label.red }} {{ scheme.settings.button_label.green }} {{ scheme.settings.button_label.blue }};
+    --color-button-secondary-text: {{ scheme.settings.secondary_button_label.red }} {{ scheme.settings.secondary_button_label.green }} {{ scheme.settings.secondary_button_label.blue }};
+    --color-border: {{ scheme.settings.border.red }} {{ scheme.settings.border.green }} {{ scheme.settings.border.blue }};
+    --color-card: {{ scheme.settings.card.red }} {{ scheme.settings.card.green }} {{ scheme.settings.card.blue }};
+    --color-shadow: {{ scheme.settings.shadow.red }} {{ scheme.settings.shadow.green }} {{ scheme.settings.shadow.blue }};
+    {%- if scheme.settings.background_gradient != blank %}
+    --gradient-background: {{ scheme.settings.background_gradient }};
+    {%- else %}
+    --gradient-background: none;
+    {%- endif %}
+  }
+{%- endfor %}
+
+{%- if settings.dark_mode != 'off' %}
+  {%- capture dark_tokens -%}
+    --color-background: {{ settings.dark_background.red }} {{ settings.dark_background.green }} {{ settings.dark_background.blue }};
+    --color-text: {{ settings.dark_text.red }} {{ settings.dark_text.green }} {{ settings.dark_text.blue }};
+    --color-text-muted: {{ settings.dark_text_muted.red }} {{ settings.dark_text_muted.green }} {{ settings.dark_text_muted.blue }};
+    --color-accent: {{ settings.dark_accent.red }} {{ settings.dark_accent.green }} {{ settings.dark_accent.blue }};
+    --color-button: {{ settings.dark_text.red }} {{ settings.dark_text.green }} {{ settings.dark_text.blue }};
+    --color-button-text: {{ settings.dark_background.red }} {{ settings.dark_background.green }} {{ settings.dark_background.blue }};
+    --color-button-secondary-text: {{ settings.dark_text.red }} {{ settings.dark_text.green }} {{ settings.dark_text.blue }};
+    --color-border: {{ settings.dark_border.red }} {{ settings.dark_border.green }} {{ settings.dark_border.blue }};
+    --color-card: {{ settings.dark_card.red }} {{ settings.dark_card.green }} {{ settings.dark_card.blue }};
+    --color-shadow: 0 0 0;
+    --gradient-background: none;
+  {%- endcapture -%}
+
+  {%- if settings.dark_mode == 'auto' or settings.dark_mode == 'auto_toggle' %}
+  @media (prefers-color-scheme: dark) {
+    html:not([data-bends-theme='light']) [class*='color-'] {
+      {{ dark_tokens }}
+    }
+  }
+  {%- endif %}
+
+  html[data-bends-theme='dark'] [class*='color-'] {
+    {{ dark_tokens }}
+  }
+{%- endif %}

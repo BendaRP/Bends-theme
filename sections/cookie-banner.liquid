@@ -1,0 +1,110 @@
+{%- comment -%}
+  Cookie consent, wired to Shopify's customer privacy API so a refusal really
+  does stop analytics and marketing tracking rather than just hiding a bar.
+  Written with Israel's Privacy Protection Law Amendment 13 in mind; it is
+  groundwork, not legal advice.
+{%- endcomment -%}
+{%- if settings.cookie_banner_enabled -%}
+  <cookie-consent
+    class="cookie-banner cookie-banner--{{ settings.cookie_banner_position }} color-{{ section.settings.color_scheme }}"
+    data-cookie-banner
+    data-block-page="{{ settings.cookie_banner_block }}"
+    hidden
+  >
+    {%- if settings.cookie_banner_block -%}
+      <div class="cookie-banner__scrim"></div>
+    {%- endif -%}
+
+    <div class="cookie-banner__panel" role="dialog" aria-modal="false" aria-labelledby="CookieBannerTitle" aria-describedby="CookieBannerBody">
+      <div class="cookie-banner__main">
+        <div class="cookie-banner__intro">
+          {% render 'icon', icon: 'cookie', class: 'cookie-banner__icon' %}
+          <div>
+            <h2 class="h6" id="CookieBannerTitle">
+              {{- section.settings.heading | default: 'compliance.cookies.title' | t -}}
+            </h2>
+            <p class="text-small" id="CookieBannerBody">
+              {%- if section.settings.body != blank -%}
+                {{ section.settings.body }}
+              {%- else -%}
+                {{ 'compliance.cookies.body' | t }}
+              {%- endif -%}
+              {%- if settings.cookie_policy_url != blank -%}
+                <a class="link" href="{{ settings.cookie_policy_url }}">{{ 'compliance.cookies.policy_link' | t }}</a>
+              {%- endif -%}
+            </p>
+          </div>
+        </div>
+
+        <div class="cookie-banner__actions">
+          <button class="button button--small" type="button" data-cookie-accept>
+            {{ 'compliance.cookies.accept' | t }}
+          </button>
+          <button class="button button--secondary button--small" type="button" data-cookie-decline>
+            {{ 'compliance.cookies.decline' | t }}
+          </button>
+          <button class="button button--link button--small" type="button" data-cookie-customise aria-expanded="false" aria-controls="CookiePreferences">
+            {{ 'compliance.cookies.customise' | t }}
+          </button>
+        </div>
+      </div>
+
+      <div class="cookie-banner__preferences" id="CookiePreferences" data-cookie-preferences hidden>
+        <ul class="cookie-banner__list">
+          <li class="cookie-banner__option">
+            <label class="checkbox">
+              <input type="checkbox" checked disabled>
+              <span>
+                <strong class="text-small">{{ 'compliance.cookies.necessary' | t }}</strong>
+                <span class="text-tiny text-muted">{{ 'compliance.cookies.necessary_body' | t }}</span>
+              </span>
+            </label>
+          </li>
+          <li class="cookie-banner__option">
+            <label class="checkbox">
+              <input type="checkbox" data-cookie-category="analytics" checked>
+              <span>
+                <strong class="text-small">{{ 'compliance.cookies.analytics' | t }}</strong>
+                <span class="text-tiny text-muted">{{ 'compliance.cookies.analytics_body' | t }}</span>
+              </span>
+            </label>
+          </li>
+          <li class="cookie-banner__option">
+            <label class="checkbox">
+              <input type="checkbox" data-cookie-category="marketing" checked>
+              <span>
+                <strong class="text-small">{{ 'compliance.cookies.marketing' | t }}</strong>
+                <span class="text-tiny text-muted">{{ 'compliance.cookies.marketing_body' | t }}</span>
+              </span>
+            </label>
+          </li>
+          <li class="cookie-banner__option">
+            <label class="checkbox">
+              <input type="checkbox" data-cookie-category="preferences" checked>
+              <span>
+                <strong class="text-small">{{ 'compliance.cookies.preferences' | t }}</strong>
+                <span class="text-tiny text-muted">{{ 'compliance.cookies.preferences_body' | t }}</span>
+              </span>
+            </label>
+          </li>
+        </ul>
+        <button class="button button--small" type="button" data-cookie-save>
+          {{ 'compliance.cookies.save' | t }}
+        </button>
+      </div>
+    </div>
+  </cookie-consent>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Cookie banner",
+  "settings": [
+    { "type": "paragraph", "content": "Switch this on and set the privacy policy page under Compliance in Theme settings. Analytics and marketing tags stay off until the visitor accepts." },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-1" },
+    { "type": "text", "id": "heading", "label": "Heading" },
+    { "type": "richtext", "id": "body", "label": "Body" }
+  ],
+  "enabled_on": { "groups": ["overlay"] }
+}
+{% endschema %}

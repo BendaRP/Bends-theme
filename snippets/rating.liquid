@@ -1,0 +1,34 @@
+{%- comment -%}
+  Star rating read from the standard reviews metafields, so it works with any
+  review app that writes to them — no app-specific code in the theme.
+
+  Accepts:
+  - product:    {Product}
+  - show_count: {Boolean} show the number of reviews beside the stars
+  - class:      {String} extra class names
+{%- endcomment -%}
+{%- liquid
+  assign rating_value = product.metafields.reviews.rating.value
+  assign rating_count = product.metafields.reviews.rating_count.value | plus: 0
+-%}
+{%- if rating_value and rating_count > 0 -%}
+  {%- liquid
+    assign scale = rating_value.scale_max | default: 5
+    assign score = rating_value.rating | times: 1.0
+    assign rounded = score | round
+  -%}
+  <div class="rating {{ class }}" role="img" aria-label="{{ 'accessibility.star_rating' | t: rating: score, scale: scale }}">
+    <span class="rating__stars" aria-hidden="true">
+      {%- for i in (1..scale) -%}
+        {%- if i <= rounded -%}
+          {% render 'icon', icon: 'star-filled', class: 'rating__star rating__star--on' %}
+        {%- else -%}
+          {% render 'icon', icon: 'star', class: 'rating__star' %}
+        {%- endif -%}
+      {%- endfor -%}
+    </span>
+    {%- if show_count -%}
+      <span class="rating__count text-tiny text-muted" aria-hidden="true">({{ rating_count }})</span>
+    {%- endif -%}
+  </div>
+{%- endif -%}

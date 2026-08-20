@@ -1,0 +1,237 @@
+{%- liquid
+  assign drawer_enabled = false
+  if settings.cart_type == 'drawer'
+    assign drawer_enabled = true
+  endif
+-%}
+{%- if drawer_enabled -%}
+  <cart-drawer
+    class="cart-drawer color-{{ section.settings.color_scheme }}{% if settings.cart_drawer_full_width_mobile %} cart-drawer--full-mobile{% endif %}"
+    data-cart-drawer
+    hidden
+  >
+    <div class="cart-drawer__scrim" data-cart-close></div>
+
+    <div
+      class="cart-drawer__panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="CartDrawerTitle"
+    >
+      <header class="cart-drawer__head">
+        <h2 class="h4" id="CartDrawerTitle">
+          {{ 'cart.general.title' | t }}
+          <span class="text-muted text-small" data-cart-count-text>
+            {{- 'cart.general.items_count' | t: count: cart.item_count -}}
+          </span>
+        </h2>
+        <button
+          class="cart-drawer__close tap-target"
+          type="button"
+          data-cart-close
+          aria-label="{{ 'cart.general.close' | t }}"
+        >
+          {% render 'icon', icon: 'close', class: 'icon--large' %}
+        </button>
+      </header>
+
+      <div class="cart-drawer__body" data-cart-body>
+        {%- if cart.item_count > 0 -%}
+          {%- render 'free-shipping-bar' -%}
+
+          <ul class="cart-items" data-cart-items>
+            {%- for item in cart.items -%}
+              {%- render 'cart-item', item: item, index: forloop.index -%}
+            {%- endfor -%}
+          </ul>
+
+          {%- for block in section.blocks -%}
+            <div class="cart-drawer__block cart-drawer__block--{{ block.type }}" {{ block.shopify_attributes }}>
+              {%- case block.type -%}
+                {%- when 'upsell' -%}
+                  {%- if block.settings.products != blank -%}
+                    <div class="cart-upsell">
+                      <h3 class="cart-upsell__title h6">
+                        {{- block.settings.heading | default: 'cart.upsell.title' | t -}}
+                      </h3>
+                      <ul class="cart-upsell__list">
+                        {%- for upsell_product in block.settings.products limit: block.settings.limit -%}
+                          {%- unless upsell_product.empty? -%}
+                            {%- assign already_in_cart = false -%}
+                            {%- for line in cart.items -%}
+                              {%- if line.product_id == upsell_product.id -%}
+                                {%- assign already_in_cart = true -%}
+                                {%- break -%}
+                              {%- endif -%}
+                            {%- endfor -%}
+                            {%- unless already_in_cart -%}
+                              <li class="cart-upsell__item">
+                                <div class="frame frame--soft" data-ratio="square">
+                                  {%- if upsell_product.featured_media -%}
+                                    {%- render 'responsive-image',
+                                      image: upsell_product.featured_media.preview_image,
+                                      widths: '80,120,160,240',
+                                      sizes: '72px',
+                                      max_width: 240
+                                    -%}
+                                  {%- else -%}
+                                    <div class="media-placeholder">{{ 'product-1' | placeholder_svg_tag }}</div>
+                                  {%- endif -%}
+                                </div>
+                                <div class="cart-upsell__info">
+                                  <a class="cart-upsell__name text-small" href="{{ upsell_product.url }}">
+                                    {{- upsell_product.title -}}
+                                  </a>
+                                  {%- render 'price', target: upsell_product, class: 'price--small' -%}
+                                </div>
+                                {%- if upsell_product.available -%}
+                                  <form action="{{ routes.cart_add_url }}" method="post" data-quick-add-form>
+                                    <input
+                                      type="hidden"
+                                      name="id"
+                                      value="{{ upsell_product.selected_or_first_available_variant.id }}"
+                                    >
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="button button--secondary button--small">
+                                      {{ 'cart.upsell.add' | t }}
+                                    </button>
+                                  </form>
+                                {%- endif -%}
+                              </li>
+                            {%- endunless -%}
+                          {%- endunless -%}
+                        {%- endfor -%}
+                      </ul>
+                    </div>
+                  {%- endif -%}
+
+                {%- when 'countdown' -%}
+                  <div
+                    class="cart-countdown"
+                    data-cart-countdown-wrapper
+                    data-minutes="{{ block.settings.minutes }}"
+                  >
+                    {% render 'icon', icon: 'clock' %}
+                    <div>
+                      <strong class="text-small">{{ block.settings.heading | default: 'cart.countdown.title' | t }}</strong>
+                      <p class="text-tiny text-muted">{{ 'cart.countdown.body_html' | t }}</p>
+                    </div>
+                  </div>
+
+                {%- when 'text_with_icon' -%}
+                  <p class="cart-note-line text-small">
+                    {%- if block.settings.icon != 'none' -%}
+                      {% render 'icon', icon: block.settings.icon %}
+                    {%- endif -%}
+                    <span>{{ block.settings.text }}</span>
+                  </p>
+
+                {%- when 'image' -%}
+                  {%- if block.settings.image != blank -%}
+                    <div class="cart-drawer__image">
+                      {%- if block.settings.link != blank -%}<a href="{{ block.settings.link }}">{%- endif -%}
+                        {%- render 'responsive-image',
+                          image: block.settings.image,
+                          widths: '320,480,640,860',
+                          sizes: '(min-width: 750px) 420px, 90vw',
+                          max_width: 860
+                        -%}
+                      {%- if block.settings.link != blank -%}</a>{%- endif -%}
+                    </div>
+                  {%- endif -%}
+
+                {%- when 'custom_liquid' -%}
+                  {{ block.settings.custom_liquid }}
+              {%- endcase -%}
+            </div>
+          {%- endfor -%}
+        {%- else -%}
+          <div class="cart-empty">
+            {% render 'icon', icon: settings.cart_icon, class: 'cart-empty__icon' %}
+            <p class="h4">{{ 'cart.general.empty' | t }}</p>
+            <p class="text-muted">{{ 'cart.general.empty_body' | t }}</p>
+            <a class="button" href="{{ routes.all_products_collection_url }}">
+              {{ 'cart.general.continue_shopping' | t }}
+            </a>
+          </div>
+        {%- endif -%}
+      </div>
+
+      {%- if cart.item_count > 0 -%}
+        <form action="{{ routes.cart_url }}" method="post" class="cart-drawer__foot" data-cart-form>
+          {%- render 'cart-summary', context: 'drawer' -%}
+        </form>
+      {%- endif -%}
+    </div>
+  </cart-drawer>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Cart drawer",
+  "settings": [
+    { "type": "paragraph", "content": "The drawer only appears when the cart behaviour in Theme settings is set to Slide-out drawer." },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-1" }
+  ],
+  "blocks": [
+    {
+      "type": "upsell",
+      "name": "Upsell",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Add one more?" },
+        { "type": "product_list", "id": "products", "label": "Products", "limit": 8 },
+        { "type": "range", "id": "limit", "min": 1, "max": 6, "step": 1, "label": "Maximum shown", "default": 3 }
+      ]
+    },
+    {
+      "type": "countdown",
+      "name": "Cart hold timer",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Your cart is reserved" },
+        { "type": "range", "id": "minutes", "min": 5, "max": 60, "step": 5, "unit": "min", "label": "Hold for", "default": 15 }
+      ]
+    },
+    {
+      "type": "text_with_icon",
+      "name": "Text with icon",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "truck", "label": "Delivery" },
+            { "value": "return", "label": "Returns" },
+            { "value": "shield-check", "label": "Secure" },
+            { "value": "gift", "label": "Gift" },
+            { "value": "leaf", "label": "Sustainable" },
+            { "value": "clock", "label": "Time" }
+          ],
+          "default": "truck"
+        },
+        { "type": "text", "id": "text", "label": "Text", "default": "Free returns within 30 days" }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    },
+    {
+      "type": "custom_liquid",
+      "name": "Custom Liquid",
+      "limit": 2,
+      "settings": [
+        { "type": "liquid", "id": "custom_liquid", "label": "Liquid", "info": "An insertion point for app snippets and one-off markup." }
+      ]
+    }
+  ],
+  "enabled_on": { "groups": ["overlay"] }
+}
+{% endschema %}

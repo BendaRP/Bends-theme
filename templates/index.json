@@ -1,0 +1,13 @@
+{
+  "sections": {
+    "icon-bar": {
+      "type": "icon-bar",
+      "blocks": {
+        "i1": { "type": "item", "settings": { "icon": "truck", "heading": "Fast delivery" } }
+      },
+      "block_order": ["i1"],
+      "settings": {}
+    }
+  },
+  "order": ["icon-bar"]
+}

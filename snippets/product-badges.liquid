@@ -1,0 +1,66 @@
+{%- comment -%}
+  The badge stack for a product card or product page.
+
+  Accepts:
+  - product:  {Product}
+  - position: {String} overrides the theme setting for this instance
+{%- endcomment -%}
+{%- liquid
+  assign badge_position = position | default: settings.badge_position
+  assign variant = product.selected_or_first_available_variant
+
+  assign is_new = false
+  if settings.badge_new and product.published_at
+    assign seconds_in_window = settings.badge_new_days | times: 86400
+    assign published_seconds = product.published_at | date: '%s' | plus: 0
+    assign now_seconds = 'now' | date: '%s' | plus: 0
+    assign age = now_seconds | minus: published_seconds
+    if age < seconds_in_window
+      assign is_new = true
+    endif
+  endif
+
+  assign is_bestseller = false
+  if settings.badge_bestseller and settings.badge_bestseller_tag != blank
+    if product.tags contains settings.badge_bestseller_tag
+      assign is_bestseller = true
+    endif
+  endif
+
+  assign is_low_stock = false
+  if settings.badge_low_stock and product.available and variant.inventory_management != null and variant.inventory_policy == 'deny'
+    if variant.inventory_quantity > 0 and variant.inventory_quantity <= settings.badge_low_stock_threshold
+      assign is_low_stock = true
+    endif
+  endif
+-%}
+<div class="badge-stack" data-position="{{ badge_position }}">
+  {%- unless product.available -%}
+    {%- if settings.badge_sold_out -%}
+      <span class="badge badge--sold-out">{{ 'products.product.sold_out' | t }}</span>
+    {%- endif -%}
+  {%- else -%}
+    {%- if settings.badge_sale and product.compare_at_price > product.price -%}
+      {%- liquid
+        assign saved_amount = product.compare_at_price | minus: product.price
+        assign saved_percent = saved_amount | times: 100.0 | divided_by: product.compare_at_price | round
+      -%}
+      <span class="badge badge--sale">
+        {%- case settings.badge_sale_format -%}
+          {%- when 'percent' -%}{{ 'products.product.save_percent' | t: percent: saved_percent }}
+          {%- when 'amount' -%}{%- assign saved_money = saved_amount | money -%}{{ 'products.product.save_amount' | t: amount: saved_money }}
+          {%- else -%}{{ 'products.product.sale_badge' | t }}
+        {%- endcase -%}
+      </span>
+    {%- endif -%}
+    {%- if is_new -%}
+      <span class="badge badge--new">{{ 'products.product.new_badge' | t }}</span>
+    {%- endif -%}
+    {%- if is_bestseller -%}
+      <span class="badge badge--bestseller">{{ 'products.product.bestseller_badge' | t }}</span>
+    {%- endif -%}
+    {%- if is_low_stock -%}
+      <span class="badge badge--low-stock">{{ 'products.product.low_stock_badge' | t }}</span>
+    {%- endif -%}
+  {%- endunless -%}
+</div>

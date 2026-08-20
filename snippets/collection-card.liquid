@@ -1,0 +1,43 @@
+{%- comment -%}
+  Collection card.
+
+  Accepts:
+  - collection: {Collection}
+  - index:      {Number}
+  - show_count: {Boolean}
+  - ratio:      {String}
+  - sizes:      {String}
+{%- endcomment -%}
+{%- liquid
+  assign card_sizes = sizes | default: '(min-width: 990px) 33vw, 50vw'
+  assign card_ratio = ratio | default: 'portrait'
+  assign card_index = index | default: 0
+-%}
+<a
+  class="collection-card"
+  href="{{ collection.url }}"
+  data-reveal
+  style="--reveal-delay: calc(var(--stagger) * {{ card_index }});"
+  aria-label="{{ 'collections.general.link_title' | t: title: collection.title }}"
+>
+  <div class="frame" data-ratio="{{ card_ratio }}">
+    {%- if collection.featured_image -%}
+      {%- render 'responsive-image',
+        image: collection.featured_image,
+        sizes: card_sizes,
+        class: 'collection-card__image'
+      -%}
+    {%- else -%}
+      <div class="media-placeholder">{{ 'collection-1' | placeholder_svg_tag }}</div>
+    {%- endif -%}
+  </div>
+  <div class="collection-card__body">
+    <span class="collection-card__title h5">{{ collection.title }}</span>
+    {%- if show_count -%}
+      <span class="text-tiny text-muted">
+        {{- 'collections.general.items_with_count' | t: count: collection.products_count -}}
+      </span>
+    {%- endif -%}
+    <span class="collection-card__arrow">{% render 'icon', icon: 'arrow-right' %}</span>
+  </div>
+</a>

@@ -1,0 +1,57 @@
+{%- style -%}
+  {%- render 'section-styles', section_id: section.id, s: section.settings -%}
+{%- endstyle -%}
+
+<div class="section-wrapper color-{{ section.settings.color_scheme }}">
+  <div class="section">
+    <div class="page-width" data-cart-page>
+      <h1 class="h2">{{ 'cart.general.title' | t }}</h1>
+
+      {%- if cart.item_count > 0 -%}
+        <form action="{{ routes.cart_url }}" method="post" class="cart-page" data-cart-form>
+          <div class="cart-page__items">
+            {%- render 'free-shipping-bar' -%}
+
+            <ul class="cart-items cart-items--page">
+              {%- for item in cart.items -%}
+                {%- render 'cart-item', item: item, index: forloop.index -%}
+              {%- endfor -%}
+            </ul>
+
+            <a class="button button--link" href="{{ routes.all_products_collection_url }}">
+              {% render 'icon', icon: 'arrow-left' %}
+              <span>{{ 'cart.general.keep_shopping' | t }}</span>
+            </a>
+          </div>
+
+          <aside class="cart-page__summary">
+            {%- render 'cart-summary', context: 'page' -%}
+          </aside>
+        </form>
+      {%- else -%}
+        <div class="cart-empty cart-empty--page">
+          {% render 'icon', icon: settings.cart_icon, class: 'cart-empty__icon' %}
+          <p class="h3">{{ 'cart.general.empty' | t }}</p>
+          <p class="text-muted">{{ 'cart.general.empty_body' | t }}</p>
+          <a class="button" href="{{ routes.all_products_collection_url }}">
+            {{ 'cart.general.continue_shopping' | t }}
+          </a>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Cart",
+  "tag": "section",
+  "class": "section-main-cart",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-1" },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Top padding", "default": 40 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Bottom padding", "default": 64 }
+  ]
+}
+{% endschema %}

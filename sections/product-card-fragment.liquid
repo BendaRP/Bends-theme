@@ -1,0 +1,13 @@
+{%- comment -%}
+  A single product card, fetched by JS to build the wishlist and
+  recently-viewed lists from handles held in the visitor's browser.
+{%- endcomment -%}
+<div data-card-fragment>
+  {%- render 'product-card', product: product, sizes: '(min-width: 990px) 25vw, 50vw' -%}
+</div>
+
+{% schema %}
+{
+  "name": "Product card fragment"
+}
+{% endschema %}

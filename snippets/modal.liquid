@@ -1,0 +1,40 @@
+{%- comment -%}
+  A generic dialog opened by any button carrying data-modal-open="<id>".
+
+  Accepts:
+  - modal_id:          {String}
+  - title:             {String}
+  - body:              {String} rich text
+  - page_content:      {Page} a page whose content fills the dialog
+  - show_unit_switch:  {Boolean} adds the centimetre / inch converter
+{%- endcomment -%}
+<div class="modal" data-modal="{{ modal_id }}" hidden>
+  <div class="modal__scrim" data-modal-close></div>
+  <div class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="modal-title-{{ modal_id }}">
+    <div class="modal__head">
+      <h2 class="h5" id="modal-title-{{ modal_id }}">{{ title }}</h2>
+      <button class="modal__close tap-target" type="button" data-modal-close aria-label="{{ 'general.close' | t }}">
+        {% render 'icon', icon: 'close', class: 'icon--large' %}
+      </button>
+    </div>
+
+    {%- if show_unit_switch -%}
+      <div class="modal__units" data-unit-switch>
+        <button class="modal__unit is-active" type="button" data-unit="cm" aria-pressed="true">
+          {{ 'sections.size_chart.units_cm' | t }}
+        </button>
+        <button class="modal__unit" type="button" data-unit="in" aria-pressed="false">
+          {{ 'sections.size_chart.units_in' | t }}
+        </button>
+      </div>
+    {%- endif -%}
+
+    <div class="modal__body rte">
+      {%- if page_content != blank -%}
+        {{ page_content.content }}
+      {%- else -%}
+        {{ body }}
+      {%- endif -%}
+    </div>
+  </div>
+</div>

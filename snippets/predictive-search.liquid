@@ -1,0 +1,48 @@
+{%- comment -%}
+  The search field with type-ahead suggestions.
+
+  Accepts:
+  - context: {String} keeps ids unique when the field appears more than once
+{%- endcomment -%}
+<predictive-search-form
+  class="search-form"
+  data-enabled="{{ settings.predictive_search_enabled }}"
+  data-limit="{{ settings.predictive_search_limit }}"
+>
+  <form action="{{ routes.search_url }}" method="get" role="search" class="search-form__form">
+    <input type="hidden" name="options[prefix]" value="last">
+    <label class="visually-hidden" for="search-input-{{ context }}">{{ 'general.search.search' | t }}</label>
+    <div class="search-form__field">
+      {% render 'icon', icon: 'search', class: 'search-form__icon' %}
+      <input
+        id="search-input-{{ context }}"
+        class="search-form__input"
+        type="search"
+        name="q"
+        value="{% if request.page_type == 'search' %}{{ search.terms | escape }}{% endif %}"
+        placeholder="{{ 'general.search.placeholder' | t | escape }}"
+        autocomplete="off"
+        autocorrect="off"
+        spellcheck="false"
+        data-search-input
+        aria-expanded="false"
+        aria-controls="search-results-{{ context }}"
+      >
+      <button type="reset" class="search-form__reset tap-target" data-search-reset hidden>
+        <span class="visually-hidden">{{ 'general.search.reset' | t }}</span>
+        {% render 'icon', icon: 'close' %}
+      </button>
+      <button type="submit" class="search-form__submit tap-target">
+        <span class="visually-hidden">{{ 'general.search.submit' | t }}</span>
+        {% render 'icon', icon: 'arrow-right' %}
+      </button>
+    </div>
+  </form>
+  <div
+    id="search-results-{{ context }}"
+    class="search-form__results"
+    data-search-results
+    tabindex="-1"
+    hidden
+  ></div>
+</predictive-search-form>

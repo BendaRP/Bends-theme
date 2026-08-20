@@ -1,0 +1,748 @@
+{%- comment -%}
+  Renders one product-page block. Every block here can be added, removed and
+  reordered from the theme editor.
+
+  Accepts:
+  - block:   {Object} the section block
+  - product: {Product}
+  - context: {String} main | quick_view
+{%- endcomment -%}
+{%- liquid
+  assign variant = product.selected_or_first_available_variant
+  assign block_id = block.id
+-%}
+<div class="product-block product-block--{{ block.type }}" {{ block.shopify_attributes }}>
+{%- case block.type -%}
+
+  {%- when 'breadcrumbs' -%}
+    {%- render 'breadcrumbs' -%}
+
+  {%- when 'vendor' -%}
+    {%- if product.vendor != blank -%}
+      <span class="eyebrow">
+        {%- if block.settings.link_to_vendor -%}
+          <a class="link" href="{{ product.vendor | url_for_vendor }}">{{ product.vendor }}</a>
+        {%- else -%}
+          {{ product.vendor }}
+        {%- endif -%}
+      </span>
+    {%- endif -%}
+
+  {%- when 'title' -%}
+    {%- if context == 'quick_view' -%}
+      <h2 class="product-title h3">{{ product.title }}</h2>
+    {%- else -%}
+      <h1 class="product-title {{ block.settings.size }}">{{ product.title }}</h1>
+    {%- endif -%}
+
+  {%- when 'price' -%}
+    {%- render 'price', target: variant, show_savings: block.settings.show_savings, class: 'price--large' -%}
+    {%- if block.settings.show_tax_note and block.settings.tax_note != blank -%}
+      <p class="text-tiny text-muted">{{ block.settings.tax_note }}</p>
+    {%- endif -%}
+
+  {%- when 'rating' -%}
+    {%- render 'rating', product: product, show_count: true, class: 'rating--large' -%}
+
+  {%- when 'sku' -%}
+    <p class="text-tiny text-muted" data-variant-sku>
+      {%- if variant.sku != blank -%}
+        {{ 'products.product.sku' | t }}: <span data-sku-value>{{ variant.sku }}</span>
+      {%- endif -%}
+    </p>
+
+  {%- when 'inventory' -%}
+    {%- liquid
+      assign quantity = variant.inventory_quantity
+      assign tracked = false
+      if variant.inventory_management != blank
+        assign tracked = true
+      endif
+    -%}
+    <div class="inventory" data-inventory-block data-threshold="{{ block.settings.low_threshold }}">
+      <span class="inventory__dot" data-inventory-dot></span>
+      <span class="inventory__label text-small" data-inventory-label>
+        {%- if variant.available == false -%}
+          {{ 'products.product.inventory.out_of_stock' | t }}
+        {%- elsif tracked == false -%}
+          {{ 'products.product.inventory.in_stock' | t }}
+        {%- elsif quantity <= block.settings.low_threshold and quantity > 0 -%}
+          {%- if block.settings.show_exact_count -%}
+            {{ 'products.product.inventory.in_stock_count' | t: count: quantity }}
+          {%- else -%}
+            {{ 'products.product.inventory.low_stock' | t }}
+          {%- endif -%}
+        {%- else -%}
+          {{ 'products.product.inventory.in_stock' | t }}
+        {%- endif -%}
+      </span>
+    </div>
+    {%- if block.settings.show_bar and variant.available and tracked -%}
+      {%- liquid
+        assign bar_max = block.settings.bar_max
+        assign bar_percent = quantity | times: 100.0 | divided_by: bar_max
+        if bar_percent > 100
+          assign bar_percent = 100
+        endif
+      -%}
+      <div class="inventory__bar" data-inventory-bar>
+        <span class="inventory__bar-fill" style="--progress: {{ bar_percent }}%;" data-inventory-fill></span>
+      </div>
+    {%- endif -%}
+
+  {%- when 'description' -%}
+    {%- if product.description != blank -%}
+      <div class="rte product-description{% if block.settings.collapse %} product-description--collapsed{% endif %}" data-description>
+        {{ product.description }}
+      </div>
+      {%- if block.settings.collapse -%}
+        <button class="button button--link text-small" type="button" data-description-toggle>
+          {{ 'general.show_more' | t }}
+        </button>
+      {%- endif -%}
+    {%- endif -%}
+
+  {%- when 'variant_picker' -%}
+    {%- render 'variant-picker', product: product, block: block, context: context -%}
+
+  {%- when 'quantity_selector' -%}
+    {%- if settings.product_show_quantity -%}
+      <div class="product-quantity">
+        <span class="field__label">{{ 'products.product.quantity.label' | t }}</span>
+        <quantity-input class="quantity">
+          <button class="quantity__button tap-target" type="button" name="minus" aria-label="{{ 'accessibility.decrease_quantity' | t }}">
+            {% render 'icon', icon: 'minus' %}
+          </button>
+          <label class="visually-hidden" for="quantity-{{ block_id }}">
+            {{- 'products.product.quantity.input_label' | t: product: product.title -}}
+          </label>
+          <input
+            id="quantity-{{ block_id }}"
+            class="quantity__input"
+            type="number"
+            name="quantity"
+            value="{{ variant.quantity_rule.min | default: 1 }}"
+            min="{{ variant.quantity_rule.min | default: 1 }}"
+            step="{{ variant.quantity_rule.increment | default: 1 }}"
+            {% if variant.quantity_rule.max %}max="{{ variant.quantity_rule.max }}"{% endif %}
+            inputmode="numeric"
+            form="product-form-{{ product.id }}-{{ context }}"
+            data-quantity-input
+          >
+          <button class="quantity__button tap-target" type="button" name="plus" aria-label="{{ 'accessibility.increase_quantity' | t }}">
+            {% render 'icon', icon: 'plus' %}
+          </button>
+        </quantity-input>
+        {%- if variant.quantity_rule.min > 1 -%}
+          <span class="text-tiny text-muted">
+            {{- 'products.product.quantity.minimum_of' | t: quantity: variant.quantity_rule.min -}}
+          </span>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+  {%- when 'volume_pricing' -%}
+    {%- if block.settings.tier_2_quantity > 1 -%}
+      <div class="volume-pricing" data-volume-pricing>
+        <span class="eyebrow">{{ block.settings.heading | default: 'products.product.volume_pricing.title' | t }}</span>
+        <ul class="volume-pricing__tiers">
+          {%- for i in (1..3) -%}
+            {%- liquid
+              case i
+                when 1
+                  assign tier_quantity = 1
+                  assign tier_discount = 0
+                  assign tier_label = block.settings.tier_1_label
+                when 2
+                  assign tier_quantity = block.settings.tier_2_quantity
+                  assign tier_discount = block.settings.tier_2_discount
+                  assign tier_label = block.settings.tier_2_label
+                when 3
+                  assign tier_quantity = block.settings.tier_3_quantity
+                  assign tier_discount = block.settings.tier_3_discount
+                  assign tier_label = block.settings.tier_3_label
+              endcase
+              assign keep = 100 | minus: tier_discount
+              assign tier_price = variant.price | times: keep | divided_by: 100
+            -%}
+            {%- if tier_quantity > 0 -%}
+              <li>
+                <button
+                  class="volume-pricing__tier{% if i == 1 %} is-active{% endif %}"
+                  type="button"
+                  data-volume-tier
+                  data-quantity="{{ tier_quantity }}"
+                  aria-pressed="{% if i == 1 %}true{% else %}false{% endif %}"
+                >
+                  <span class="volume-pricing__quantity">
+                    {{- 'products.product.volume_pricing.quantity' | t }}: {{ tier_quantity -}}
+                  </span>
+                  <span class="volume-pricing__price">{{ tier_price | money }} {{ 'products.product.volume_pricing.each' | t }}</span>
+                  {%- if tier_discount > 0 -%}
+                    <span class="badge badge--sale">−{{ tier_discount }}%</span>
+                  {%- endif -%}
+                  {%- if tier_label != blank -%}
+                    <span class="volume-pricing__label text-tiny">{{ tier_label }}</span>
+                  {%- endif -%}
+                </button>
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+        <p class="text-tiny text-muted">{{ block.settings.note }}</p>
+      </div>
+    {%- endif -%}
+
+  {%- when 'buy_buttons' -%}
+    {%- render 'buy-buttons', product: product, block: block, context: context -%}
+
+  {%- when 'selling_plans' -%}
+    {%- if product.selling_plan_groups.size > 0 -%}
+      <fieldset class="selling-plans" data-selling-plans>
+        <legend class="field__label">{{ 'products.product.subscription.title' | t }}</legend>
+        <label class="selling-plans__option checkbox">
+          <input type="radio" name="selling_plan_choice" value="" checked data-selling-plan-radio form="product-form-{{ product.id }}-{{ context }}">
+          <span>{{ 'products.product.subscription.one_time' | t }}</span>
+        </label>
+        {%- for group in product.selling_plan_groups -%}
+          {%- for plan in group.selling_plans -%}
+            <label class="selling-plans__option checkbox">
+              <input type="radio" name="selling_plan_choice" value="{{ plan.id }}" data-selling-plan-radio form="product-form-{{ product.id }}-{{ context }}">
+              <span>
+                {{ plan.name }}
+                {%- assign allocation = variant.selected_selling_plan_allocation -%}
+                {%- if plan.price_adjustments.size > 0 and allocation == nil -%}
+                  <span class="text-tiny text-success">{{ 'products.product.subscription.cancel_anytime' | t }}</span>
+                {%- endif -%}
+              </span>
+            </label>
+          {%- endfor -%}
+        {%- endfor -%}
+      </fieldset>
+    {%- endif -%}
+
+  {%- when 'urgency' -%}
+    <p class="urgency text-small" data-urgency>
+      {% render 'icon', icon: block.settings.icon %}
+      <span>{{ block.settings.text }}</span>
+    </p>
+
+  {%- when 'social_proof' -%}
+    <div class="social-proof" data-social-proof data-min="{{ block.settings.min_viewers }}" data-max="{{ block.settings.max_viewers }}">
+      {%- if block.settings.show_avatars -%}
+        <span class="social-proof__avatars" aria-hidden="true">
+          <span class="social-proof__avatar"></span>
+          <span class="social-proof__avatar"></span>
+          <span class="social-proof__avatar"></span>
+        </span>
+      {%- endif -%}
+      <span class="text-small" data-social-proof-text>{{ block.settings.text }}</span>
+    </div>
+
+  {%- when 'countdown' -%}
+    <countdown-timer
+      class="product-countdown"
+      data-deadline="{{ block.settings.deadline }}"
+      data-hide-when-done="{{ block.settings.hide_when_done }}"
+    >
+      {%- if block.settings.heading != blank -%}
+        <span class="product-countdown__heading text-small">
+          {% render 'icon', icon: 'fire' %}
+          {{ block.settings.heading }}
+        </span>
+      {%- endif -%}
+      <div class="countdown" data-countdown role="timer">
+        <span class="countdown__unit"><b data-countdown-days>00</b><small>{{ 'sections.countdown.days' | t }}</small></span>
+        <span class="countdown__unit"><b data-countdown-hours>00</b><small>{{ 'sections.countdown.hours' | t }}</small></span>
+        <span class="countdown__unit"><b data-countdown-minutes>00</b><small>{{ 'sections.countdown.minutes' | t }}</small></span>
+        <span class="countdown__unit"><b data-countdown-seconds>00</b><small>{{ 'sections.countdown.seconds' | t }}</small></span>
+      </div>
+      <p class="countdown__ended text-small" data-countdown-ended hidden>{{ 'sections.countdown.ended' | t }}</p>
+    </countdown-timer>
+
+  {%- when 'shipping_estimate' -%}
+    <p class="shipping-estimate text-small" data-shipping-estimate data-cutoff-hour="{{ block.settings.cutoff_hour }}" data-min-days="{{ block.settings.min_days }}" data-max-days="{{ block.settings.max_days }}">
+      {% render 'icon', icon: 'truck' %}
+      <span data-shipping-estimate-text>{{ block.settings.fallback_text }}</span>
+    </p>
+
+  {%- when 'shipping_milestones' -%}
+    <ol class="milestones">
+      {%- for i in (1..3) -%}
+        {%- liquid
+          case i
+            when 1
+              assign milestone_icon = block.settings.step_1_icon
+              assign milestone_text = block.settings.step_1_text
+            when 2
+              assign milestone_icon = block.settings.step_2_icon
+              assign milestone_text = block.settings.step_2_text
+            when 3
+              assign milestone_icon = block.settings.step_3_icon
+              assign milestone_text = block.settings.step_3_text
+          endcase
+        -%}
+        {%- if milestone_text != blank -%}
+          <li class="milestones__step">
+            {% render 'icon', icon: milestone_icon %}
+            <span class="text-small">{{ milestone_text }}</span>
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ol>
+
+  {%- when 'pickup' -%}
+    {%- if settings.product_show_pickup -%}
+      <pickup-availability
+        class="pickup"
+        data-pickup
+        data-variant="{{ variant.id }}"
+        data-base-url="{{ shop.url }}{{ routes.root_url }}"
+        {% if variant.available %}data-available="true"{% endif %}
+      ></pickup-availability>
+    {%- endif -%}
+
+  {%- when 'benefits' -%}
+    <ul class="benefits">
+      {%- assign benefit_lines = block.settings.benefits | newline_to_br | split: '<br />' -%}
+      {%- for line in benefit_lines -%}
+        {%- assign trimmed = line | strip -%}
+        {%- if trimmed != blank -%}
+          <li class="benefits__item">
+            {%- if block.settings.marker == 'icon' -%}
+              {% render 'icon', icon: block.settings.icon, class: 'benefits__icon' %}
+            {%- endif -%}
+            <span>{{ trimmed }}</span>
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+
+  {%- when 'icon_row' -%}
+    <ul class="product-icons">
+      {%- for i in (1..4) -%}
+        {%- liquid
+          case i
+            when 1
+              assign row_icon = block.settings.icon_1
+              assign row_text = block.settings.text_1
+            when 2
+              assign row_icon = block.settings.icon_2
+              assign row_text = block.settings.text_2
+            when 3
+              assign row_icon = block.settings.icon_3
+              assign row_text = block.settings.text_3
+            when 4
+              assign row_icon = block.settings.icon_4
+              assign row_text = block.settings.text_4
+          endcase
+        -%}
+        {%- if row_text != blank -%}
+          <li class="product-icons__item">
+            {% render 'icon', icon: row_icon, class: 'product-icons__icon' %}
+            <span class="text-tiny">{{ row_text }}</span>
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+
+  {%- when 'payment_badges' -%}
+    <div class="product-trust">
+      {%- if block.settings.text != blank -%}
+        <p class="text-tiny text-muted">
+          {% render 'icon', icon: 'lock' %}
+          <span>{{ block.settings.text }}</span>
+        </p>
+      {%- endif -%}
+      {%- render 'payment-icons' -%}
+    </div>
+
+  {%- when 'share' -%}
+    {%- render 'share-buttons', share_url: product.url, share_title: product.title, context: block_id -%}
+
+  {%- when 'size_chart' -%}
+    <button
+      class="button button--link text-small"
+      type="button"
+      data-modal-open="size-chart-{{ block_id }}"
+      aria-haspopup="dialog"
+    >
+      {% render 'icon', icon: 'ruler' %}
+      <span>{{ block.settings.label | default: 'products.product.size_chart' | t }}</span>
+    </button>
+    {%- assign size_chart_modal_id = 'size-chart-' | append: block_id -%}
+    {%- render 'modal',
+      modal_id: size_chart_modal_id,
+      title: block.settings.label,
+      page_content: block.settings.page,
+      show_unit_switch: block.settings.show_unit_switch
+    -%}
+
+  {%- when 'popup' -%}
+    <button
+      class="button button--link text-small"
+      type="button"
+      data-modal-open="popup-{{ block_id }}"
+      aria-haspopup="dialog"
+    >
+      {%- if block.settings.icon != 'none' -%}{% render 'icon', icon: block.settings.icon %}{%- endif -%}
+      <span>{{ block.settings.label }}</span>
+    </button>
+    {%- assign popup_modal_id = 'popup-' | append: block_id -%}
+    {%- render 'modal',
+      modal_id: popup_modal_id,
+      title: block.settings.label,
+      page_content: block.settings.page,
+      body: block.settings.text
+    -%}
+
+  {%- when 'collapsible_row' -%}
+    <details class="collapsible" data-collapsible>
+      <summary class="collapsible__summary">
+        <span class="collapsible__title">
+          {%- if block.settings.icon != 'none' -%}{% render 'icon', icon: block.settings.icon %}{%- endif -%}
+          {{ block.settings.heading }}
+        </span>
+        {% render 'icon', icon: 'chevron-down', class: 'collapsible__chevron' %}
+      </summary>
+      <div class="collapsible__body rte">
+        {%- if block.settings.page != blank -%}
+          {{ block.settings.page.content }}
+        {%- else -%}
+          {{ block.settings.text }}
+        {%- endif -%}
+      </div>
+    </details>
+
+  {%- when 'tabs' -%}
+    <product-tabs class="tabs" data-tabs>
+      <div class="tabs__list" role="tablist">
+        {%- for i in (1..4) -%}
+          {%- liquid
+            case i
+              when 1
+                assign tab_title = block.settings.tab_1_title
+              when 2
+                assign tab_title = block.settings.tab_2_title
+              when 3
+                assign tab_title = block.settings.tab_3_title
+              when 4
+                assign tab_title = block.settings.tab_4_title
+            endcase
+          -%}
+          {%- if tab_title != blank -%}
+            <button
+              class="tabs__tab{% if i == 1 %} is-active{% endif %}"
+              type="button"
+              role="tab"
+              id="tab-{{ block_id }}-{{ i }}"
+              aria-controls="panel-{{ block_id }}-{{ i }}"
+              aria-selected="{% if i == 1 %}true{% else %}false{% endif %}"
+              tabindex="{% if i == 1 %}0{% else %}-1{% endif %}"
+            >
+              {{ tab_title }}
+            </button>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+      {%- for i in (1..4) -%}
+        {%- liquid
+          case i
+            when 1
+              assign tab_title = block.settings.tab_1_title
+              assign tab_content = block.settings.tab_1_content
+              assign tab_page = block.settings.tab_1_page
+            when 2
+              assign tab_title = block.settings.tab_2_title
+              assign tab_content = block.settings.tab_2_content
+              assign tab_page = block.settings.tab_2_page
+            when 3
+              assign tab_title = block.settings.tab_3_title
+              assign tab_content = block.settings.tab_3_content
+              assign tab_page = block.settings.tab_3_page
+            when 4
+              assign tab_title = block.settings.tab_4_title
+              assign tab_content = block.settings.tab_4_content
+              assign tab_page = block.settings.tab_4_page
+          endcase
+        -%}
+        {%- if tab_title != blank -%}
+          <div
+            class="tabs__panel rte"
+            role="tabpanel"
+            id="panel-{{ block_id }}-{{ i }}"
+            aria-labelledby="tab-{{ block_id }}-{{ i }}"
+            {% unless i == 1 %}hidden{% endunless %}
+          >
+            {%- if tab_page != blank -%}{{ tab_page.content }}{%- else -%}{{ tab_content }}{%- endif -%}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </product-tabs>
+
+  {%- when 'complementary' -%}
+    <div
+      class="complementary"
+      data-complementary
+      data-url="{{ routes.product_recommendations_url }}?section_id=product-recommendations&product_id={{ product.id }}&limit={{ block.settings.limit }}&intent=complementary"
+    >
+      <h2 class="h6">{{ block.settings.heading | default: 'products.product.complementary' | t }}</h2>
+      <div class="complementary__list" data-complementary-list></div>
+    </div>
+
+  {%- when 'bundle' -%}
+    {%- if block.settings.products != blank -%}
+      <product-bundle class="bundle" data-bundle data-base-price="{{ variant.price }}">
+        <h2 class="h6">{{ block.settings.heading | default: 'products.product.bundle.title' | t }}</h2>
+        <ul class="bundle__list">
+          <li class="bundle__item">
+            <label class="checkbox">
+              <input type="checkbox" checked disabled>
+              <span class="bundle__item-body">
+                <span class="bundle__name text-small">{{ product.title }}</span>
+                <span class="bundle__price text-small">{{ variant.price | money }}</span>
+              </span>
+            </label>
+          </li>
+          {%- for bundle_product in block.settings.products limit: 4 -%}
+            {%- unless bundle_product.empty? or bundle_product.available == false -%}
+              <li class="bundle__item">
+                <label class="checkbox">
+                  <input
+                    type="checkbox"
+                    checked
+                    data-bundle-item
+                    data-variant-id="{{ bundle_product.selected_or_first_available_variant.id }}"
+                    data-price="{{ bundle_product.selected_or_first_available_variant.price }}"
+                  >
+                  <span class="bundle__item-body">
+                    <span class="bundle__name text-small">{{ bundle_product.title }}</span>
+                    <span class="bundle__price text-small">{{ bundle_product.selected_or_first_available_variant.price | money }}</span>
+                  </span>
+                </label>
+              </li>
+            {%- endunless -%}
+          {%- endfor -%}
+        </ul>
+        <div class="bundle__foot">
+          <span class="bundle__total">
+            {{ 'products.product.bundle.total' | t }}
+            <b data-bundle-total>{{ variant.price | money }}</b>
+          </span>
+          <button class="button button--full" type="button" data-bundle-add data-base-variant="{{ variant.id }}">
+            {{ 'products.product.bundle.add_bundle' | t }}
+          </button>
+        </div>
+      </product-bundle>
+    {%- endif -%}
+
+  {%- when 'upsell' -%}
+    {%- if block.settings.product != blank -%}
+      {%- assign upsell_variant = block.settings.product.selected_or_first_available_variant -%}
+      <div class="product-upsell">
+        <div class="frame frame--soft" data-ratio="square">
+          {%- if block.settings.product.featured_media -%}
+            {%- render 'responsive-image',
+              image: block.settings.product.featured_media.preview_image,
+              widths: '80,120,160,240',
+              sizes: '72px',
+              max_width: 240
+            -%}
+          {%- else -%}
+            <div class="media-placeholder">{{ 'product-1' | placeholder_svg_tag }}</div>
+          {%- endif -%}
+        </div>
+        <div class="product-upsell__body">
+          <span class="text-tiny eyebrow">{{ block.settings.heading }}</span>
+          <a class="text-small" href="{{ block.settings.product.url }}">{{ block.settings.product.title }}</a>
+          {%- render 'price', target: upsell_variant, class: 'price--small' -%}
+        </div>
+        {%- if block.settings.product.available -%}
+          <form action="{{ routes.cart_add_url }}" method="post" data-quick-add-form>
+            <input type="hidden" name="id" value="{{ upsell_variant.id }}">
+            <input type="hidden" name="quantity" value="1">
+            <button type="submit" class="button button--secondary button--small">{{ 'cart.upsell.add' | t }}</button>
+          </form>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+  {%- when 'free_gift' -%}
+    {%- liquid
+      assign gift_locked_text = 'products.product.gift.locked' | t: quantity: block.settings.quantity
+      assign gift_unlocked_text = 'products.product.gift.unlocked' | t
+    -%}
+    <div
+      class="free-gift"
+      data-free-gift
+      data-quantity="{{ block.settings.quantity }}"
+      data-locked-text="{{ gift_locked_text | escape }}"
+      data-unlocked-text="{{ gift_unlocked_text | escape }}"
+    >
+      {% render 'icon', icon: 'gift', class: 'free-gift__icon' %}
+      <div>
+        <strong class="text-small" data-free-gift-title>{{ gift_locked_text }}</strong>
+        {%- if block.settings.text != blank -%}
+          <p class="text-tiny text-muted">{{ block.settings.text }}</p>
+        {%- endif -%}
+      </div>
+    </div>
+
+  {%- when 'discount_code' -%}
+    {%- if block.settings.code != blank -%}
+      <div class="discount-code">
+        {%- if block.settings.heading != blank -%}
+          <span class="text-tiny eyebrow">{{ block.settings.heading }}</span>
+        {%- endif -%}
+        <button class="discount-code__button" type="button" data-copy="{{ block.settings.code }}">
+          <span class="discount-code__value">{{ block.settings.code }}</span>
+          {% render 'icon', icon: 'copy' %}
+          <span class="visually-hidden">{{ 'products.product.discount_code.copy' | t }}</span>
+        </button>
+      </div>
+    {%- endif -%}
+
+  {%- when 'comparison_table' -%}
+    {%- if block.settings.rows != blank -%}
+      <div class="comparison-table-wrapper">
+        {%- if block.settings.heading != blank -%}
+          <h2 class="h6">{{ block.settings.heading }}</h2>
+        {%- endif -%}
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th scope="col">{{ block.settings.column_0 }}</th>
+              <th scope="col">{{ block.settings.column_1 }}</th>
+              <th scope="col">{{ block.settings.column_2 }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {%- assign rows = block.settings.rows | newline_to_br | split: '<br />' -%}
+            {%- for row in rows -%}
+              {%- assign cells = row | strip | split: '|' -%}
+              {%- if cells.size > 1 -%}
+                <tr>
+                  <th scope="row">{{ cells[0] | strip }}</th>
+                  <td>{%- render 'comparison-cell', value: cells[1] -%}</td>
+                  <td>{%- render 'comparison-cell', value: cells[2] -%}</td>
+                </tr>
+              {%- endif -%}
+            {%- endfor -%}
+          </tbody>
+        </table>
+      </div>
+    {%- endif -%}
+
+  {%- when 'custom_field' -%}
+    <div class="field custom-field">
+      <label class="field__label" for="custom-field-{{ block_id }}">{{ block.settings.label }}</label>
+      {%- if block.settings.field_type == 'textarea' -%}
+        <textarea
+          id="custom-field-{{ block_id }}"
+          name="properties[{{ block.settings.label }}]"
+          maxlength="{{ block.settings.max_length }}"
+          form="product-form-{{ product.id }}-{{ context }}"
+          {% if block.settings.required %}required{% endif %}
+          data-custom-field
+        ></textarea>
+      {%- else -%}
+        <input
+          id="custom-field-{{ block_id }}"
+          type="text"
+          name="properties[{{ block.settings.label }}]"
+          maxlength="{{ block.settings.max_length }}"
+          form="product-form-{{ product.id }}-{{ context }}"
+          {% if block.settings.required %}required{% endif %}
+          data-custom-field
+        >
+      {%- endif -%}
+      <span class="text-tiny text-muted" data-custom-field-counter>
+        {{- 'products.product.custom_field.characters_left' | t: count: block.settings.max_length -}}
+      </span>
+      {%- if block.settings.help != blank -%}
+        <span class="text-tiny text-muted">{{ block.settings.help }}</span>
+      {%- endif -%}
+    </div>
+
+  {%- when 'trust_stars' -%}
+    <div class="trust-stars">
+      <span class="rating__stars" aria-hidden="true">
+        {%- for i in (1..5) -%}
+          {%- if i <= block.settings.stars -%}
+            {% render 'icon', icon: 'star-filled', class: 'rating__star rating__star--on' %}
+          {%- else -%}
+            {% render 'icon', icon: 'star', class: 'rating__star' %}
+          {%- endif -%}
+        {%- endfor -%}
+      </span>
+      <span class="text-small">{{ block.settings.text }}</span>
+    </div>
+
+  {%- when 'text' -%}
+    <div class="rte {{ block.settings.size }}">{{ block.settings.text }}</div>
+
+  {%- when 'image' -%}
+    {%- if block.settings.image != blank -%}
+      <div class="product-block__image" style="--block-image-width: {{ block.settings.width }}%;">
+        {%- render 'responsive-image',
+          image: block.settings.image,
+          sizes: '(min-width: 990px) 40vw, 90vw',
+          max_width: 1200
+        -%}
+      </div>
+    {%- endif -%}
+
+  {%- when 'video' -%}
+    {%- if block.settings.video != blank -%}
+      <div class="frame" data-ratio="wide">
+        {{ block.settings.video | video_tag: image_size: '800x', controls: true, muted: true, playsinline: true }}
+      </div>
+    {%- elsif block.settings.video_url != blank -%}
+      <div class="frame" data-ratio="wide">
+        {{ block.settings.video_url | external_video_tag: loading: 'lazy' }}
+      </div>
+    {%- endif -%}
+
+  {%- when 'button' -%}
+    {%- if block.settings.label != blank -%}
+      <a
+        class="button {{ block.settings.style }}{% if block.settings.full_width %} button--full{% endif %}"
+        href="{{ block.settings.link | default: '#' }}"
+        {% if block.settings.new_tab %}target="_blank" rel="noopener"{% endif %}
+      >
+        {{ block.settings.label }}
+        {%- if block.settings.new_tab -%}
+          <span class="visually-hidden">{{ 'accessibility.new_window' | t }}</span>
+        {%- endif -%}
+      </a>
+    {%- endif -%}
+
+  {%- when 'anchor_links' -%}
+    <nav class="anchor-links" aria-label="{{ block.settings.heading | escape }}">
+      <ul>
+        {%- assign anchors = block.settings.links | newline_to_br | split: '<br />' -%}
+        {%- for anchor in anchors -%}
+          {%- assign parts = anchor | strip | split: '|' -%}
+          {%- if parts.size > 1 -%}
+            <li>
+              <a class="anchor-links__link" href="#{{ parts[1] | strip | handle }}" data-anchor-link>
+                {{ parts[0] | strip }}
+                {% render 'icon', icon: 'arrow-down' %}
+              </a>
+            </li>
+          {%- endif -%}
+        {%- endfor -%}
+      </ul>
+    </nav>
+
+  {%- when 'separator' -%}
+    <hr class="product-block__separator" style="--separator-space: {{ block.settings.spacing }}px;">
+
+  {%- when 'custom_liquid' -%}
+    {{ block.settings.custom_liquid }}
+
+  {%- when '@app' -%}
+    {%- render block -%}
+
+{%- endcase -%}
+</div>

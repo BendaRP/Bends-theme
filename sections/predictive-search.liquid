@@ -1,0 +1,109 @@
+{%- comment -%}
+  The suggestion list fetched as the shopper types. Rendered by Shopify's
+  predictive search endpoint, so results respect the store's own search rules.
+{%- endcomment -%}
+<div data-predictive-results>
+  {%- if predictive_search.performed -%}
+    {%- liquid
+      assign has_results = false
+      if predictive_search.resources.products.size > 0 or predictive_search.resources.collections.size > 0 or predictive_search.resources.pages.size > 0 or predictive_search.resources.articles.size > 0 or predictive_search.resources.queries.size > 0
+        assign has_results = true
+      endif
+    -%}
+
+    {%- if has_results -%}
+      <div class="search-results">
+        {%- if settings.predictive_search_show_queries and predictive_search.resources.queries.size > 0 -%}
+          <div class="search-results__group">
+            <span class="eyebrow">{{ 'general.search.suggestions' | t }}</span>
+            <ul>
+              {%- for query in predictive_search.resources.queries -%}
+                <li>
+                  <a class="search-results__query" href="{{ query.url }}">
+                    {% render 'icon', icon: 'search' %}
+                    <span>{{ query.styled_text }}</span>
+                  </a>
+                </li>
+              {%- endfor -%}
+            </ul>
+          </div>
+        {%- endif -%}
+
+        {%- if settings.predictive_search_show_products and predictive_search.resources.products.size > 0 -%}
+          <div class="search-results__group">
+            <span class="eyebrow">{{ 'general.search.products' | t }}</span>
+            <ul class="search-results__products">
+              {%- for item in predictive_search.resources.products -%}
+                <li>
+                  <a class="search-results__product" href="{{ item.url }}">
+                    <div class="frame frame--soft" data-ratio="square">
+                      {%- if item.featured_media -%}
+                        {%- render 'responsive-image',
+                          image: item.featured_media.preview_image,
+                          widths: '60,90,120,180',
+                          sizes: '56px',
+                          max_width: 180
+                        -%}
+                      {%- else -%}
+                        <div class="media-placeholder">{{ 'product-1' | placeholder_svg_tag }}</div>
+                      {%- endif -%}
+                    </div>
+                    <span class="search-results__product-body">
+                      <span class="text-small">{{ item.title }}</span>
+                      {%- render 'price', target: item, class: 'price--small' -%}
+                    </span>
+                  </a>
+                </li>
+              {%- endfor -%}
+            </ul>
+          </div>
+        {%- endif -%}
+
+        {%- if settings.predictive_search_show_collections and predictive_search.resources.collections.size > 0 -%}
+          <div class="search-results__group">
+            <span class="eyebrow">{{ 'general.search.collections' | t }}</span>
+            <ul>
+              {%- for item in predictive_search.resources.collections -%}
+                <li><a class="search-results__link" href="{{ item.url }}">{{ item.title }}</a></li>
+              {%- endfor -%}
+            </ul>
+          </div>
+        {%- endif -%}
+
+        {%- if settings.predictive_search_show_pages and predictive_search.resources.pages.size > 0 -%}
+          <div class="search-results__group">
+            <span class="eyebrow">{{ 'general.search.pages' | t }}</span>
+            <ul>
+              {%- for item in predictive_search.resources.pages -%}
+                <li><a class="search-results__link" href="{{ item.url }}">{{ item.title }}</a></li>
+              {%- endfor -%}
+            </ul>
+          </div>
+        {%- endif -%}
+
+        {%- if settings.predictive_search_show_articles and predictive_search.resources.articles.size > 0 -%}
+          <div class="search-results__group">
+            <span class="eyebrow">{{ 'general.search.articles' | t }}</span>
+            <ul>
+              {%- for item in predictive_search.resources.articles -%}
+                <li><a class="search-results__link" href="{{ item.url }}">{{ item.title }}</a></li>
+              {%- endfor -%}
+            </ul>
+          </div>
+        {%- endif -%}
+
+        <a class="search-results__all button button--secondary button--small button--full" href="{{ routes.search_url }}?q={{ predictive_search.terms | url_encode }}">
+          {{ 'general.search.view_all' | t }}
+        </a>
+      </div>
+    {%- else -%}
+      <p class="search-form__empty text-small text-muted">{{ 'general.search.no_results_short' | t }}</p>
+    {%- endif -%}
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Predictive search"
+}
+{% endschema %}

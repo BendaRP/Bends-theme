@@ -1,0 +1,6 @@
+.dev/
+.git/
+.github/
+*.md
+!README.md
+.theme-check.yml

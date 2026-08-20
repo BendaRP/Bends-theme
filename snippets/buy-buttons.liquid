@@ -1,0 +1,104 @@
+{%- comment -%}
+  The product form: add to cart, dynamic checkout, and the sold-out fallbacks
+  that keep a shopper moving rather than landing on a dead end.
+
+  Accepts:
+  - product: {Product}
+  - block:   {Object}
+  - context: {String} main | quick_view
+{%- endcomment -%}
+{%- liquid
+  assign variant = product.selected_or_first_available_variant
+  assign form_id = 'product-form-' | append: product.id | append: '-' | append: context
+-%}
+<div class="buy-buttons" data-buy-buttons>
+  {%- if product.available -%}
+    {%- form 'product',
+      product,
+      id: form_id,
+      class: 'product-form',
+      novalidate: 'novalidate',
+      data-product-form: ''
+    -%}
+      <input type="hidden" name="id" value="{{ variant.id }}" data-variant-input>
+      <input type="hidden" name="selling_plan" value="" data-selling-plan-input disabled>
+
+      <button
+        type="submit"
+        name="add"
+        class="button button--full button--large product-form__submit"
+        data-add-to-cart
+        {% unless variant.available %}disabled{% endunless %}
+      >
+        <span data-add-to-cart-text>
+          {%- if variant.available -%}
+            {%- if settings.product_show_price_in_button -%}
+              {%- assign button_price = variant.price | money -%}
+              {{ 'products.product.add_to_cart_with_price' | t: price: button_price }}
+            {%- else -%}
+              {{ 'products.product.add_to_cart' | t }}
+            {%- endif -%}
+          {%- else -%}
+            {{ 'products.product.sold_out' | t }}
+          {%- endif -%}
+        </span>
+      </button>
+
+      <p class="field__error" data-form-error hidden></p>
+
+      {%- if block.settings.show_dynamic_checkout and settings.product_dynamic_checkout -%}
+        {{ form | payment_button }}
+      {%- endif -%}
+    {%- endform -%}
+  {%- else -%}
+    <button type="button" class="button button--full button--large" disabled>
+      {{ 'products.product.sold_out' | t }}
+    </button>
+
+    {%- if settings.sold_out_show_notify -%}
+      <div class="notify-me" data-notify-me>
+        <h2 class="h6">{{ 'products.product.notify_me.title' | t }}</h2>
+        <p class="text-small text-muted">{{ 'products.product.notify_me.body' | t }}</p>
+        {%- form 'contact', id: 'notify-' | append: product.id | append: '-' | append: context, class: 'notify-me__form' -%}
+          {%- if form.posted_successfully? -%}
+            <p class="form-status form-status--success" tabindex="-1">
+              {{ 'products.product.notify_me.success' | t }}
+            </p>
+          {%- else -%}
+            <input
+              type="hidden"
+              name="contact[body]"
+              value="{{ 'products.product.notify_me.subject' | t: product: product.title }} — {{ shop.url }}{{ product.url }}"
+            >
+            <div class="notify-me__field">
+              <label class="visually-hidden" for="notify-email-{{ product.id }}-{{ context }}">
+                {{- 'products.product.notify_me.email_label' | t -}}
+              </label>
+              <input
+                id="notify-email-{{ product.id }}-{{ context }}"
+                type="email"
+                name="contact[email]"
+                placeholder="{{ 'newsletter.placeholder' | t | escape }}"
+                autocomplete="email"
+                required
+              >
+              <button type="submit" class="button button--small">
+                {{ 'products.product.notify_me.submit' | t }}
+              </button>
+            </div>
+            {%- if form.errors -%}
+              <p class="field__error">{{ form.errors.messages.email }}</p>
+            {%- endif -%}
+          {%- endif -%}
+        {%- endform -%}
+      </div>
+    {%- endif -%}
+  {%- endif -%}
+
+  {%- if settings.wishlist_enabled and block.settings.show_wishlist -%}
+    <div class="buy-buttons__wishlist">
+      {%- render 'wishlist-button', product: product, class: 'wishlist-button--labelled' -%}
+      <span class="text-small" data-wishlist-label>{{ 'wishlist.add' | t }}</span>
+    </div>
+  {%- endif -%}
+</div>

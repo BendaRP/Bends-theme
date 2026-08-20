@@ -1,0 +1,131 @@
+{%- style -%}
+  {%- render 'section-styles', section_id: section.id, s: section.settings -%}
+{%- endstyle -%}
+
+<div class="section-wrapper color-{{ section.settings.color_scheme }}">
+  <article class="section article-page">
+    <div class="page-width page-width--narrow">
+      {%- if section.settings.show_breadcrumbs -%}
+        {%- render 'breadcrumbs' -%}
+      {%- endif -%}
+
+      <header class="article-page__head">
+        {%- if article.tags.size > 0 -%}
+          <span class="eyebrow">{{ article.tags.first }}</span>
+        {%- endif -%}
+        <h1 class="h1">{{ article.title }}</h1>
+        <div class="article-page__meta text-small text-muted">
+          {%- if section.settings.show_date -%}
+            <span>{{ 'blogs.article.published_on' | t: date: article.published_at | date: format: 'date' }}</span>
+          {%- endif -%}
+          {%- if section.settings.show_author and article.author != blank -%}
+            <span>{{ 'blogs.article.written_by' | t: author: article.author }}</span>
+          {%- endif -%}
+          {%- if section.settings.show_read_time -%}
+            {%- assign word_count = article.content | strip_html | split: ' ' | size -%}
+            {%- assign minutes = word_count | divided_by: 200 | at_least: 1 -%}
+            <span>{{ 'blogs.article.read_time' | t: minutes: minutes }}</span>
+          {%- endif -%}
+        </div>
+      </header>
+    </div>
+
+    {%- if article.image and section.settings.show_image -%}
+      <div class="page-width">
+        <div class="frame article-page__hero" data-ratio="wide">
+          {%- render 'responsive-image', image: article.image, sizes: '100vw', priority: true -%}
+        </div>
+      </div>
+    {%- endif -%}
+
+    <div class="page-width page-width--narrow">
+      <div class="rte article-page__content">{{ article.content }}</div>
+
+      {%- if section.settings.show_share -%}
+        {%- render 'share-buttons', share_url: article.url, share_title: article.title, context: 'article' -%}
+      {%- endif -%}
+
+      {%- if blog.comments_enabled? -%}
+        <section class="comments" id="comments">
+          <h2 class="h4">
+            {{- 'blogs.comments.with_count' | t: count: article.comments_count -}}
+          </h2>
+
+          {%- if article.comments_count > 0 -%}
+            <ul class="comments__list">
+              {%- for comment in article.comments -%}
+                <li class="comments__item">
+                  <p class="comments__author text-small">{{ comment.author }}</p>
+                  <p class="comments__date text-tiny text-muted">{{ comment.created_at | date: format: 'date' }}</p>
+                  <div class="rte text-small">{{ comment.content }}</div>
+                </li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+
+          {%- form 'new_comment', article, class: 'comments__form' -%}
+            {%- if form.posted_successfully? -%}
+              <p class="form-status form-status--success" tabindex="-1">
+                {%- if blog.moderated? -%}
+                  {{ 'blogs.comments.success_moderated' | t }}
+                {%- else -%}
+                  {{ 'blogs.comments.success' | t }}
+                {%- endif -%}
+              </p>
+            {%- endif -%}
+
+            {%- if form.errors -%}
+              <p class="form-status form-status--error" tabindex="-1">
+                {{ form.errors.messages.form }}
+              </p>
+            {%- endif -%}
+
+            <div class="comments__fields">
+              <div class="field">
+                <label class="field__label" for="CommentAuthor">{{ 'blogs.comments.name' | t }}</label>
+                <input id="CommentAuthor" type="text" name="comment[author]" autocomplete="name" required>
+              </div>
+              <div class="field">
+                <label class="field__label" for="CommentEmail">{{ 'blogs.comments.email' | t }}</label>
+                <input id="CommentEmail" type="email" name="comment[email]" autocomplete="email" required>
+              </div>
+            </div>
+            <div class="field">
+              <label class="field__label" for="CommentBody">{{ 'blogs.comments.message' | t }}</label>
+              <textarea id="CommentBody" name="comment[body]" required></textarea>
+            </div>
+            {%- if blog.moderated? -%}
+              <p class="text-tiny text-muted">{{ 'blogs.comments.moderated' | t }}</p>
+            {%- endif -%}
+            <button type="submit" class="button">{{ 'blogs.comments.post' | t }}</button>
+          {%- endform -%}
+        </section>
+      {%- endif -%}
+
+      <a class="button button--link" href="{{ blog.url }}">
+        {% render 'icon', icon: 'arrow-left' %}
+        <span>{{ 'blogs.article.back_to_blog' | t: title: blog.title }}</span>
+      </a>
+    </div>
+  </article>
+</div>
+
+{% schema %}
+{
+  "name": "Article",
+  "tag": "section",
+  "class": "section-main-article",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-1" },
+    { "type": "checkbox", "id": "show_breadcrumbs", "label": "Show breadcrumbs", "default": true },
+    { "type": "checkbox", "id": "show_image", "label": "Show the featured image", "default": true },
+    { "type": "checkbox", "id": "show_date", "label": "Show the date", "default": true },
+    { "type": "checkbox", "id": "show_author", "label": "Show the author", "default": true },
+    { "type": "checkbox", "id": "show_read_time", "label": "Show the reading time", "default": true },
+    { "type": "checkbox", "id": "show_share", "label": "Show share buttons", "default": true },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Top padding", "default": 40 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Bottom padding", "default": 64 }
+  ]
+}
+{% endschema %}

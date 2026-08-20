@@ -1,0 +1,23 @@
+{%- comment -%}
+  Wishlist toggle. State lives in the visitor's own browser, so it survives
+  between visits without an account and without a paid app.
+
+  Accepts:
+  - product: {Product}
+  - class:   {String} extra class names
+{%- endcomment -%}
+{%- if settings.wishlist_enabled and product != blank -%}
+  <button
+    type="button"
+    class="wishlist-button tap-target {{ class }}"
+    data-wishlist-toggle
+    data-product-handle="{{ product.handle }}"
+    data-product-id="{{ product.id }}"
+    aria-pressed="false"
+    aria-label="{{ 'wishlist.add' | t }}"
+    title="{{ 'wishlist.add' | t }}"
+  >
+    {% render 'icon', icon: 'heart', class: 'wishlist-button__off' %}
+    {% render 'icon', icon: 'heart-filled', class: 'wishlist-button__on' %}
+  </button>
+{%- endif -%}

@@ -1,0 +1,115 @@
+{%- style -%}
+  {%- render 'section-styles', section_id: section.id, s: section.settings -%}
+  #shopify-section-{{ section.id }} { --grid-mobile: {{ section.settings.columns_mobile }}; }
+{%- endstyle -%}
+
+<div class="section-wrapper color-{{ section.settings.color_scheme }}">
+  <div class="section">
+    <div class="page-width">
+      <div class="search-page__head">
+        <h1 class="h2">
+          {%- if search.performed -%}
+            {{ 'general.search.results_for' | t: terms: search.terms }}
+          {%- else -%}
+            {{ 'templates.search.title' | t }}
+          {%- endif -%}
+        </h1>
+        {%- render 'predictive-search', context: 'page' -%}
+      </div>
+
+      {%- if search.performed -%}
+        {%- if search.results_count > 0 -%}
+          <p class="text-small text-muted">
+            {{- 'general.search.results_with_count' | t: count: search.results_count -}}
+          </p>
+
+          {%- paginate search.results by section.settings.results_per_page -%}
+            <div class="collection-layout collection-layout--{{ section.settings.filter_layout }}">
+              {%- if section.settings.show_filters and search.filters.size > 0 -%}
+                <button
+                  class="button button--secondary button--small collection-layout__filter-toggle"
+                  type="button"
+                  data-facet-toggle
+                  aria-expanded="false"
+                  aria-controls="SearchFacets-{{ section.id }}"
+                >
+                  {% render 'icon', icon: 'filter' %}
+                  <span>{{ 'products.facets.filter_and_sort' | t }}</span>
+                </button>
+                <aside class="collection-layout__aside" id="SearchFacets-{{ section.id }}" data-facet-panel>
+                  {%- render 'facets', results: search, context: 'search', layout: section.settings.filter_layout -%}
+                </aside>
+              {%- endif -%}
+
+              <div class="collection-layout__main" id="SearchResults">
+                <div class="grid grid--auto" data-product-grid>
+                  {%- for item in search.results -%}
+                    {%- case item.object_type -%}
+                      {%- when 'product' -%}
+                        {%- render 'product-card', product: item, index: forloop.index0 -%}
+                      {%- when 'article' -%}
+                        {%- render 'article-card', article: item, index: forloop.index0 -%}
+                      {%- else -%}
+                        <div class="search-card" data-reveal>
+                          <a class="search-card__link" href="{{ item.url }}">
+                            <span class="eyebrow">{{ item.object_type }}</span>
+                            <span class="h5">{{ item.title }}</span>
+                          </a>
+                        </div>
+                    {%- endcase -%}
+                  {%- endfor -%}
+                </div>
+
+                {%- render 'pagination', paginate: paginate, anchor: '#SearchResults' -%}
+              </div>
+            </div>
+          {%- endpaginate -%}
+        {%- else -%}
+          <div class="collection-empty">
+            <p class="h4">{{ 'general.search.no_results' | t: terms: search.terms }}</p>
+            <a class="button" href="{{ routes.all_products_collection_url }}">
+              {{ 'collections.general.browse_all' | t }}
+            </a>
+          </div>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Search results",
+  "tag": "section",
+  "class": "section-main-search",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-1" },
+    { "type": "range", "id": "results_per_page", "min": 8, "max": 48, "step": 4, "label": "Results per page", "default": 24 },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Columns on mobile",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "2"
+    },
+    { "type": "checkbox", "id": "show_filters", "label": "Show filters", "default": true },
+    {
+      "type": "select",
+      "id": "filter_layout",
+      "label": "Filter layout",
+      "options": [
+        { "value": "sidebar", "label": "Sidebar" },
+        { "value": "drawer", "label": "Drawer" },
+        { "value": "inline", "label": "Along the top" }
+      ],
+      "default": "drawer"
+    },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Top padding", "default": 40 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Bottom padding", "default": 64 }
+  ]
+}
+{% endschema %}

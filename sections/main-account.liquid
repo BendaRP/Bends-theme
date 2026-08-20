@@ -1,0 +1,85 @@
+{%- style -%}
+  {%- render 'section-styles', section_id: section.id, s: section.settings -%}
+{%- endstyle -%}
+
+<div class="section-wrapper color-{{ section.settings.color_scheme }}">
+  <div class="section">
+    <div class="page-width">
+      <div class="account-head">
+        <h1 class="h2">{{ 'customer.account.title' | t }}</h1>
+        <div class="cluster">
+          <a class="button button--secondary button--small" href="{{ routes.account_addresses_url }}">
+            {{ 'customer.account.view_addresses' | t }}
+          </a>
+          <a class="button button--link button--small" href="{{ routes.account_logout_url }}">
+            {{ 'customer.log_out' | t }}
+          </a>
+        </div>
+      </div>
+
+      <div class="account-layout">
+        <section class="account-orders">
+          <h2 class="h4">{{ 'customer.orders.title' | t }}</h2>
+          {%- paginate customer.orders by 20 -%}
+            {%- if customer.orders.size > 0 -%}
+              <div class="table-scroll">
+                <table class="account-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">{{ 'customer.orders.order_number' | t }}</th>
+                      <th scope="col">{{ 'customer.orders.date' | t }}</th>
+                      <th scope="col">{{ 'customer.orders.payment_status' | t }}</th>
+                      <th scope="col">{{ 'customer.orders.fulfillment_status' | t }}</th>
+                      <th scope="col">{{ 'customer.orders.total' | t }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {%- for order in customer.orders -%}
+                      <tr>
+                        <th scope="row">
+                          <a class="link" href="{{ order.customer_url }}">{{ order.name }}</a>
+                        </th>
+                        <td>{{ order.created_at | date: format: 'date' }}</td>
+                        <td>{{ order.financial_status_label }}</td>
+                        <td>{{ order.fulfillment_status_label }}</td>
+                        <td>{{ order.total_price | money }}</td>
+                      </tr>
+                    {%- endfor -%}
+                  </tbody>
+                </table>
+              </div>
+              {%- render 'pagination', paginate: paginate, anchor: '' -%}
+            {%- else -%}
+              <p class="text-muted">{{ 'customer.orders.none' | t }}</p>
+              <a class="button" href="{{ routes.all_products_collection_url }}">
+                {{ 'cart.general.continue_shopping' | t }}
+              </a>
+            {%- endif -%}
+          {%- endpaginate -%}
+        </section>
+
+        <aside class="account-details">
+          <h2 class="h5">{{ 'customer.account.details' | t }}</h2>
+          {{ customer.default_address | format_address }}
+          <a class="link text-small" href="{{ routes.account_addresses_url }}">
+            {{ 'customer.addresses.title' | t }}
+          </a>
+        </aside>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Account",
+  "tag": "section",
+  "class": "section-main-account",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-1" },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Top padding", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Bottom padding", "default": 64 }
+  ]
+}
+{% endschema %}

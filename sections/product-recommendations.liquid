@@ -1,0 +1,26 @@
+{%- comment -%}
+  Shopify's own recommendation engine. Fetched over AJAX so it never delays
+  the first paint of the product page.
+{%- endcomment -%}
+{%- if recommendations.performed and recommendations.products_count > 0 -%}
+  <div data-recommendations-content>
+    <div class="complementary__list">
+      {%- for recommended in recommendations.products -%}
+        {%- render 'product-card',
+          product: recommended,
+          index: forloop.index0,
+          sizes: '(min-width: 990px) 20vw, 40vw',
+          class: 'product-card--compact'
+        -%}
+      {%- endfor -%}
+    </div>
+  </div>
+{%- else -%}
+  <div data-recommendations-content></div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Product recommendations"
+}
+{% endschema %}

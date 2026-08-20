@@ -1,0 +1,159 @@
+{%- comment -%}
+  Product media: images, video, external video and 3D models.
+
+  Accepts:
+  - product: {Product}
+  - layout:  {String} overrides the theme's gallery layout setting
+  - compact: {Boolean} a smaller gallery, used by quick view
+{%- endcomment -%}
+{%- liquid
+  assign gallery_layout = layout | default: settings.product_gallery_layout
+  if compact
+    assign gallery_layout = 'carousel'
+  endif
+  assign media_count = product.media.size
+  assign zoom_mode = settings.product_zoom
+  if compact
+    assign zoom_mode = 'none'
+  endif
+  assign gallery_sizes = '(min-width: 990px) 50vw, 100vw'
+  if compact
+    assign gallery_sizes = '(min-width: 750px) 40vw, 90vw'
+  endif
+-%}
+<product-gallery
+  class="product-gallery product-gallery--{{ gallery_layout }}"
+  data-zoom="{{ zoom_mode }}"
+  data-count="{{ media_count }}"
+>
+  {%- if media_count == 0 -%}
+    <div class="frame" data-ratio="portrait">
+      <div class="media-placeholder">{{ 'product-1' | placeholder_svg_tag }}</div>
+    </div>
+  {%- else -%}
+    <div
+      class="product-gallery__stage"
+      data-gallery-stage
+      role="region"
+      aria-roledescription="{{ 'accessibility.carousel' | t }}"
+      aria-label="{{ 'products.product.media.gallery_label' | t }}"
+    >
+      {%- for media in product.media -%}
+        <div
+          class="product-gallery__slide{% if forloop.first %} is-active{% endif %}"
+          data-gallery-slide
+          data-media-id="{{ media.id }}"
+          data-media-type="{{ media.media_type }}"
+          {% unless forloop.first %}aria-hidden="true"{% endunless %}
+        >
+          {%- case media.media_type -%}
+            {%- when 'image' -%}
+              <div class="frame" data-ratio="{% if settings.card_image_ratio == 'adapt' %}adapt{% else %}portrait{% endif %}">
+                {%- render 'responsive-image',
+                  image: media,
+                  sizes: gallery_sizes,
+                  priority: forloop.first,
+                  class: 'product-gallery__image'
+                -%}
+                {%- if zoom_mode != 'none' -%}
+                  <button
+                    class="product-gallery__zoom tap-target"
+                    type="button"
+                    data-gallery-zoom
+                    data-index="{{ forloop.index0 }}"
+                    aria-label="{{ 'accessibility.zoom_image' | t }}"
+                  >
+                    {% render 'icon', icon: 'zoom' %}
+                  </button>
+                {%- endif -%}
+              </div>
+
+            {%- when 'video' -%}
+              <div class="frame" data-ratio="portrait">
+                {{ media | video_tag: image_size: '1100x', controls: true, muted: false, playsinline: true }}
+              </div>
+
+            {%- when 'external_video' -%}
+              <div class="frame" data-ratio="wide">
+                {{ media | external_video_tag: loading: 'lazy' }}
+              </div>
+
+            {%- when 'model' -%}
+              <div class="frame" data-ratio="portrait">
+                {{ media | model_viewer_tag: image_size: '1100x', reveal: 'interaction', toggleable: true }}
+              </div>
+
+            {%- else -%}
+              <div class="frame" data-ratio="portrait">
+                {{ media | media_tag: image_size: '1100x' }}
+              </div>
+          {%- endcase -%}
+        </div>
+      {%- endfor -%}
+
+      {%- if media_count > 1 and gallery_layout == 'carousel' -%}
+        <button class="product-gallery__arrow product-gallery__arrow--prev tap-target" type="button" data-gallery-prev aria-label="{{ 'accessibility.previous_slide' | t }}">
+          {% render 'icon', icon: 'chevron-left' %}
+        </button>
+        <button class="product-gallery__arrow product-gallery__arrow--next tap-target" type="button" data-gallery-next aria-label="{{ 'accessibility.next_slide' | t }}">
+          {% render 'icon', icon: 'chevron-right' %}
+        </button>
+        <p class="product-gallery__counter text-tiny" data-gallery-counter aria-live="polite">
+          <span data-gallery-current>1</span> / {{ media_count }}
+        </p>
+      {%- endif -%}
+    </div>
+
+    {%- if media_count > 1 and gallery_layout != 'carousel' -%}
+      <ul class="product-gallery__thumbs" data-gallery-thumbs>
+        {%- for media in product.media -%}
+          <li>
+            <button
+              class="product-gallery__thumb{% if forloop.first %} is-active{% endif %}"
+              type="button"
+              data-gallery-thumb
+              data-index="{{ forloop.index0 }}"
+              data-media-id="{{ media.id }}"
+              aria-label="{{ 'accessibility.thumbnail_for' | t: index: forloop.index }}"
+            >
+              <div class="frame frame--soft" data-ratio="square">
+                {%- render 'responsive-image',
+                  image: media.preview_image,
+                  widths: '80,120,160,240',
+                  sizes: '84px',
+                  max_width: 240
+                -%}
+              </div>
+              {%- if media.media_type == 'video' or media.media_type == 'external_video' -%}
+                <span class="product-gallery__thumb-badge">{% render 'icon', icon: 'play' %}</span>
+              {%- elsif media.media_type == 'model' -%}
+                <span class="product-gallery__thumb-badge">{% render 'icon', icon: 'expand' %}</span>
+              {%- endif -%}
+            </button>
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  {%- endif -%}
+</product-gallery>
+
+{%- if zoom_mode == 'lightbox' and media_count > 0 -%}
+  <div class="lightbox" data-lightbox hidden>
+    <button class="lightbox__close tap-target" type="button" data-lightbox-close aria-label="{{ 'products.product.media.close_lightbox' | t }}">
+      {% render 'icon', icon: 'close', class: 'icon--large' %}
+    </button>
+    <div class="lightbox__stage" data-lightbox-stage>
+      {%- for media in product.media -%}
+        {%- if media.media_type == 'image' -%}
+          <div class="lightbox__item" data-lightbox-item data-index="{{ forloop.index0 }}">
+            {%- render 'responsive-image',
+              image: media,
+              sizes: '(min-width: 750px) 90vw, 100vw',
+              widths: '600,900,1200,1600,2048'
+            -%}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+{%- endif -%}

@@ -1,0 +1,608 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Bends",
+    "theme_author": "Bends Studio",
+    "theme_version": "1.0.0",
+    "theme_documentation_url": "https://github.com/BendaRP/Bends-theme",
+    "theme_support_url": "https://github.com/BendaRP/Bends-theme/issues"
+  },
+
+  {
+    "name": "Brand",
+    "settings": [
+      { "type": "image_picker", "id": "logo", "label": "Logo" },
+      { "type": "range", "id": "logo_width", "min": 40, "max": 320, "step": 5, "unit": "px", "label": "Logo width (desktop)", "default": 130 },
+      { "type": "range", "id": "logo_width_mobile", "min": 40, "max": 220, "step": 5, "unit": "px", "label": "Logo width (mobile)", "default": 95 },
+      { "type": "image_picker", "id": "logo_inverted", "label": "Logo for dark backgrounds", "info": "Used on transparent headers over imagery and in dark mode." },
+      { "type": "image_picker", "id": "favicon", "label": "Favicon", "info": "512 x 512 px .png recommended." },
+      { "type": "text", "id": "brand_name", "label": "Brand name", "info": "Used for structured data and the accessible page landmark. Leave blank to use the store name." },
+      { "type": "richtext", "id": "brand_description", "label": "Brand description", "info": "Shown in the footer brand block and used for Organization structured data.", "default": "<p>Made in small batches. Shipped with care.</p>" },
+      { "type": "header", "content": "Social profiles" },
+      { "type": "text", "id": "social_instagram_link", "label": "Instagram" },
+      { "type": "text", "id": "social_facebook_link", "label": "Facebook" },
+      { "type": "text", "id": "social_tiktok_link", "label": "TikTok" },
+      { "type": "text", "id": "social_youtube_link", "label": "YouTube" },
+      { "type": "text", "id": "social_x_link", "label": "X" },
+      { "type": "text", "id": "social_pinterest_link", "label": "Pinterest" },
+      { "type": "text", "id": "social_linkedin_link", "label": "LinkedIn" },
+      { "type": "text", "id": "social_whatsapp_link", "label": "WhatsApp", "info": "Use the full https://wa.me/… link." },
+      { "type": "text", "id": "social_telegram_link", "label": "Telegram" }
+    ]
+  },
+
+  {
+    "name": "Colors",
+    "settings": [
+      {
+        "type": "color_scheme_group",
+        "id": "color_schemes",
+        "definition": [
+          { "type": "color", "id": "background", "label": "Background", "default": "#FFFFFF" },
+          { "type": "color_background", "id": "background_gradient", "label": "Background gradient", "info": "Replaces the background colour where supported." },
+          { "type": "color", "id": "text", "label": "Text", "default": "#171512" },
+          { "type": "color", "id": "text_muted", "label": "Muted text", "default": "#6B655C" },
+          { "type": "color", "id": "accent", "label": "Accent", "default": "#8C4A2F" },
+          { "type": "color", "id": "button", "label": "Primary button background", "default": "#171512" },
+          { "type": "color", "id": "button_label", "label": "Primary button text", "default": "#FFFFFF" },
+          { "type": "color", "id": "secondary_button_label", "label": "Secondary button text", "default": "#171512" },
+          { "type": "color", "id": "border", "label": "Borders and rules", "default": "#DED8CE" },
+          { "type": "color", "id": "card", "label": "Card surface", "default": "#F7F4EE" },
+          { "type": "color", "id": "shadow", "label": "Shadow", "default": "#171512" }
+        ],
+        "role": {
+          "background": { "solid": "background", "gradient": "background_gradient" },
+          "text": "text",
+          "primary_button": "button",
+          "on_primary_button": "button_label",
+          "primary_button_border": "button",
+          "secondary_button": "background",
+          "on_secondary_button": "secondary_button_label",
+          "secondary_button_border": "secondary_button_label",
+          "links": "accent",
+          "icons": "text",
+          "shadow": "shadow"
+        }
+      },
+      { "type": "header", "content": "Status colours" },
+      { "type": "color", "id": "color_sale", "label": "Sale / discount", "default": "#A32E28" },
+      { "type": "color", "id": "color_success", "label": "In stock / success", "default": "#2C6E49" },
+      { "type": "color", "id": "color_warning", "label": "Low stock / urgency", "default": "#B45309" },
+      { "type": "color", "id": "color_error", "label": "Error / sold out", "default": "#A32E28" },
+      { "type": "header", "content": "Dark mode" },
+      {
+        "type": "select",
+        "id": "dark_mode",
+        "label": "Dark mode",
+        "options": [
+          { "value": "off", "label": "Off" },
+          { "value": "auto", "label": "Follow the visitor's device" },
+          { "value": "toggle", "label": "Off by default, with a visitor toggle" },
+          { "value": "auto_toggle", "label": "Follow device, with a visitor toggle" }
+        ],
+        "default": "off"
+      },
+      { "type": "color", "id": "dark_background", "label": "Dark background", "default": "#14120F" },
+      { "type": "color", "id": "dark_card", "label": "Dark card surface", "default": "#1E1B17" },
+      { "type": "color", "id": "dark_text", "label": "Dark text", "default": "#F2EDE5" },
+      { "type": "color", "id": "dark_text_muted", "label": "Dark muted text", "default": "#A8A093" },
+      { "type": "color", "id": "dark_border", "label": "Dark borders", "default": "#332E27" },
+      { "type": "color", "id": "dark_accent", "label": "Dark accent", "default": "#D89A6A" }
+    ]
+  },
+
+  {
+    "name": "Typography",
+    "settings": [
+      { "type": "header", "content": "Headings" },
+      { "type": "font_picker", "id": "type_heading_font", "label": "Heading font", "default": "assistant_n4" },
+      { "type": "text", "id": "type_heading_stack", "label": "Heading font stack (takes priority)", "info": "Comma-separated CSS families rendered before the font above. Lets you keep a Hebrew serif for headings. Clear the field to use only the picked font.", "default": "\"Frank Ruhl Libre\", \"David Libre\", \"Times New Roman\"" },
+      { "type": "range", "id": "type_heading_scale", "min": 80, "max": 160, "step": 2, "unit": "%", "label": "Heading size", "default": 100 },
+      { "type": "range", "id": "type_heading_tracking", "min": -6, "max": 12, "step": 1, "unit": "px", "label": "Heading letter spacing", "default": -1, "info": "Value is divided by 100. Negative tightens." },
+      { "type": "range", "id": "type_heading_line_height", "min": 90, "max": 170, "step": 5, "unit": "%", "label": "Heading line height", "default": 110 },
+      {
+        "type": "select",
+        "id": "type_heading_transform",
+        "label": "Heading capitalisation",
+        "options": [
+          { "value": "none", "label": "As typed" },
+          { "value": "uppercase", "label": "UPPERCASE" },
+          { "value": "lowercase", "label": "lowercase" }
+        ],
+        "default": "none"
+      },
+      { "type": "range", "id": "type_heading_weight", "min": 300, "max": 900, "step": 100, "label": "Heading weight", "default": 500 },
+      { "type": "header", "content": "Body" },
+      { "type": "font_picker", "id": "type_body_font", "label": "Body font", "default": "assistant_n4" },
+      { "type": "text", "id": "type_body_stack", "label": "Body font stack (takes priority)", "info": "Comma-separated CSS families rendered before the font above.", "default": "" },
+      { "type": "range", "id": "type_body_scale", "min": 85, "max": 135, "step": 1, "unit": "%", "label": "Body size", "default": 100 },
+      { "type": "range", "id": "type_body_line_height", "min": 120, "max": 200, "step": 5, "unit": "%", "label": "Body line height", "default": 160 },
+      { "type": "range", "id": "type_body_tracking", "min": -3, "max": 8, "step": 1, "unit": "px", "label": "Body letter spacing", "default": 0, "info": "Value is divided by 100." },
+      { "type": "header", "content": "Accents and labels" },
+      { "type": "range", "id": "type_eyebrow_scale", "min": 60, "max": 120, "step": 2, "unit": "%", "label": "Eyebrow / label size", "default": 78 },
+      { "type": "range", "id": "type_eyebrow_tracking", "min": 0, "max": 30, "step": 1, "unit": "px", "label": "Eyebrow letter spacing", "default": 14, "info": "Value is divided by 100." },
+      {
+        "type": "select",
+        "id": "type_eyebrow_transform",
+        "label": "Eyebrow capitalisation",
+        "options": [
+          { "value": "none", "label": "As typed" },
+          { "value": "uppercase", "label": "UPPERCASE" }
+        ],
+        "default": "uppercase"
+      }
+    ]
+  },
+
+  {
+    "name": "Layout and shape",
+    "settings": [
+      { "type": "header", "content": "Page" },
+      { "type": "range", "id": "layout_page_width", "min": 1000, "max": 1800, "step": 20, "unit": "px", "label": "Maximum content width", "default": 1360 },
+      { "type": "range", "id": "layout_narrow_width", "min": 560, "max": 1100, "step": 20, "unit": "px", "label": "Maximum reading width", "default": 760, "info": "Used for long-form text such as articles and policies." },
+      { "type": "range", "id": "layout_gutter", "min": 12, "max": 64, "step": 2, "unit": "px", "label": "Side gutter", "default": 24 },
+      { "type": "range", "id": "layout_spacing_scale", "min": 60, "max": 160, "step": 5, "unit": "%", "label": "Vertical breathing room", "default": 100, "info": "Scales the padding of every section at once. Higher values read as more premium." },
+      { "type": "range", "id": "layout_grid_gap", "min": 8, "max": 56, "step": 2, "unit": "px", "label": "Grid gap", "default": 20 },
+      { "type": "header", "content": "Signature shape" },
+      { "type": "paragraph", "content": "The shape language applied to media frames, cards and overlays. This is what stops the storefront reading as a stock template — pick one and it flows through every section." },
+      {
+        "type": "select",
+        "id": "shape_signature",
+        "label": "Media frame shape",
+        "options": [
+          { "value": "arch", "label": "Arch — cathedral top" },
+          { "value": "notch", "label": "Notch — cut corner" },
+          { "value": "rounded", "label": "Rounded" },
+          { "value": "pill", "label": "Pill" },
+          { "value": "square", "label": "Square" }
+        ],
+        "default": "arch"
+      },
+      { "type": "range", "id": "shape_arch_depth", "min": 10, "max": 60, "step": 2, "unit": "%", "label": "Arch depth", "default": 34, "info": "Only applies to the Arch and Pill shapes." },
+      { "type": "range", "id": "shape_notch_size", "min": 8, "max": 72, "step": 2, "unit": "px", "label": "Notch size", "default": 28, "info": "Only applies to the Notch shape." },
+      { "type": "header", "content": "Corners" },
+      { "type": "range", "id": "radius_base", "min": 0, "max": 32, "step": 1, "unit": "px", "label": "Corner radius", "default": 4 },
+      { "type": "range", "id": "radius_card", "min": 0, "max": 40, "step": 1, "unit": "px", "label": "Card corner radius", "default": 6 },
+      { "type": "range", "id": "radius_button", "min": 0, "max": 50, "step": 1, "unit": "px", "label": "Button corner radius", "default": 50 },
+      { "type": "range", "id": "radius_input", "min": 0, "max": 40, "step": 1, "unit": "px", "label": "Input corner radius", "default": 4 },
+      { "type": "header", "content": "Depth" },
+      {
+        "type": "select",
+        "id": "shadow_style",
+        "label": "Shadow style",
+        "options": [
+          { "value": "none", "label": "None" },
+          { "value": "soft", "label": "Soft" },
+          { "value": "lifted", "label": "Lifted" },
+          { "value": "hard", "label": "Hard offset" }
+        ],
+        "default": "soft"
+      },
+      { "type": "range", "id": "shadow_opacity", "min": 0, "max": 60, "step": 2, "unit": "%", "label": "Shadow strength", "default": 10 },
+      { "type": "range", "id": "border_width", "min": 0, "max": 4, "step": 1, "unit": "px", "label": "Border width", "default": 1 }
+    ]
+  },
+
+  {
+    "name": "Buttons and links",
+    "settings": [
+      {
+        "type": "select",
+        "id": "button_style",
+        "label": "Primary button style",
+        "options": [
+          { "value": "solid", "label": "Solid" },
+          { "value": "outline", "label": "Outline" },
+          { "value": "underline", "label": "Underline" }
+        ],
+        "default": "solid"
+      },
+      {
+        "type": "select",
+        "id": "button_hover",
+        "label": "Button hover effect",
+        "options": [
+          { "value": "none", "label": "None" },
+          { "value": "lift", "label": "Lift" },
+          { "value": "fill", "label": "Wipe fill" },
+          { "value": "invert", "label": "Invert" },
+          { "value": "shine", "label": "Shine" },
+          { "value": "arrow", "label": "Arrow slide" }
+        ],
+        "default": "fill"
+      },
+      { "type": "range", "id": "button_padding_y", "min": 8, "max": 28, "step": 1, "unit": "px", "label": "Button height padding", "default": 15 },
+      { "type": "range", "id": "button_padding_x", "min": 12, "max": 60, "step": 2, "unit": "px", "label": "Button width padding", "default": 30 },
+      { "type": "range", "id": "button_weight", "min": 400, "max": 800, "step": 100, "label": "Button text weight", "default": 600 },
+      { "type": "range", "id": "button_tracking", "min": 0, "max": 20, "step": 1, "unit": "px", "label": "Button letter spacing", "default": 4, "info": "Value is divided by 100." },
+      {
+        "type": "select",
+        "id": "button_transform",
+        "label": "Button capitalisation",
+        "options": [
+          { "value": "none", "label": "As typed" },
+          { "value": "uppercase", "label": "UPPERCASE" }
+        ],
+        "default": "none"
+      },
+      { "type": "header", "content": "Links" },
+      {
+        "type": "select",
+        "id": "link_underline",
+        "label": "Link underline",
+        "options": [
+          { "value": "always", "label": "Always" },
+          { "value": "hover", "label": "On hover" },
+          { "value": "never", "label": "Never" }
+        ],
+        "default": "hover"
+      },
+      { "type": "header", "content": "Ink accent" },
+      { "type": "paragraph", "content": "A hand-drawn stroke that can sit under headings. Sections choose whether to use it; this controls how it looks." },
+      {
+        "type": "select",
+        "id": "ink_style",
+        "label": "Ink stroke style",
+        "options": [
+          { "value": "brush", "label": "Brush" },
+          { "value": "scribble", "label": "Scribble" },
+          { "value": "straight", "label": "Straight rule" },
+          { "value": "double", "label": "Double rule" }
+        ],
+        "default": "brush"
+      },
+      { "type": "range", "id": "ink_thickness", "min": 1, "max": 12, "step": 1, "unit": "px", "label": "Ink thickness", "default": 4 },
+      { "type": "range", "id": "ink_opacity", "min": 10, "max": 100, "step": 5, "unit": "%", "label": "Ink opacity", "default": 100 }
+    ]
+  },
+
+  {
+    "name": "Animation",
+    "settings": [
+      { "type": "checkbox", "id": "animations_enabled", "label": "Enable animations", "default": true, "info": "Visitors who ask their device to reduce motion never see animation, whatever this is set to." },
+      {
+        "type": "select",
+        "id": "animation_style",
+        "label": "Reveal style",
+        "options": [
+          { "value": "fade", "label": "Fade" },
+          { "value": "rise", "label": "Rise" },
+          { "value": "slide", "label": "Slide in" },
+          { "value": "mask", "label": "Mask wipe" },
+          { "value": "zoom", "label": "Zoom" }
+        ],
+        "default": "rise",
+        "visible_if": "{{ settings.animations_enabled }}"
+      },
+      { "type": "range", "id": "animation_duration", "min": 200, "max": 1400, "step": 50, "unit": "ms", "label": "Reveal duration", "default": 650, "visible_if": "{{ settings.animations_enabled }}" },
+      { "type": "range", "id": "animation_stagger", "min": 0, "max": 300, "step": 10, "unit": "ms", "label": "Stagger between items", "default": 70, "visible_if": "{{ settings.animations_enabled }}" },
+      { "type": "checkbox", "id": "animation_images_hover", "label": "Animate images on hover", "default": true },
+      {
+        "type": "select",
+        "id": "image_hover_effect",
+        "label": "Image hover effect",
+        "options": [
+          { "value": "zoom", "label": "Slow zoom" },
+          { "value": "second_image", "label": "Show second image" },
+          { "value": "slide", "label": "Slide through gallery" },
+          { "value": "tilt", "label": "Tilt" },
+          { "value": "none", "label": "None" }
+        ],
+        "default": "second_image",
+        "visible_if": "{{ settings.animation_images_hover }}"
+      },
+      { "type": "checkbox", "id": "animation_sticky_reveal", "label": "Reveal the header on scroll up", "default": true },
+      { "type": "checkbox", "id": "scroll_progress_enabled", "label": "Show a scroll progress bar", "default": false },
+      { "type": "checkbox", "id": "skeleton_loading", "label": "Show skeleton placeholders while content loads", "default": true }
+    ]
+  },
+
+  {
+    "name": "Product cards",
+    "settings": [
+      {
+        "type": "select",
+        "id": "card_image_ratio",
+        "label": "Image ratio",
+        "options": [
+          { "value": "adapt", "label": "Adapt to image" },
+          { "value": "square", "label": "Square (1:1)" },
+          { "value": "portrait", "label": "Portrait (3:4)" },
+          { "value": "tall", "label": "Tall (2:3)" },
+          { "value": "landscape", "label": "Landscape (4:3)" }
+        ],
+        "default": "portrait"
+      },
+      {
+        "type": "select",
+        "id": "card_text_alignment",
+        "label": "Text alignment",
+        "options": [
+          { "value": "start", "label": "Start of line" },
+          { "value": "center", "label": "Centre" }
+        ],
+        "default": "start"
+      },
+      {
+        "type": "select",
+        "id": "card_style",
+        "label": "Card style",
+        "options": [
+          { "value": "plain", "label": "Plain" },
+          { "value": "surface", "label": "Surface" },
+          { "value": "bordered", "label": "Bordered" }
+        ],
+        "default": "plain"
+      },
+      { "type": "checkbox", "id": "card_show_vendor", "label": "Show vendor", "default": false },
+      { "type": "checkbox", "id": "card_show_rating", "label": "Show star rating", "default": true, "info": "Reads the product's review metafields. Works with any review app that writes to the standard rating metafield." },
+      { "type": "checkbox", "id": "card_show_swatches", "label": "Show colour swatches", "default": true },
+      { "type": "range", "id": "card_swatch_limit", "min": 2, "max": 12, "step": 1, "label": "Maximum swatches shown", "default": 5, "visible_if": "{{ settings.card_show_swatches }}" },
+      { "type": "checkbox", "id": "card_show_quick_add", "label": "Show quick add", "default": true },
+      { "type": "checkbox", "id": "card_show_quick_view", "label": "Show quick view", "default": true, "info": "Opens the product in a dialog so shoppers never lose their place in the collection." },
+      { "type": "checkbox", "id": "card_show_wishlist", "label": "Show wishlist button", "default": true },
+      { "type": "checkbox", "id": "card_show_second_image", "label": "Show second image on hover", "default": true },
+      { "type": "header", "content": "Badges" },
+      { "type": "checkbox", "id": "badge_sale", "label": "Show sale badge", "default": true },
+      {
+        "type": "select",
+        "id": "badge_sale_format",
+        "label": "Sale badge shows",
+        "options": [
+          { "value": "text", "label": "Wording only" },
+          { "value": "percent", "label": "Percentage off" },
+          { "value": "amount", "label": "Amount saved" }
+        ],
+        "default": "percent",
+        "visible_if": "{{ settings.badge_sale }}"
+      },
+      { "type": "checkbox", "id": "badge_sold_out", "label": "Show sold out badge", "default": true },
+      { "type": "checkbox", "id": "badge_new", "label": "Show new badge", "default": true },
+      { "type": "range", "id": "badge_new_days", "min": 5, "max": 180, "step": 5, "unit": "d", "label": "Counts as new for", "default": 30, "visible_if": "{{ settings.badge_new }}" },
+      { "type": "checkbox", "id": "badge_bestseller", "label": "Show bestseller badge", "default": true },
+      { "type": "text", "id": "badge_bestseller_tag", "label": "Bestseller product tag", "default": "bestseller", "info": "Tag a product with this word in the admin to give it the badge.", "visible_if": "{{ settings.badge_bestseller }}" },
+      { "type": "checkbox", "id": "badge_low_stock", "label": "Show low stock badge", "default": true },
+      { "type": "range", "id": "badge_low_stock_threshold", "min": 1, "max": 50, "step": 1, "label": "Low stock starts at", "default": 8, "visible_if": "{{ settings.badge_low_stock }}" },
+      {
+        "type": "select",
+        "id": "badge_position",
+        "label": "Badge position",
+        "options": [
+          { "value": "top-start", "label": "Top, start of line" },
+          { "value": "top-end", "label": "Top, end of line" },
+          { "value": "bottom-start", "label": "Bottom, start of line" },
+          { "value": "bottom-end", "label": "Bottom, end of line" }
+        ],
+        "default": "top-start"
+      }
+    ]
+  },
+
+  {
+    "name": "Product page",
+    "settings": [
+      {
+        "type": "select",
+        "id": "product_gallery_layout",
+        "label": "Gallery layout",
+        "options": [
+          { "value": "thumbs_side", "label": "Thumbnails beside the image" },
+          { "value": "thumbs_below", "label": "Thumbnails below the image" },
+          { "value": "stacked", "label": "Stacked column" },
+          { "value": "grid", "label": "Two-column grid" },
+          { "value": "carousel", "label": "Carousel only" }
+        ],
+        "default": "thumbs_side"
+      },
+      {
+        "type": "select",
+        "id": "product_zoom",
+        "label": "Image zoom",
+        "options": [
+          { "value": "lightbox", "label": "Open a lightbox" },
+          { "value": "hover", "label": "Magnify on hover" },
+          { "value": "inline", "label": "Zoom in place on click" },
+          { "value": "none", "label": "Off" }
+        ],
+        "default": "lightbox"
+      },
+      { "type": "checkbox", "id": "product_sticky_column", "label": "Keep the buy column in view while the gallery scrolls", "default": true },
+      { "type": "checkbox", "id": "product_sticky_atc", "label": "Show a sticky add to cart bar", "default": true },
+      {
+        "type": "select",
+        "id": "product_sticky_atc_position",
+        "label": "Sticky bar position",
+        "options": [
+          { "value": "bottom", "label": "Bottom of the screen" },
+          { "value": "top", "label": "Top of the screen" }
+        ],
+        "default": "bottom",
+        "visible_if": "{{ settings.product_sticky_atc }}"
+      },
+      { "type": "checkbox", "id": "product_show_price_in_button", "label": "Show the price inside the add to cart button", "default": false },
+      { "type": "checkbox", "id": "product_show_quantity", "label": "Show the quantity picker", "default": true },
+      { "type": "checkbox", "id": "product_dynamic_checkout", "label": "Show the dynamic checkout buttons", "default": true, "info": "Shop Pay, PayPal, Google Pay and the rest, as configured in your payment settings." },
+      { "type": "checkbox", "id": "product_show_pickup", "label": "Show local pickup availability", "default": true },
+      {
+        "type": "select",
+        "id": "variant_picker_style",
+        "label": "Variant picker",
+        "options": [
+          { "value": "buttons", "label": "Buttons" },
+          { "value": "swatches", "label": "Swatches and buttons" },
+          { "value": "dropdown", "label": "Dropdowns" }
+        ],
+        "default": "swatches"
+      },
+      { "type": "checkbox", "id": "variant_hide_unavailable", "label": "Hide unavailable variant combinations", "default": false, "info": "Leave off to show them struck through — shoppers understand the range better and can still ask to be told when stock returns." },
+      { "type": "checkbox", "id": "variant_update_url", "label": "Update the address bar when a variant is picked", "default": true },
+      { "type": "header", "content": "Never a dead end" },
+      { "type": "paragraph", "content": "A sold-out product should always offer the shopper somewhere to go next." },
+      { "type": "checkbox", "id": "sold_out_show_notify", "label": "Offer a back in stock reminder", "default": true },
+      { "type": "checkbox", "id": "sold_out_show_alternatives", "label": "Show similar products when sold out", "default": true },
+      { "type": "header", "content": "Recently viewed" },
+      { "type": "checkbox", "id": "recently_viewed_enabled", "label": "Remember recently viewed products", "default": true },
+      { "type": "range", "id": "recently_viewed_limit", "min": 4, "max": 20, "step": 1, "label": "Products remembered", "default": 12, "visible_if": "{{ settings.recently_viewed_enabled }}" }
+    ]
+  },
+
+  {
+    "name": "Cart",
+    "settings": [
+      {
+        "type": "select",
+        "id": "cart_type",
+        "label": "Cart behaviour",
+        "options": [
+          { "value": "drawer", "label": "Slide-out drawer" },
+          { "value": "page", "label": "Go to the cart page" },
+          { "value": "popup", "label": "Confirmation popup" }
+        ],
+        "default": "drawer"
+      },
+      {
+        "type": "select",
+        "id": "cart_icon",
+        "label": "Cart icon",
+        "options": [
+          { "value": "bag", "label": "Bag" },
+          { "value": "tote", "label": "Tote" },
+          { "value": "cart", "label": "Trolley" },
+          { "value": "basket", "label": "Basket" },
+          { "value": "text", "label": "Wording only" }
+        ],
+        "default": "bag"
+      },
+      { "type": "checkbox", "id": "cart_drawer_full_width_mobile", "label": "Full width drawer on mobile", "default": true },
+      { "type": "checkbox", "id": "cart_show_savings", "label": "Show the amount saved per line and in total", "default": true },
+      { "type": "checkbox", "id": "cart_show_compare_price", "label": "Show the compare-at price per line", "default": true },
+      { "type": "checkbox", "id": "cart_note_enabled", "label": "Let shoppers add an order note", "default": true },
+      { "type": "checkbox", "id": "cart_discount_field", "label": "Show a discount code field in the cart", "default": true, "info": "The code is applied at checkout. Shoppers can still enter codes at checkout as usual." },
+      { "type": "header", "content": "Free shipping bar" },
+      { "type": "checkbox", "id": "cart_free_shipping_enabled", "label": "Show progress to free shipping", "default": true },
+      { "type": "text", "id": "cart_free_shipping_threshold", "label": "Free shipping from", "default": "250", "info": "In your store currency, without symbols. This must match the shipping rate you set up in your shipping settings — the bar does not create the discount.", "visible_if": "{{ settings.cart_free_shipping_enabled }}" },
+      { "type": "header", "content": "Milestones" },
+      { "type": "paragraph", "content": "Optional second and third rewards along the same progress bar, for example a free gift. Set these up as automatic discounts in your admin first." },
+      { "type": "checkbox", "id": "cart_milestones_enabled", "label": "Show extra milestones", "default": false },
+      { "type": "text", "id": "cart_milestone_2_amount", "label": "Second milestone amount", "default": "400", "visible_if": "{{ settings.cart_milestones_enabled }}" },
+      { "type": "text", "id": "cart_milestone_2_label", "label": "Second milestone reward", "default": "Free gift", "visible_if": "{{ settings.cart_milestones_enabled }}" },
+      { "type": "text", "id": "cart_milestone_3_amount", "label": "Third milestone amount", "default": "600", "visible_if": "{{ settings.cart_milestones_enabled }}" },
+      { "type": "text", "id": "cart_milestone_3_label", "label": "Third milestone reward", "default": "VIP gift box", "visible_if": "{{ settings.cart_milestones_enabled }}" },
+      { "type": "header", "content": "Terms" },
+      { "type": "checkbox", "id": "cart_terms_required", "label": "Require agreement to the terms before checkout", "default": true, "info": "Commonly required for Israeli storefronts. The shopper cannot reach checkout until the box is ticked." },
+      { "type": "url", "id": "cart_terms_url", "label": "Terms page", "visible_if": "{{ settings.cart_terms_required }}" },
+      { "type": "header", "content": "Reassurance" },
+      { "type": "checkbox", "id": "cart_show_payment_icons", "label": "Show payment icons", "default": true },
+      { "type": "checkbox", "id": "cart_show_trust_badge", "label": "Show a security badge", "default": true }
+    ]
+  },
+
+  {
+    "name": "Search",
+    "settings": [
+      { "type": "checkbox", "id": "predictive_search_enabled", "label": "Suggest results as the shopper types", "default": true },
+      { "type": "checkbox", "id": "predictive_search_show_products", "label": "Suggest products", "default": true, "visible_if": "{{ settings.predictive_search_enabled }}" },
+      { "type": "checkbox", "id": "predictive_search_show_collections", "label": "Suggest collections", "default": true, "visible_if": "{{ settings.predictive_search_enabled }}" },
+      { "type": "checkbox", "id": "predictive_search_show_pages", "label": "Suggest pages", "default": true, "visible_if": "{{ settings.predictive_search_enabled }}" },
+      { "type": "checkbox", "id": "predictive_search_show_articles", "label": "Suggest articles", "default": true, "visible_if": "{{ settings.predictive_search_enabled }}" },
+      { "type": "checkbox", "id": "predictive_search_show_queries", "label": "Suggest search terms", "default": true, "visible_if": "{{ settings.predictive_search_enabled }}" },
+      { "type": "range", "id": "predictive_search_limit", "min": 2, "max": 10, "step": 1, "label": "Suggestions per group", "default": 4, "visible_if": "{{ settings.predictive_search_enabled }}" }
+    ]
+  },
+
+  {
+    "name": "Wishlist and sharing",
+    "settings": [
+      { "type": "checkbox", "id": "wishlist_enabled", "label": "Enable the wishlist", "default": true, "info": "Saved in the shopper's own browser, so it survives between visits without an account or an app." },
+      { "type": "url", "id": "wishlist_page", "label": "Wishlist page", "info": "Create a page and give it the Wishlist template, then select it here.", "visible_if": "{{ settings.wishlist_enabled }}" },
+      { "type": "checkbox", "id": "share_enabled", "label": "Show share buttons", "default": true },
+      { "type": "checkbox", "id": "share_native", "label": "Use the device share sheet where available", "default": true, "visible_if": "{{ settings.share_enabled }}" },
+      { "type": "header", "content": "Refer a friend" },
+      { "type": "checkbox", "id": "referral_enabled", "label": "Show the refer a friend panel", "default": false },
+      { "type": "url", "id": "referral_page", "label": "Referral programme page", "visible_if": "{{ settings.referral_enabled }}" }
+    ]
+  },
+
+  {
+    "name": "Currency and language",
+    "settings": [
+      { "type": "checkbox", "id": "show_country_selector", "label": "Show the country and currency selector", "default": true, "info": "Only appears when more than one market is published in your markets settings." },
+      { "type": "checkbox", "id": "show_language_selector", "label": "Show the language selector", "default": true, "info": "Only appears when more than one language is published." },
+      { "type": "checkbox", "id": "show_currency_code", "label": "Always show the currency code beside prices", "default": false }
+    ]
+  },
+
+  {
+    "name": "Compliance",
+    "settings": [
+      { "type": "paragraph", "content": "These tools give you the technical groundwork for Israeli privacy and accessibility duties. They are not a substitute for legal advice or a real accessibility audit — you still need both." },
+      { "type": "header", "content": "Cookie consent" },
+      { "type": "checkbox", "id": "cookie_banner_enabled", "label": "Show the cookie consent banner", "default": true, "info": "Marketing and analytics pixels stay switched off until the visitor accepts." },
+      {
+        "type": "select",
+        "id": "cookie_banner_position",
+        "label": "Banner position",
+        "options": [
+          { "value": "bottom", "label": "Bottom bar" },
+          { "value": "bottom-start", "label": "Bottom corner, start of line" },
+          { "value": "bottom-end", "label": "Bottom corner, end of line" },
+          { "value": "center", "label": "Centre of the screen" }
+        ],
+        "default": "bottom",
+        "visible_if": "{{ settings.cookie_banner_enabled }}"
+      },
+      { "type": "checkbox", "id": "cookie_banner_block", "label": "Dim the page until a choice is made", "default": false, "visible_if": "{{ settings.cookie_banner_enabled }}" },
+      { "type": "url", "id": "cookie_policy_url", "label": "Privacy policy page", "visible_if": "{{ settings.cookie_banner_enabled }}" },
+      { "type": "header", "content": "Accessibility" },
+      { "type": "checkbox", "id": "accessibility_widget_enabled", "label": "Show the accessibility tools button", "default": true },
+      {
+        "type": "select",
+        "id": "accessibility_widget_position",
+        "label": "Button position",
+        "options": [
+          { "value": "start-middle", "label": "Middle, start of line" },
+          { "value": "end-middle", "label": "Middle, end of line" },
+          { "value": "start-bottom", "label": "Bottom, start of line" },
+          { "value": "end-bottom", "label": "Bottom, end of line" }
+        ],
+        "default": "start-middle",
+        "visible_if": "{{ settings.accessibility_widget_enabled }}"
+      },
+      { "type": "url", "id": "accessibility_statement_url", "label": "Accessibility statement page", "visible_if": "{{ settings.accessibility_widget_enabled }}" },
+      { "type": "text", "id": "accessibility_contact", "label": "Accessibility coordinator contact", "info": "Name, email or phone. Shown in the accessibility panel.", "visible_if": "{{ settings.accessibility_widget_enabled }}" }
+    ]
+  },
+
+  {
+    "name": "Analytics",
+    "settings": [
+      { "type": "paragraph", "content": "Each tag below loads only after the visitor accepts marketing or analytics cookies, using Shopify's own customer privacy API." },
+      { "type": "text", "id": "ga4_measurement_id", "label": "Google Analytics 4 measurement ID", "info": "Looks like G-XXXXXXX." },
+      { "type": "text", "id": "meta_pixel_id", "label": "Meta pixel ID" },
+      { "type": "text", "id": "tiktok_pixel_id", "label": "TikTok pixel ID" },
+      { "type": "checkbox", "id": "analytics_track_view_content", "label": "Report product views", "default": true },
+      { "type": "checkbox", "id": "analytics_track_add_to_cart", "label": "Report add to cart", "default": true },
+      { "type": "checkbox", "id": "analytics_track_search", "label": "Report searches", "default": true }
+    ]
+  },
+
+  {
+    "name": "Search engines",
+    "settings": [
+      { "type": "checkbox", "id": "seo_structured_data", "label": "Add product, offer and rating structured data", "default": true },
+      { "type": "checkbox", "id": "seo_breadcrumb_data", "label": "Add breadcrumb structured data", "default": true },
+      { "type": "checkbox", "id": "seo_organization_data", "label": "Add organisation and website structured data", "default": true },
+      { "type": "image_picker", "id": "seo_share_image", "label": "Default sharing image", "info": "Used when a page has no image of its own. 1200 x 630 px." }
+    ]
+  },
+
+  {
+    "name": "Custom code",
+    "settings": [
+      { "type": "paragraph", "content": "For small refinements you would rather not make in the code editor." },
+      { "type": "textarea", "id": "custom_css", "label": "Custom CSS", "info": "Written into every page inside a style tag." },
+      { "type": "html", "id": "custom_head_html", "label": "Custom code in the head", "info": "For verification tags and similar. Do not put marketing pixels here — use the Analytics settings so they respect cookie consent." },
+      { "type": "html", "id": "custom_body_html", "label": "Custom code before the closing body tag", "info": "Chat widgets and support tools belong here." }
+    ]
+  }
+]

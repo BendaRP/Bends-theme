@@ -1,0 +1,40 @@
+{%- comment -%}
+  Social profile links. Only the networks filled in under Brand appear.
+{%- endcomment -%}
+{%- liquid
+  assign has_social = false
+  if settings.social_instagram_link != blank or settings.social_facebook_link != blank or settings.social_tiktok_link != blank or settings.social_youtube_link != blank or settings.social_x_link != blank or settings.social_pinterest_link != blank or settings.social_linkedin_link != blank or settings.social_whatsapp_link != blank or settings.social_telegram_link != blank
+    assign has_social = true
+  endif
+-%}
+{%- if has_social -%}
+  <ul class="social-links" aria-label="{{ 'sections.footer.follow_us' | t }}">
+    {%- if settings.social_instagram_link != blank -%}
+      <li><a class="social-links__link tap-target" href="{{ settings.social_instagram_link }}" target="_blank" rel="noopener" aria-label="{{ 'general.share.share_on' | t: platform: 'Instagram' }}">{% render 'icon', icon: 'instagram' %}</a></li>
+    {%- endif -%}
+    {%- if settings.social_facebook_link != blank -%}
+      <li><a class="social-links__link tap-target" href="{{ settings.social_facebook_link }}" target="_blank" rel="noopener" aria-label="{{ 'general.share.share_on' | t: platform: 'Facebook' }}">{% render 'icon', icon: 'facebook' %}</a></li>
+    {%- endif -%}
+    {%- if settings.social_tiktok_link != blank -%}
+      <li><a class="social-links__link tap-target" href="{{ settings.social_tiktok_link }}" target="_blank" rel="noopener" aria-label="{{ 'general.share.share_on' | t: platform: 'TikTok' }}">{% render 'icon', icon: 'tiktok' %}</a></li>
+    {%- endif -%}
+    {%- if settings.social_youtube_link != blank -%}
+      <li><a class="social-links__link tap-target" href="{{ settings.social_youtube_link }}" target="_blank" rel="noopener" aria-label="{{ 'general.share.share_on' | t: platform: 'YouTube' }}">{% render 'icon', icon: 'youtube' %}</a></li>
+    {%- endif -%}
+    {%- if settings.social_x_link != blank -%}
+      <li><a class="social-links__link tap-target" href="{{ settings.social_x_link }}" target="_blank" rel="noopener" aria-label="{{ 'general.share.share_on' | t: platform: 'X' }}">{% render 'icon', icon: 'x-social' %}</a></li>
+    {%- endif -%}
+    {%- if settings.social_pinterest_link != blank -%}
+      <li><a class="social-links__link tap-target" href="{{ settings.social_pinterest_link }}" target="_blank" rel="noopener" aria-label="{{ 'general.share.share_on' | t: platform: 'Pinterest' }}">{% render 'icon', icon: 'pinterest' %}</a></li>
+    {%- endif -%}
+    {%- if settings.social_linkedin_link != blank -%}
+      <li><a class="social-links__link tap-target" href="{{ settings.social_linkedin_link }}" target="_blank" rel="noopener" aria-label="{{ 'general.share.share_on' | t: platform: 'LinkedIn' }}">{% render 'icon', icon: 'linkedin' %}</a></li>
+    {%- endif -%}
+    {%- if settings.social_whatsapp_link != blank -%}
+      <li><a class="social-links__link tap-target" href="{{ settings.social_whatsapp_link }}" target="_blank" rel="noopener" aria-label="{{ 'general.share.share_on' | t: platform: 'WhatsApp' }}">{% render 'icon', icon: 'whatsapp' %}</a></li>
+    {%- endif -%}
+    {%- if settings.social_telegram_link != blank -%}
+      <li><a class="social-links__link tap-target" href="{{ settings.social_telegram_link }}" target="_blank" rel="noopener" aria-label="{{ 'general.share.share_on' | t: platform: 'Telegram' }}">{% render 'icon', icon: 'telegram' %}</a></li>
+    {%- endif -%}
+  </ul>
+{%- endif -%}

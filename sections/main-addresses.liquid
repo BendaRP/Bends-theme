@@ -1,0 +1,83 @@
+{%- style -%}
+  {%- render 'section-styles', section_id: section.id, s: section.settings -%}
+{%- endstyle -%}
+
+<div class="section-wrapper color-{{ section.settings.color_scheme }}">
+  <div class="section">
+    <div class="page-width page-width--narrow">
+      <a class="button button--link" href="{{ routes.account_url }}">
+        {% render 'icon', icon: 'arrow-left' %}
+        <span>{{ 'customer.account.return' | t }}</span>
+      </a>
+
+      <h1 class="h2">{{ 'customer.addresses.title' | t }}</h1>
+
+      <details class="account-address-form">
+        <summary class="button button--secondary">{{ 'customer.addresses.add_new' | t }}</summary>
+        {%- form 'customer_address', customer.new_address -%}
+          {%- render 'address-fields', form: form, prefix: 'new' -%}
+          <div class="cluster">
+            <button type="submit" class="button">{{ 'customer.addresses.save' | t }}</button>
+          </div>
+        {%- endform -%}
+      </details>
+
+      {%- paginate customer.addresses by 10 -%}
+        {%- if customer.addresses.size > 0 -%}
+          <ul class="account-address-list">
+            {%- for address in customer.addresses -%}
+              <li class="account-address">
+                {%- if address == customer.default_address -%}
+                  <span class="badge badge--outline">{{ 'customer.addresses.default' | t }}</span>
+                {%- endif -%}
+                {{ address | format_address }}
+
+                <div class="cluster">
+                  <details class="account-address-form">
+                    <summary class="button button--link button--small">{{ 'customer.addresses.edit' | t }}</summary>
+                    {%- form 'customer_address', address -%}
+                      {%- render 'address-fields', form: form, prefix: address.id -%}
+                      <div class="cluster">
+                        <button type="submit" class="button button--small">{{ 'customer.addresses.save' | t }}</button>
+                      </div>
+                    {%- endform -%}
+                  </details>
+
+                  {%- form 'customer_address', address -%}
+                    <button
+                      type="submit"
+                      class="button button--link button--small"
+                      formmethod="post"
+                      name="_method"
+                      value="delete"
+                      data-confirm="{{ 'customer.addresses.delete_confirm' | t | escape }}"
+                    >
+                      {{ 'customer.addresses.delete' | t }}
+                    </button>
+                  {%- endform -%}
+                </div>
+              </li>
+            {%- endfor -%}
+          </ul>
+          {%- render 'pagination', paginate: paginate, anchor: '' -%}
+        {%- else -%}
+          <p class="text-muted">{{ 'customer.addresses.none' | t }}</p>
+        {%- endif -%}
+      {%- endpaginate -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Addresses",
+  "tag": "section",
+  "class": "section-main-addresses",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-1" },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Top padding", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Bottom padding", "default": 64 }
+  ]
+}
+{% endschema %}

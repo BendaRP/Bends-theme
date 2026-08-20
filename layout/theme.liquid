@@ -1,0 +1,204 @@
+<!doctype html>
+{%- liquid
+  assign rtl_locales = 'ar,arc,ckb,dv,fa,ha,he,khw,ks,ps,sd,ug,ur,uz-AF,yi' | split: ','
+  assign text_direction = 'ltr'
+  if rtl_locales contains request.locale.iso_code
+    assign text_direction = 'rtl'
+  endif
+
+  assign show_theme_toggle = false
+  if settings.dark_mode == 'toggle' or settings.dark_mode == 'auto_toggle'
+    assign show_theme_toggle = true
+  endif
+-%}
+<html
+  class="no-js ink-{{ settings.ink_style }}{% if settings.animations_enabled %} animations-on{% endif %}"
+  lang="{{ request.locale.iso_code }}"
+  dir="{{ text_direction }}"
+  data-dark-mode="{{ settings.dark_mode }}"
+>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="">
+
+    <title>
+      {{ page_title }}
+      {%- if current_tags %} &ndash; {{ 'general.meta.tags' | t: tags: current_tags | join: ', ' }}{% endif -%}
+      {%- if current_page != 1 %} &ndash; {{ 'general.meta.page' | t: page: current_page }}{% endif -%}
+      {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+    </title>
+
+    {%- if page_description %}
+      <meta name="description" content="{{ page_description | escape }}">
+    {%- endif %}
+
+    <link rel="canonical" href="{{ canonical_url }}">
+
+    {%- if settings.favicon != blank %}
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+      <link rel="apple-touch-icon" href="{{ settings.favicon | image_url: width: 180, height: 180 }}">
+    {%- endif %}
+
+    {%- render 'meta-tags' -%}
+
+    <style data-bends-tokens>
+      {%- render 'css-variables' -%}
+    </style>
+
+    {{ 'base.css' | asset_url | stylesheet_tag }}
+    {{ 'components.css' | asset_url | stylesheet_tag }}
+
+    <script>
+      document.documentElement.classList.remove('no-js');
+      document.documentElement.classList.add('js');
+      (function () {
+        var mode = document.documentElement.getAttribute('data-dark-mode');
+        if (mode === 'off') return;
+        try {
+          var stored = localStorage.getItem('bends:theme');
+          if (stored === 'dark' || stored === 'light') {
+            document.documentElement.setAttribute('data-bends-theme', stored);
+          }
+        } catch (error) {
+          /* Storage can be unavailable in private browsing. The theme still renders. */
+        }
+      })();
+    </script>
+
+    {{ content_for_header }}
+
+    <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'product.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'widgets.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'analytics.js' | asset_url }}" defer="defer"></script>
+
+    {%- if settings.custom_head_html != blank -%}
+      {{ settings.custom_head_html }}
+    {%- endif -%}
+  </head>
+
+  <body
+    class="template-{{ template.name | handle }}{% if template.suffix %} template-suffix-{{ template.suffix | handle }}{% endif %} cart-type-{{ settings.cart_type }} shape-{{ settings.shape_signature }} btn-hover-{{ settings.button_hover }} card-style-{{ settings.card_style }}"
+    data-animation-style="{{ settings.animation_style }}"
+    data-image-hover="{% if settings.animation_images_hover %}{{ settings.image_hover_effect }}{% else %}none{% endif %}"
+    data-button-style="{{ settings.button_style }}"
+    data-link-underline="{{ settings.link_underline }}"
+  >
+    <a class="skip-link button" href="#MainContent">{{ 'accessibility.skip_to_content' | t }}</a>
+
+    {%- if settings.scroll_progress_enabled -%}
+      <div class="scroll-progress" aria-hidden="true"><span class="scroll-progress__bar" data-scroll-progress></span></div>
+    {%- endif -%}
+
+    {% sections 'header-group' %}
+
+    <main id="MainContent" class="main-content" role="main" tabindex="-1">
+      {{ content_for_layout }}
+    </main>
+
+    {% sections 'footer-group' %}
+
+    {% sections 'overlay-group' %}
+
+    <div class="visually-hidden" aria-live="polite" data-live-region></div>
+
+    {%- if show_theme_toggle -%}
+      <button
+        class="theme-toggle"
+        type="button"
+        data-theme-toggle
+        aria-pressed="false"
+        aria-label="{{ 'accessibility.toggle_dark_mode' | t }}"
+      >
+        {% render 'icon', icon: 'sun', class: 'theme-toggle__sun' %}
+        {% render 'icon', icon: 'moon', class: 'theme-toggle__moon' %}
+      </button>
+    {%- endif -%}
+
+    <script>
+      window.BendsTheme = {
+        routes: {
+          root: {{ routes.root_url | json }},
+          cart: {{ routes.cart_url | json }},
+          cartAdd: {{ routes.cart_add_url | json }},
+          cartChange: {{ routes.cart_change_url | json }},
+          cartUpdate: {{ routes.cart_update_url | json }},
+          predictiveSearch: {{ routes.predictive_search_url | json }},
+          search: {{ routes.search_url | json }}
+        },
+        cartType: {{ settings.cart_type | json }},
+        moneyFormat: {{ shop.money_format | json }},
+        moneyWithCurrencyFormat: {{ shop.money_with_currency_format | json }},
+        currency: {{ cart.currency.iso_code | json }},
+        direction: {{ text_direction | json }},
+        animations: {
+          enabled: {{ settings.animations_enabled | json }},
+          duration: {{ settings.animation_duration | json }},
+          stagger: {{ settings.animation_stagger | json }}
+        },
+        recentlyViewed: {
+          enabled: {{ settings.recently_viewed_enabled | json }},
+          limit: {{ settings.recently_viewed_limit | json }}
+        },
+        wishlist: { enabled: {{ settings.wishlist_enabled | json }} },
+        analytics: {
+          ga4: {{ settings.ga4_measurement_id | json }},
+          metaPixel: {{ settings.meta_pixel_id | json }},
+          tiktokPixel: {{ settings.tiktok_pixel_id | json }},
+          trackViewContent: {{ settings.analytics_track_view_content | json }},
+          trackAddToCart: {{ settings.analytics_track_add_to_cart | json }},
+          trackSearch: {{ settings.analytics_track_search | json }}
+        },
+        page: {
+          type: {{ request.page_type | json }}
+          {%- if request.page_type == 'product' and product != blank -%},
+          product: {
+            id: {{ product.id | json }},
+            title: {{ product.title | json }},
+            handle: {{ product.handle | json }},
+            vendor: {{ product.vendor | json }},
+            type: {{ product.type | json }},
+            price: {{ product.selected_or_first_available_variant.price | divided_by: 100.0 | json }},
+            currency: {{ cart.currency.iso_code | json }}
+          }
+          {%- endif -%}
+          {%- if request.page_type == 'search' -%},
+          searchTerms: {{ search.terms | json }}
+          {%- endif -%}
+        },
+        freeShipping: {
+          enabled: {{ settings.cart_free_shipping_enabled | json }},
+          threshold: {{ settings.cart_free_shipping_threshold | json }}
+        },
+        strings: {
+          addToCart: {{ 'products.product.add_to_cart' | t | json }},
+          soldOut: {{ 'products.product.sold_out' | t | json }},
+          unavailable: {{ 'products.product.unavailable' | t | json }},
+          addedToCart: {{ 'cart.general.item_added' | t | json }},
+          cartError: {{ 'cart.general.error' | t | json }},
+          quantityError: {{ 'cart.general.quantity_error' | t | json }},
+          wishlistAdd: {{ 'wishlist.add' | t | json }},
+          wishlistRemove: {{ 'wishlist.remove' | t | json }},
+          savedToWishlist: {{ 'wishlist.added' | t | json }},
+          removedFromWishlist: {{ 'wishlist.removed' | t | json }},
+          copied: {{ 'general.share.copied' | t | json }},
+          showMore: {{ 'general.show_more' | t | json }},
+          showLess: {{ 'general.show_less' | t | json }},
+          savedNote: {{ 'cart.note.saved' | t | json }},
+          termsError: {{ 'cart.terms.error' | t | json }},
+          searchNoResults: {{ 'general.search.no_results_short' | t | json }}
+        }
+      };
+    </script>
+
+    {%- if settings.custom_css != blank -%}
+      <style data-bends-custom>{{ settings.custom_css }}</style>
+    {%- endif -%}
+
+    {%- if settings.custom_body_html != blank -%}
+      {{ settings.custom_body_html }}
+    {%- endif -%}
+  </body>
+</html>

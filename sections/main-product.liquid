@@ -1,0 +1,2930 @@
+{%- liquid
+  assign variant = product.selected_or_first_available_variant
+  assign has_sticky = false
+  if settings.product_sticky_atc
+    assign has_sticky = true
+  endif
+-%}
+
+{%- style -%}
+  {%- render 'section-styles', section_id: section.id, s: section.settings -%}
+  #shopify-section-{{ section.id }} {
+    --product-media-width: {{ section.settings.media_width }}%;
+  }
+{%- endstyle -%}
+
+<div class="section-wrapper color-{{ section.settings.color_scheme }}">
+  <div class="section">
+    <div class="page-width">
+      <div class="product-layout product-layout--{{ section.settings.media_position }}">
+        <div class="product-layout__media{% if settings.product_sticky_column %} product-layout__media--scroll{% endif %}">
+          {%- render 'product-gallery', product: product -%}
+        </div>
+
+        <div class="product-layout__info{% if settings.product_sticky_column %} product-layout__info--sticky{% endif %}">
+          <div class="product-info" data-product-info data-product-id="{{ product.id }}" data-product-handle="{{ product.handle }}">
+            {%- for block in section.blocks -%}
+              {%- render 'product-block', block: block, product: product, context: 'main' -%}
+            {%- endfor -%}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{%- if has_sticky -%}
+  <sticky-atc
+    class="sticky-atc sticky-atc--{{ settings.product_sticky_atc_position }}"
+    data-sticky-atc
+    hidden
+  >
+    <div class="page-width sticky-atc__inner">
+      <div class="sticky-atc__product">
+        {%- if product.featured_media -%}
+          <div class="frame frame--soft" data-ratio="square">
+            {%- render 'responsive-image',
+              image: product.featured_media.preview_image,
+              widths: '60,90,120,180',
+              sizes: '52px',
+              max_width: 180
+            -%}
+          </div>
+        {%- endif -%}
+        <div class="sticky-atc__text">
+          <span class="sticky-atc__title text-small">{{ product.title }}</span>
+          {%- render 'price', target: variant, class: 'price--small' -%}
+        </div>
+      </div>
+
+      <div class="sticky-atc__actions">
+        {%- if product.variants.size > 1 -%}
+          <label class="visually-hidden" for="sticky-variant-{{ section.id }}">
+            {{- 'products.product.quick_view' | t -}}
+          </label>
+          <select id="sticky-variant-{{ section.id }}" class="sticky-atc__select" data-sticky-variant>
+            {%- for option_variant in product.variants -%}
+              <option
+                value="{{ option_variant.id }}"
+                {% if option_variant.id == variant.id %}selected{% endif %}
+                {% unless option_variant.available %}disabled{% endunless %}
+              >
+                {{ option_variant.title }} — {{ option_variant.price | money }}
+              </option>
+            {%- endfor -%}
+          </select>
+        {%- endif -%}
+        <button class="button" type="button" data-sticky-add {% unless product.available %}disabled{% endunless %}>
+          {%- if product.available -%}
+            {{ 'products.product.add_to_cart' | t }}
+          {%- else -%}
+            {{ 'products.product.sold_out' | t }}
+          {%- endif -%}
+        </button>
+      </div>
+    </div>
+  </sticky-atc>
+{%- endif -%}
+
+{%- if settings.recently_viewed_enabled -%}
+  <script type="application/json" data-recently-viewed-product>
+    {{ product.handle | json }}
+  </script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Product",
+  "tag": "section",
+  "class": "section-main-product",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Colour scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "media_position",
+      "label": "Gallery position",
+      "options": [
+        {
+          "value": "start",
+          "label": "Start of the line"
+        },
+        {
+          "value": "end",
+          "label": "End of the line"
+        }
+      ],
+      "default": "start"
+    },
+    {
+      "type": "range",
+      "id": "media_width",
+      "min": 40,
+      "max": 65,
+      "step": 1,
+      "unit": "%",
+      "label": "Gallery width",
+      "default": 55
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 60
+    }
+  ],
+  "blocks": [
+    {
+      "type": "breadcrumbs",
+      "name": "Breadcrumbs",
+      "limit": 1,
+      "settings": []
+    },
+    {
+      "type": "vendor",
+      "name": "Vendor",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "link_to_vendor",
+          "label": "Link to the vendor page",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "title",
+      "name": "Title",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "size",
+          "label": "Size",
+          "options": [
+            {
+              "value": "h3",
+              "label": "Small"
+            },
+            {
+              "value": "h2",
+              "label": "Medium"
+            },
+            {
+              "value": "h1",
+              "label": "Large"
+            }
+          ],
+          "default": "h2"
+        }
+      ]
+    },
+    {
+      "type": "price",
+      "name": "Price",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_savings",
+          "label": "Show the amount saved",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_tax_note",
+          "label": "Show a tax or shipping note",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "tax_note",
+          "label": "Note",
+          "default": "Tax included. Shipping calculated at checkout.",
+          "visible_if": "{{ block.settings.show_tax_note }}"
+        }
+      ]
+    },
+    {
+      "type": "rating",
+      "name": "Star rating",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Reads the standard review metafields, so it works with whichever review app you use."
+        }
+      ]
+    },
+    {
+      "type": "sku",
+      "name": "SKU",
+      "limit": 1,
+      "settings": []
+    },
+    {
+      "type": "inventory",
+      "name": "Live stock",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "range",
+          "id": "low_threshold",
+          "min": 1,
+          "max": 50,
+          "step": 1,
+          "label": "Low stock starts at",
+          "default": 10
+        },
+        {
+          "type": "checkbox",
+          "id": "show_exact_count",
+          "label": "Show the exact number left",
+          "default": true,
+          "info": "Only ever shows the real inventory figure — this never invents scarcity."
+        },
+        {
+          "type": "checkbox",
+          "id": "show_bar",
+          "label": "Show a stock bar",
+          "default": true
+        },
+        {
+          "type": "range",
+          "id": "bar_max",
+          "min": 5,
+          "max": 100,
+          "step": 5,
+          "label": "Full bar equals",
+          "default": 25,
+          "visible_if": "{{ block.settings.show_bar }}"
+        }
+      ]
+    },
+    {
+      "type": "description",
+      "name": "Description",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "collapse",
+          "label": "Shorten with a show more link",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "variant_picker",
+      "name": "Variant picker",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "style",
+          "label": "Style",
+          "options": [
+            {
+              "value": "swatches",
+              "label": "Swatches and buttons"
+            },
+            {
+              "value": "buttons",
+              "label": "Buttons"
+            },
+            {
+              "value": "dropdown",
+              "label": "Dropdowns"
+            }
+          ],
+          "default": "swatches"
+        }
+      ]
+    },
+    {
+      "type": "quantity_selector",
+      "name": "Quantity",
+      "limit": 1,
+      "settings": []
+    },
+    {
+      "type": "volume_pricing",
+      "name": "Quantity breaks",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Shows the tiers to the shopper. Create the matching automatic discounts in your admin so checkout honours them."
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Buy more, pay less"
+        },
+        {
+          "type": "text",
+          "id": "tier_1_label",
+          "label": "Tier 1 label",
+          "default": ""
+        },
+        {
+          "type": "range",
+          "id": "tier_2_quantity",
+          "min": 1,
+          "max": 20,
+          "step": 1,
+          "label": "Tier 2 quantity",
+          "default": 2
+        },
+        {
+          "type": "range",
+          "id": "tier_2_discount",
+          "min": 0,
+          "max": 70,
+          "step": 1,
+          "unit": "%",
+          "label": "Tier 2 discount",
+          "default": 10
+        },
+        {
+          "type": "text",
+          "id": "tier_2_label",
+          "label": "Tier 2 label",
+          "default": "Most popular"
+        },
+        {
+          "type": "range",
+          "id": "tier_3_quantity",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "label": "Tier 3 quantity",
+          "default": 3
+        },
+        {
+          "type": "range",
+          "id": "tier_3_discount",
+          "min": 0,
+          "max": 70,
+          "step": 1,
+          "unit": "%",
+          "label": "Tier 3 discount",
+          "default": 15
+        },
+        {
+          "type": "text",
+          "id": "tier_3_label",
+          "label": "Tier 3 label",
+          "default": "Best value"
+        },
+        {
+          "type": "text",
+          "id": "note",
+          "label": "Note",
+          "default": "Discount applied automatically at checkout."
+        }
+      ]
+    },
+    {
+      "type": "buy_buttons",
+      "name": "Buy buttons",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_dynamic_checkout",
+          "label": "Show the dynamic checkout buttons",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_wishlist",
+          "label": "Show the wishlist button",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "selling_plans",
+      "name": "Subscriptions",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Appears when the product has selling plans set up in your admin."
+        }
+      ]
+    },
+    {
+      "type": "urgency",
+      "name": "Urgency text",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "truck",
+              "label": "Truck"
+            },
+            {
+              "value": "package",
+              "label": "Package"
+            },
+            {
+              "value": "return",
+              "label": "Return"
+            },
+            {
+              "value": "shield",
+              "label": "Shield"
+            },
+            {
+              "value": "shield-check",
+              "label": "Shield check"
+            },
+            {
+              "value": "lock",
+              "label": "Lock"
+            },
+            {
+              "value": "gift",
+              "label": "Gift"
+            },
+            {
+              "value": "tag",
+              "label": "Tag"
+            },
+            {
+              "value": "percent",
+              "label": "Percent"
+            },
+            {
+              "value": "leaf",
+              "label": "Leaf"
+            },
+            {
+              "value": "sparkle",
+              "label": "Sparkle"
+            },
+            {
+              "value": "award",
+              "label": "Award"
+            },
+            {
+              "value": "globe",
+              "label": "Globe"
+            },
+            {
+              "value": "pin",
+              "label": "Pin"
+            },
+            {
+              "value": "store",
+              "label": "Store"
+            },
+            {
+              "value": "phone",
+              "label": "Phone"
+            },
+            {
+              "value": "mail",
+              "label": "Mail"
+            },
+            {
+              "value": "chat",
+              "label": "Chat"
+            },
+            {
+              "value": "question",
+              "label": "Question"
+            },
+            {
+              "value": "info",
+              "label": "Info"
+            },
+            {
+              "value": "alert",
+              "label": "Alert"
+            },
+            {
+              "value": "eye",
+              "label": "Eye"
+            },
+            {
+              "value": "ruler",
+              "label": "Ruler"
+            },
+            {
+              "value": "scissors",
+              "label": "Scissors"
+            },
+            {
+              "value": "clock",
+              "label": "Clock"
+            },
+            {
+              "value": "calendar",
+              "label": "Calendar"
+            },
+            {
+              "value": "fire",
+              "label": "Fire"
+            },
+            {
+              "value": "bolt",
+              "label": "Bolt"
+            },
+            {
+              "value": "heart",
+              "label": "Heart"
+            },
+            {
+              "value": "star",
+              "label": "Star"
+            },
+            {
+              "value": "check",
+              "label": "Check"
+            },
+            {
+              "value": "check-circle",
+              "label": "Check circle"
+            },
+            {
+              "value": "credit-card",
+              "label": "Credit card"
+            },
+            {
+              "value": "wallet",
+              "label": "Wallet"
+            },
+            {
+              "value": "refresh",
+              "label": "Refresh"
+            },
+            {
+              "value": "quote",
+              "label": "Quote"
+            }
+          ],
+          "default": "fire"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Selling fast this week"
+        }
+      ]
+    },
+    {
+      "type": "social_proof",
+      "name": "Live viewers",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "A soft social-proof line. It shows a range you choose, not a measured figure — keep the numbers honest for your traffic."
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "{{ count }} people are looking at this right now",
+          "info": "Use {{ count }} where the number should appear."
+        },
+        {
+          "type": "range",
+          "id": "min_viewers",
+          "min": 2,
+          "max": 50,
+          "step": 1,
+          "label": "Lowest number",
+          "default": 6
+        },
+        {
+          "type": "range",
+          "id": "max_viewers",
+          "min": 3,
+          "max": 120,
+          "step": 1,
+          "label": "Highest number",
+          "default": 24
+        },
+        {
+          "type": "checkbox",
+          "id": "show_avatars",
+          "label": "Show avatars",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "countdown",
+      "name": "Countdown timer",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Offer ends in"
+        },
+        {
+          "type": "text",
+          "id": "deadline",
+          "label": "Ends at",
+          "default": "2026-12-31 23:59",
+          "info": "Format: YYYY-MM-DD HH:MM. A real end date, so the timer never resets on a shopper."
+        },
+        {
+          "type": "checkbox",
+          "id": "hide_when_done",
+          "label": "Hide once it ends",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "shipping_estimate",
+      "name": "Delivery estimate",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "range",
+          "id": "cutoff_hour",
+          "min": 0,
+          "max": 23,
+          "step": 1,
+          "label": "Same-day cut-off hour",
+          "default": 14
+        },
+        {
+          "type": "range",
+          "id": "min_days",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "d",
+          "label": "Fastest delivery",
+          "default": 2
+        },
+        {
+          "type": "range",
+          "id": "max_days",
+          "min": 1,
+          "max": 60,
+          "step": 1,
+          "unit": "d",
+          "label": "Slowest delivery",
+          "default": 5
+        },
+        {
+          "type": "text",
+          "id": "fallback_text",
+          "label": "Text before the date loads",
+          "default": "Delivered in 2 to 5 working days"
+        }
+      ]
+    },
+    {
+      "type": "shipping_milestones",
+      "name": "Delivery steps",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "step_1_icon",
+          "label": "Step 1 icon",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "truck",
+              "label": "Truck"
+            },
+            {
+              "value": "package",
+              "label": "Package"
+            },
+            {
+              "value": "return",
+              "label": "Return"
+            },
+            {
+              "value": "shield",
+              "label": "Shield"
+            },
+            {
+              "value": "shield-check",
+              "label": "Shield check"
+            },
+            {
+              "value": "lock",
+              "label": "Lock"
+            },
+            {
+              "value": "gift",
+              "label": "Gift"
+            },
+            {
+              "value": "tag",
+              "label": "Tag"
+            },
+            {
+              "value": "percent",
+              "label": "Percent"
+            },
+            {
+              "value": "leaf",
+              "label": "Leaf"
+            },
+            {
+              "value": "sparkle",
+              "label": "Sparkle"
+            },
+            {
+              "value": "award",
+              "label": "Award"
+            },
+            {
+              "value": "globe",
+              "label": "Globe"
+            },
+            {
+              "value": "pin",
+              "label": "Pin"
+            },
+            {
+              "value": "store",
+              "label": "Store"
+            },
+            {
+              "value": "phone",
+              "label": "Phone"
+            },
+            {
+              "value": "mail",
+              "label": "Mail"
+            },
+            {
+              "value": "chat",
+              "label": "Chat"
+            },
+            {
+              "value": "question",
+              "label": "Question"
+            },
+            {
+              "value": "info",
+              "label": "Info"
+            },
+            {
+              "value": "alert",
+              "label": "Alert"
+            },
+            {
+              "value": "eye",
+              "label": "Eye"
+            },
+            {
+              "value": "ruler",
+              "label": "Ruler"
+            },
+            {
+              "value": "scissors",
+              "label": "Scissors"
+            },
+            {
+              "value": "clock",
+              "label": "Clock"
+            },
+            {
+              "value": "calendar",
+              "label": "Calendar"
+            },
+            {
+              "value": "fire",
+              "label": "Fire"
+            },
+            {
+              "value": "bolt",
+              "label": "Bolt"
+            },
+            {
+              "value": "heart",
+              "label": "Heart"
+            },
+            {
+              "value": "star",
+              "label": "Star"
+            },
+            {
+              "value": "check",
+              "label": "Check"
+            },
+            {
+              "value": "check-circle",
+              "label": "Check circle"
+            },
+            {
+              "value": "credit-card",
+              "label": "Credit card"
+            },
+            {
+              "value": "wallet",
+              "label": "Wallet"
+            },
+            {
+              "value": "refresh",
+              "label": "Refresh"
+            },
+            {
+              "value": "quote",
+              "label": "Quote"
+            }
+          ],
+          "default": "package"
+        },
+        {
+          "type": "text",
+          "id": "step_1_text",
+          "label": "Step 1",
+          "default": "Packed today"
+        },
+        {
+          "type": "select",
+          "id": "step_2_icon",
+          "label": "Step 2 icon",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "truck",
+              "label": "Truck"
+            },
+            {
+              "value": "package",
+              "label": "Package"
+            },
+            {
+              "value": "return",
+              "label": "Return"
+            },
+            {
+              "value": "shield",
+              "label": "Shield"
+            },
+            {
+              "value": "shield-check",
+              "label": "Shield check"
+            },
+            {
+              "value": "lock",
+              "label": "Lock"
+            },
+            {
+              "value": "gift",
+              "label": "Gift"
+            },
+            {
+              "value": "tag",
+              "label": "Tag"
+            },
+            {
+              "value": "percent",
+              "label": "Percent"
+            },
+            {
+              "value": "leaf",
+              "label": "Leaf"
+            },
+            {
+              "value": "sparkle",
+              "label": "Sparkle"
+            },
+            {
+              "value": "award",
+              "label": "Award"
+            },
+            {
+              "value": "globe",
+              "label": "Globe"
+            },
+            {
+              "value": "pin",
+              "label": "Pin"
+            },
+            {
+              "value": "store",
+              "label": "Store"
+            },
+            {
+              "value": "phone",
+              "label": "Phone"
+            },
+            {
+              "value": "mail",
+              "label": "Mail"
+            },
+            {
+              "value": "chat",
+              "label": "Chat"
+            },
+            {
+              "value": "question",
+              "label": "Question"
+            },
+            {
+              "value": "info",
+              "label": "Info"
+            },
+            {
+              "value": "alert",
+              "label": "Alert"
+            },
+            {
+              "value": "eye",
+              "label": "Eye"
+            },
+            {
+              "value": "ruler",
+              "label": "Ruler"
+            },
+            {
+              "value": "scissors",
+              "label": "Scissors"
+            },
+            {
+              "value": "clock",
+              "label": "Clock"
+            },
+            {
+              "value": "calendar",
+              "label": "Calendar"
+            },
+            {
+              "value": "fire",
+              "label": "Fire"
+            },
+            {
+              "value": "bolt",
+              "label": "Bolt"
+            },
+            {
+              "value": "heart",
+              "label": "Heart"
+            },
+            {
+              "value": "star",
+              "label": "Star"
+            },
+            {
+              "value": "check",
+              "label": "Check"
+            },
+            {
+              "value": "check-circle",
+              "label": "Check circle"
+            },
+            {
+              "value": "credit-card",
+              "label": "Credit card"
+            },
+            {
+              "value": "wallet",
+              "label": "Wallet"
+            },
+            {
+              "value": "refresh",
+              "label": "Refresh"
+            },
+            {
+              "value": "quote",
+              "label": "Quote"
+            }
+          ],
+          "default": "truck"
+        },
+        {
+          "type": "text",
+          "id": "step_2_text",
+          "label": "Step 2",
+          "default": "On its way tomorrow"
+        },
+        {
+          "type": "select",
+          "id": "step_3_icon",
+          "label": "Step 3 icon",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "truck",
+              "label": "Truck"
+            },
+            {
+              "value": "package",
+              "label": "Package"
+            },
+            {
+              "value": "return",
+              "label": "Return"
+            },
+            {
+              "value": "shield",
+              "label": "Shield"
+            },
+            {
+              "value": "shield-check",
+              "label": "Shield check"
+            },
+            {
+              "value": "lock",
+              "label": "Lock"
+            },
+            {
+              "value": "gift",
+              "label": "Gift"
+            },
+            {
+              "value": "tag",
+              "label": "Tag"
+            },
+            {
+              "value": "percent",
+              "label": "Percent"
+            },
+            {
+              "value": "leaf",
+              "label": "Leaf"
+            },
+            {
+              "value": "sparkle",
+              "label": "Sparkle"
+            },
+            {
+              "value": "award",
+              "label": "Award"
+            },
+            {
+              "value": "globe",
+              "label": "Globe"
+            },
+            {
+              "value": "pin",
+              "label": "Pin"
+            },
+            {
+              "value": "store",
+              "label": "Store"
+            },
+            {
+              "value": "phone",
+              "label": "Phone"
+            },
+            {
+              "value": "mail",
+              "label": "Mail"
+            },
+            {
+              "value": "chat",
+              "label": "Chat"
+            },
+            {
+              "value": "question",
+              "label": "Question"
+            },
+            {
+              "value": "info",
+              "label": "Info"
+            },
+            {
+              "value": "alert",
+              "label": "Alert"
+            },
+            {
+              "value": "eye",
+              "label": "Eye"
+            },
+            {
+              "value": "ruler",
+              "label": "Ruler"
+            },
+            {
+              "value": "scissors",
+              "label": "Scissors"
+            },
+            {
+              "value": "clock",
+              "label": "Clock"
+            },
+            {
+              "value": "calendar",
+              "label": "Calendar"
+            },
+            {
+              "value": "fire",
+              "label": "Fire"
+            },
+            {
+              "value": "bolt",
+              "label": "Bolt"
+            },
+            {
+              "value": "heart",
+              "label": "Heart"
+            },
+            {
+              "value": "star",
+              "label": "Star"
+            },
+            {
+              "value": "check",
+              "label": "Check"
+            },
+            {
+              "value": "check-circle",
+              "label": "Check circle"
+            },
+            {
+              "value": "credit-card",
+              "label": "Credit card"
+            },
+            {
+              "value": "wallet",
+              "label": "Wallet"
+            },
+            {
+              "value": "refresh",
+              "label": "Refresh"
+            },
+            {
+              "value": "quote",
+              "label": "Quote"
+            }
+          ],
+          "default": "check-circle"
+        },
+        {
+          "type": "text",
+          "id": "step_3_text",
+          "label": "Step 3",
+          "default": "With you by Wednesday"
+        }
+      ]
+    },
+    {
+      "type": "pickup",
+      "name": "Local pickup",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Reads the pickup locations configured in your shipping settings."
+        }
+      ]
+    },
+    {
+      "type": "benefits",
+      "name": "Benefits list",
+      "settings": [
+        {
+          "type": "select",
+          "id": "marker",
+          "label": "Marker",
+          "options": [
+            {
+              "value": "icon",
+              "label": "Icon"
+            },
+            {
+              "value": "none",
+              "label": "None — use your own emoji"
+            }
+          ],
+          "default": "icon"
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "truck",
+              "label": "Truck"
+            },
+            {
+              "value": "package",
+              "label": "Package"
+            },
+            {
+              "value": "return",
+              "label": "Return"
+            },
+            {
+              "value": "shield",
+              "label": "Shield"
+            },
+            {
+              "value": "shield-check",
+              "label": "Shield check"
+            },
+            {
+              "value": "lock",
+              "label": "Lock"
+            },
+            {
+              "value": "gift",
+              "label": "Gift"
+            },
+            {
+              "value": "tag",
+              "label": "Tag"
+            },
+            {
+              "value": "percent",
+              "label": "Percent"
+            },
+            {
+              "value": "leaf",
+              "label": "Leaf"
+            },
+            {
+              "value": "sparkle",
+              "label": "Sparkle"
+            },
+            {
+              "value": "award",
+              "label": "Award"
+            },
+            {
+              "value": "globe",
+              "label": "Globe"
+            },
+            {
+              "value": "pin",
+              "label": "Pin"
+            },
+            {
+              "value": "store",
+              "label": "Store"
+            },
+            {
+              "value": "phone",
+              "label": "Phone"
+            },
+            {
+              "value": "mail",
+              "label": "Mail"
+            },
+            {
+              "value": "chat",
+              "label": "Chat"
+            },
+            {
+              "value": "question",
+              "label": "Question"
+            },
+            {
+              "value": "info",
+              "label": "Info"
+            },
+            {
+              "value": "alert",
+              "label": "Alert"
+            },
+            {
+              "value": "eye",
+              "label": "Eye"
+            },
+            {
+              "value": "ruler",
+              "label": "Ruler"
+            },
+            {
+              "value": "scissors",
+              "label": "Scissors"
+            },
+            {
+              "value": "clock",
+              "label": "Clock"
+            },
+            {
+              "value": "calendar",
+              "label": "Calendar"
+            },
+            {
+              "value": "fire",
+              "label": "Fire"
+            },
+            {
+              "value": "bolt",
+              "label": "Bolt"
+            },
+            {
+              "value": "heart",
+              "label": "Heart"
+            },
+            {
+              "value": "star",
+              "label": "Star"
+            },
+            {
+              "value": "check",
+              "label": "Check"
+            },
+            {
+              "value": "check-circle",
+              "label": "Check circle"
+            },
+            {
+              "value": "credit-card",
+              "label": "Credit card"
+            },
+            {
+              "value": "wallet",
+              "label": "Wallet"
+            },
+            {
+              "value": "refresh",
+              "label": "Refresh"
+            },
+            {
+              "value": "quote",
+              "label": "Quote"
+            }
+          ],
+          "default": "check"
+        },
+        {
+          "type": "textarea",
+          "id": "benefits",
+          "label": "Benefits",
+          "default": "Hand-finished in our own workshop\nOeko-Tex certified fabric\nFree returns within 30 days",
+          "info": "One benefit per line. Emoji work here too."
+        }
+      ]
+    },
+    {
+      "type": "icon_row",
+      "name": "Icons with text",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon_1",
+          "label": "Icon 1",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "truck",
+              "label": "Truck"
+            },
+            {
+              "value": "package",
+              "label": "Package"
+            },
+            {
+              "value": "return",
+              "label": "Return"
+            },
+            {
+              "value": "shield",
+              "label": "Shield"
+            },
+            {
+              "value": "shield-check",
+              "label": "Shield check"
+            },
+            {
+              "value": "lock",
+              "label": "Lock"
+            },
+            {
+              "value": "gift",
+              "label": "Gift"
+            },
+            {
+              "value": "tag",
+              "label": "Tag"
+            },
+            {
+              "value": "percent",
+              "label": "Percent"
+            },
+            {
+              "value": "leaf",
+              "label": "Leaf"
+            },
+            {
+              "value": "sparkle",
+              "label": "Sparkle"
+            },
+            {
+              "value": "award",
+              "label": "Award"
+            },
+            {
+              "value": "globe",
+              "label": "Globe"
+            },
+            {
+              "value": "pin",
+              "label": "Pin"
+            },
+            {
+              "value": "store",
+              "label": "Store"
+            },
+            {
+              "value": "phone",
+              "label": "Phone"
+            },
+            {
+              "value": "mail",
+              "label": "Mail"
+            },
+            {
+              "value": "chat",
+              "label": "Chat"
+            },
+            {
+              "value": "question",
+              "label": "Question"
+            },
+            {
+              "value": "info",
+              "label": "Info"
+            },
+            {
+              "value": "alert",
+              "label": "Alert"
+            },
+            {
+              "value": "eye",
+              "label": "Eye"
+            },
+            {
+              "value": "ruler",
+              "label": "Ruler"
+            },
+            {
+              "value": "scissors",
+              "label": "Scissors"
+            },
+            {
+              "value": "clock",
+              "label": "Clock"
+            },
+            {
+              "value": "calendar",
+              "label": "Calendar"
+            },
+            {
+              "value": "fire",
+              "label": "Fire"
+            },
+            {
+              "value": "bolt",
+              "label": "Bolt"
+            },
+            {
+              "value": "heart",
+              "label": "Heart"
+            },
+            {
+              "value": "star",
+              "label": "Star"
+            },
+            {
+              "value": "check",
+              "label": "Check"
+            },
+            {
+              "value": "check-circle",
+              "label": "Check circle"
+            },
+            {
+              "value": "credit-card",
+              "label": "Credit card"
+            },
+            {
+              "value": "wallet",
+              "label": "Wallet"
+            },
+            {
+              "value": "refresh",
+              "label": "Refresh"
+            },
+            {
+              "value": "quote",
+              "label": "Quote"
+            }
+          ],
+          "default": "truck"
+        },
+        {
+          "type": "text",
+          "id": "text_1",
+          "label": "Text 1",
+          "default": "Free shipping"
+        },
+        {
+          "type": "select",
+          "id": "icon_2",
+          "label": "Icon 2",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "truck",
+              "label": "Truck"
+            },
+            {
+              "value": "package",
+              "label": "Package"
+            },
+            {
+              "value": "return",
+              "label": "Return"
+            },
+            {
+              "value": "shield",
+              "label": "Shield"
+            },
+            {
+              "value": "shield-check",
+              "label": "Shield check"
+            },
+            {
+              "value": "lock",
+              "label": "Lock"
+            },
+            {
+              "value": "gift",
+              "label": "Gift"
+            },
+            {
+              "value": "tag",
+              "label": "Tag"
+            },
+            {
+              "value": "percent",
+              "label": "Percent"
+            },
+            {
+              "value": "leaf",
+              "label": "Leaf"
+            },
+            {
+              "value": "sparkle",
+              "label": "Sparkle"
+            },
+            {
+              "value": "award",
+              "label": "Award"
+            },
+            {
+              "value": "globe",
+              "label": "Globe"
+            },
+            {
+              "value": "pin",
+              "label": "Pin"
+            },
+            {
+              "value": "store",
+              "label": "Store"
+            },
+            {
+              "value": "phone",
+              "label": "Phone"
+            },
+            {
+              "value": "mail",
+              "label": "Mail"
+            },
+            {
+              "value": "chat",
+              "label": "Chat"
+            },
+            {
+              "value": "question",
+              "label": "Question"
+            },
+            {
+              "value": "info",
+              "label": "Info"
+            },
+            {
+              "value": "alert",
+              "label": "Alert"
+            },
+            {
+              "value": "eye",
+              "label": "Eye"
+            },
+            {
+              "value": "ruler",
+              "label": "Ruler"
+            },
+            {
+              "value": "scissors",
+              "label": "Scissors"
+            },
+            {
+              "value": "clock",
+              "label": "Clock"
+            },
+            {
+              "value": "calendar",
+              "label": "Calendar"
+            },
+            {
+              "value": "fire",
+              "label": "Fire"
+            },
+            {
+              "value": "bolt",
+              "label": "Bolt"
+            },
+            {
+              "value": "heart",
+              "label": "Heart"
+            },
+            {
+              "value": "star",
+              "label": "Star"
+            },
+            {
+              "value": "check",
+              "label": "Check"
+            },
+            {
+              "value": "check-circle",
+              "label": "Check circle"
+            },
+            {
+              "value": "credit-card",
+              "label": "Credit card"
+            },
+            {
+              "value": "wallet",
+              "label": "Wallet"
+            },
+            {
+              "value": "refresh",
+              "label": "Refresh"
+            },
+            {
+              "value": "quote",
+              "label": "Quote"
+            }
+          ],
+          "default": "return"
+        },
+        {
+          "type": "text",
+          "id": "text_2",
+          "label": "Text 2",
+          "default": "Easy returns"
+        },
+        {
+          "type": "select",
+          "id": "icon_3",
+          "label": "Icon 3",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "truck",
+              "label": "Truck"
+            },
+            {
+              "value": "package",
+              "label": "Package"
+            },
+            {
+              "value": "return",
+              "label": "Return"
+            },
+            {
+              "value": "shield",
+              "label": "Shield"
+            },
+            {
+              "value": "shield-check",
+              "label": "Shield check"
+            },
+            {
+              "value": "lock",
+              "label": "Lock"
+            },
+            {
+              "value": "gift",
+              "label": "Gift"
+            },
+            {
+              "value": "tag",
+              "label": "Tag"
+            },
+            {
+              "value": "percent",
+              "label": "Percent"
+            },
+            {
+              "value": "leaf",
+              "label": "Leaf"
+            },
+            {
+              "value": "sparkle",
+              "label": "Sparkle"
+            },
+            {
+              "value": "award",
+              "label": "Award"
+            },
+            {
+              "value": "globe",
+              "label": "Globe"
+            },
+            {
+              "value": "pin",
+              "label": "Pin"
+            },
+            {
+              "value": "store",
+              "label": "Store"
+            },
+            {
+              "value": "phone",
+              "label": "Phone"
+            },
+            {
+              "value": "mail",
+              "label": "Mail"
+            },
+            {
+              "value": "chat",
+              "label": "Chat"
+            },
+            {
+              "value": "question",
+              "label": "Question"
+            },
+            {
+              "value": "info",
+              "label": "Info"
+            },
+            {
+              "value": "alert",
+              "label": "Alert"
+            },
+            {
+              "value": "eye",
+              "label": "Eye"
+            },
+            {
+              "value": "ruler",
+              "label": "Ruler"
+            },
+            {
+              "value": "scissors",
+              "label": "Scissors"
+            },
+            {
+              "value": "clock",
+              "label": "Clock"
+            },
+            {
+              "value": "calendar",
+              "label": "Calendar"
+            },
+            {
+              "value": "fire",
+              "label": "Fire"
+            },
+            {
+              "value": "bolt",
+              "label": "Bolt"
+            },
+            {
+              "value": "heart",
+              "label": "Heart"
+            },
+            {
+              "value": "star",
+              "label": "Star"
+            },
+            {
+              "value": "check",
+              "label": "Check"
+            },
+            {
+              "value": "check-circle",
+              "label": "Check circle"
+            },
+            {
+              "value": "credit-card",
+              "label": "Credit card"
+            },
+            {
+              "value": "wallet",
+              "label": "Wallet"
+            },
+            {
+              "value": "refresh",
+              "label": "Refresh"
+            },
+            {
+              "value": "quote",
+              "label": "Quote"
+            }
+          ],
+          "default": "shield-check"
+        },
+        {
+          "type": "text",
+          "id": "text_3",
+          "label": "Text 3",
+          "default": "Secure payment"
+        },
+        {
+          "type": "select",
+          "id": "icon_4",
+          "label": "Icon 4",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "truck",
+              "label": "Truck"
+            },
+            {
+              "value": "package",
+              "label": "Package"
+            },
+            {
+              "value": "return",
+              "label": "Return"
+            },
+            {
+              "value": "shield",
+              "label": "Shield"
+            },
+            {
+              "value": "shield-check",
+              "label": "Shield check"
+            },
+            {
+              "value": "lock",
+              "label": "Lock"
+            },
+            {
+              "value": "gift",
+              "label": "Gift"
+            },
+            {
+              "value": "tag",
+              "label": "Tag"
+            },
+            {
+              "value": "percent",
+              "label": "Percent"
+            },
+            {
+              "value": "leaf",
+              "label": "Leaf"
+            },
+            {
+              "value": "sparkle",
+              "label": "Sparkle"
+            },
+            {
+              "value": "award",
+              "label": "Award"
+            },
+            {
+              "value": "globe",
+              "label": "Globe"
+            },
+            {
+              "value": "pin",
+              "label": "Pin"
+            },
+            {
+              "value": "store",
+              "label": "Store"
+            },
+            {
+              "value": "phone",
+              "label": "Phone"
+            },
+            {
+              "value": "mail",
+              "label": "Mail"
+            },
+            {
+              "value": "chat",
+              "label": "Chat"
+            },
+            {
+              "value": "question",
+              "label": "Question"
+            },
+            {
+              "value": "info",
+              "label": "Info"
+            },
+            {
+              "value": "alert",
+              "label": "Alert"
+            },
+            {
+              "value": "eye",
+              "label": "Eye"
+            },
+            {
+              "value": "ruler",
+              "label": "Ruler"
+            },
+            {
+              "value": "scissors",
+              "label": "Scissors"
+            },
+            {
+              "value": "clock",
+              "label": "Clock"
+            },
+            {
+              "value": "calendar",
+              "label": "Calendar"
+            },
+            {
+              "value": "fire",
+              "label": "Fire"
+            },
+            {
+              "value": "bolt",
+              "label": "Bolt"
+            },
+            {
+              "value": "heart",
+              "label": "Heart"
+            },
+            {
+              "value": "star",
+              "label": "Star"
+            },
+            {
+              "value": "check",
+              "label": "Check"
+            },
+            {
+              "value": "check-circle",
+              "label": "Check circle"
+            },
+            {
+              "value": "credit-card",
+              "label": "Credit card"
+            },
+            {
+              "value": "wallet",
+              "label": "Wallet"
+            },
+            {
+              "value": "refresh",
+              "label": "Refresh"
+            },
+            {
+              "value": "quote",
+              "label": "Quote"
+            }
+          ],
+          "default": "none"
+        },
+        {
+          "type": "text",
+          "id": "text_4",
+          "label": "Text 4",
+          "default": ""
+        }
+      ]
+    },
+    {
+      "type": "payment_badges",
+      "name": "Payment and security",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Encrypted checkout, every payment method you already trust"
+        }
+      ]
+    },
+    {
+      "type": "share",
+      "name": "Share",
+      "limit": 1,
+      "settings": []
+    },
+    {
+      "type": "size_chart",
+      "name": "Size guide",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Link label",
+          "default": "Size guide"
+        },
+        {
+          "type": "page",
+          "id": "page",
+          "label": "Page",
+          "info": "Put your size table on a page and select it here."
+        },
+        {
+          "type": "checkbox",
+          "id": "show_unit_switch",
+          "label": "Add a centimetre / inch switch",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "popup",
+      "name": "Popup",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "truck",
+              "label": "Truck"
+            },
+            {
+              "value": "package",
+              "label": "Package"
+            },
+            {
+              "value": "return",
+              "label": "Return"
+            },
+            {
+              "value": "shield",
+              "label": "Shield"
+            },
+            {
+              "value": "shield-check",
+              "label": "Shield check"
+            },
+            {
+              "value": "lock",
+              "label": "Lock"
+            },
+            {
+              "value": "gift",
+              "label": "Gift"
+            },
+            {
+              "value": "tag",
+              "label": "Tag"
+            },
+            {
+              "value": "percent",
+              "label": "Percent"
+            },
+            {
+              "value": "leaf",
+              "label": "Leaf"
+            },
+            {
+              "value": "sparkle",
+              "label": "Sparkle"
+            },
+            {
+              "value": "award",
+              "label": "Award"
+            },
+            {
+              "value": "globe",
+              "label": "Globe"
+            },
+            {
+              "value": "pin",
+              "label": "Pin"
+            },
+            {
+              "value": "store",
+              "label": "Store"
+            },
+            {
+              "value": "phone",
+              "label": "Phone"
+            },
+            {
+              "value": "mail",
+              "label": "Mail"
+            },
+            {
+              "value": "chat",
+              "label": "Chat"
+            },
+            {
+              "value": "question",
+              "label": "Question"
+            },
+            {
+              "value": "info",
+              "label": "Info"
+            },
+            {
+              "value": "alert",
+              "label": "Alert"
+            },
+            {
+              "value": "eye",
+              "label": "Eye"
+            },
+            {
+              "value": "ruler",
+              "label": "Ruler"
+            },
+            {
+              "value": "scissors",
+              "label": "Scissors"
+            },
+            {
+              "value": "clock",
+              "label": "Clock"
+            },
+            {
+              "value": "calendar",
+              "label": "Calendar"
+            },
+            {
+              "value": "fire",
+              "label": "Fire"
+            },
+            {
+              "value": "bolt",
+              "label": "Bolt"
+            },
+            {
+              "value": "heart",
+              "label": "Heart"
+            },
+            {
+              "value": "star",
+              "label": "Star"
+            },
+            {
+              "value": "check",
+              "label": "Check"
+            },
+            {
+              "value": "check-circle",
+              "label": "Check circle"
+            },
+            {
+              "value": "credit-card",
+              "label": "Credit card"
+            },
+            {
+              "value": "wallet",
+              "label": "Wallet"
+            },
+            {
+              "value": "refresh",
+              "label": "Refresh"
+            },
+            {
+              "value": "quote",
+              "label": "Quote"
+            }
+          ],
+          "default": "info"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Link label",
+          "default": "Care instructions"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text"
+        },
+        {
+          "type": "page",
+          "id": "page",
+          "label": "Page",
+          "info": "Overrides the text above."
+        }
+      ]
+    },
+    {
+      "type": "collapsible_row",
+      "name": "Collapsible row",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "truck",
+              "label": "Truck"
+            },
+            {
+              "value": "package",
+              "label": "Package"
+            },
+            {
+              "value": "return",
+              "label": "Return"
+            },
+            {
+              "value": "shield",
+              "label": "Shield"
+            },
+            {
+              "value": "shield-check",
+              "label": "Shield check"
+            },
+            {
+              "value": "lock",
+              "label": "Lock"
+            },
+            {
+              "value": "gift",
+              "label": "Gift"
+            },
+            {
+              "value": "tag",
+              "label": "Tag"
+            },
+            {
+              "value": "percent",
+              "label": "Percent"
+            },
+            {
+              "value": "leaf",
+              "label": "Leaf"
+            },
+            {
+              "value": "sparkle",
+              "label": "Sparkle"
+            },
+            {
+              "value": "award",
+              "label": "Award"
+            },
+            {
+              "value": "globe",
+              "label": "Globe"
+            },
+            {
+              "value": "pin",
+              "label": "Pin"
+            },
+            {
+              "value": "store",
+              "label": "Store"
+            },
+            {
+              "value": "phone",
+              "label": "Phone"
+            },
+            {
+              "value": "mail",
+              "label": "Mail"
+            },
+            {
+              "value": "chat",
+              "label": "Chat"
+            },
+            {
+              "value": "question",
+              "label": "Question"
+            },
+            {
+              "value": "info",
+              "label": "Info"
+            },
+            {
+              "value": "alert",
+              "label": "Alert"
+            },
+            {
+              "value": "eye",
+              "label": "Eye"
+            },
+            {
+              "value": "ruler",
+              "label": "Ruler"
+            },
+            {
+              "value": "scissors",
+              "label": "Scissors"
+            },
+            {
+              "value": "clock",
+              "label": "Clock"
+            },
+            {
+              "value": "calendar",
+              "label": "Calendar"
+            },
+            {
+              "value": "fire",
+              "label": "Fire"
+            },
+            {
+              "value": "bolt",
+              "label": "Bolt"
+            },
+            {
+              "value": "heart",
+              "label": "Heart"
+            },
+            {
+              "value": "star",
+              "label": "Star"
+            },
+            {
+              "value": "check",
+              "label": "Check"
+            },
+            {
+              "value": "check-circle",
+              "label": "Check circle"
+            },
+            {
+              "value": "credit-card",
+              "label": "Credit card"
+            },
+            {
+              "value": "wallet",
+              "label": "Wallet"
+            },
+            {
+              "value": "refresh",
+              "label": "Refresh"
+            },
+            {
+              "value": "quote",
+              "label": "Quote"
+            }
+          ],
+          "default": "none"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Shipping and returns"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Tell shoppers what they want to know before they ask.</p>"
+        },
+        {
+          "type": "page",
+          "id": "page",
+          "label": "Page",
+          "info": "Overrides the text above."
+        }
+      ]
+    },
+    {
+      "type": "tabs",
+      "name": "Tabs",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "tab_1_title",
+          "label": "Tab 1",
+          "default": "Details"
+        },
+        {
+          "type": "richtext",
+          "id": "tab_1_content",
+          "label": "Tab 1 content"
+        },
+        {
+          "type": "page",
+          "id": "tab_1_page",
+          "label": "Tab 1 page"
+        },
+        {
+          "type": "text",
+          "id": "tab_2_title",
+          "label": "Tab 2",
+          "default": "Shipping"
+        },
+        {
+          "type": "richtext",
+          "id": "tab_2_content",
+          "label": "Tab 2 content"
+        },
+        {
+          "type": "page",
+          "id": "tab_2_page",
+          "label": "Tab 2 page"
+        },
+        {
+          "type": "text",
+          "id": "tab_3_title",
+          "label": "Tab 3",
+          "default": "Reviews"
+        },
+        {
+          "type": "richtext",
+          "id": "tab_3_content",
+          "label": "Tab 3 content"
+        },
+        {
+          "type": "page",
+          "id": "tab_3_page",
+          "label": "Tab 3 page"
+        },
+        {
+          "type": "text",
+          "id": "tab_4_title",
+          "label": "Tab 4",
+          "default": ""
+        },
+        {
+          "type": "richtext",
+          "id": "tab_4_content",
+          "label": "Tab 4 content"
+        },
+        {
+          "type": "page",
+          "id": "tab_4_page",
+          "label": "Tab 4 page"
+        }
+      ]
+    },
+    {
+      "type": "complementary",
+      "name": "Goes well with",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Uses Shopify's own product recommendations, so the suggestions improve as you sell."
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Pairs well with"
+        },
+        {
+          "type": "range",
+          "id": "limit",
+          "min": 1,
+          "max": 6,
+          "step": 1,
+          "label": "Products shown",
+          "default": 3
+        }
+      ]
+    },
+    {
+      "type": "bundle",
+      "name": "Bundle offer",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Complete the set"
+        },
+        {
+          "type": "product_list",
+          "id": "products",
+          "label": "Products",
+          "limit": 4
+        }
+      ]
+    },
+    {
+      "type": "upsell",
+      "name": "Single upsell",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Add on"
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        }
+      ]
+    },
+    {
+      "type": "free_gift",
+      "name": "Free gift by quantity",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Shows progress towards a gift. Create the matching automatic discount in your admin."
+        },
+        {
+          "type": "range",
+          "id": "quantity",
+          "min": 2,
+          "max": 12,
+          "step": 1,
+          "label": "Quantity that unlocks it",
+          "default": 3
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Buy three and the travel pouch is on us"
+        }
+      ]
+    },
+    {
+      "type": "discount_code",
+      "name": "Copyable discount code",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Use code"
+        },
+        {
+          "type": "text",
+          "id": "code",
+          "label": "Code",
+          "default": "WELCOME10"
+        }
+      ]
+    },
+    {
+      "type": "comparison_table",
+      "name": "Comparison table",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "How it compares"
+        },
+        {
+          "type": "text",
+          "id": "column_0",
+          "label": "First column",
+          "default": ""
+        },
+        {
+          "type": "text",
+          "id": "column_1",
+          "label": "Second column",
+          "default": "Ours"
+        },
+        {
+          "type": "text",
+          "id": "column_2",
+          "label": "Third column",
+          "default": "Typical"
+        },
+        {
+          "type": "textarea",
+          "id": "rows",
+          "label": "Rows",
+          "default": "Hand-finished | yes | no\nOeko-Tex certified | yes | no\nFree returns | yes | 14 days",
+          "info": "One row per line, cells separated by a vertical bar. Write yes or no to get a tick or a cross."
+        }
+      ]
+    },
+    {
+      "type": "custom_field",
+      "name": "Personalisation field",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Personalisation"
+        },
+        {
+          "type": "select",
+          "id": "field_type",
+          "label": "Field type",
+          "options": [
+            {
+              "value": "text",
+              "label": "Single line"
+            },
+            {
+              "value": "textarea",
+              "label": "Multiple lines"
+            }
+          ],
+          "default": "text"
+        },
+        {
+          "type": "range",
+          "id": "max_length",
+          "min": 10,
+          "max": 500,
+          "step": 10,
+          "label": "Maximum characters",
+          "default": 60
+        },
+        {
+          "type": "checkbox",
+          "id": "required",
+          "label": "Required",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "help",
+          "label": "Help text",
+          "default": "Your text appears exactly as typed."
+        }
+      ]
+    },
+    {
+      "type": "trust_stars",
+      "name": "Review score line",
+      "settings": [
+        {
+          "type": "range",
+          "id": "stars",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "label": "Stars",
+          "default": 5
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "4.8 from 1,240 verified reviews"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Say something the product page needs and nothing else covers.</p>"
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "Size",
+          "options": [
+            {
+              "value": "text-small",
+              "label": "Small"
+            },
+            {
+              "value": "",
+              "label": "Medium"
+            },
+            {
+              "value": "text-lead",
+              "label": "Large"
+            }
+          ],
+          "default": ""
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "range",
+          "id": "width",
+          "min": 20,
+          "max": 100,
+          "step": 5,
+          "unit": "%",
+          "label": "Width",
+          "default": 100
+        }
+      ]
+    },
+    {
+      "type": "video",
+      "name": "Video",
+      "settings": [
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video",
+          "info": "Upload an MP4 to your files and pick it here."
+        },
+        {
+          "type": "video_url",
+          "id": "video_url",
+          "label": "Or a video link",
+          "accept": [
+            "youtube",
+            "vimeo"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Button",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Read the story"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "Style",
+          "options": [
+            {
+              "value": "",
+              "label": "Primary"
+            },
+            {
+              "value": "button--secondary",
+              "label": "Secondary"
+            },
+            {
+              "value": "button--ghost",
+              "label": "Ghost"
+            },
+            {
+              "value": "button--link",
+              "label": "Link"
+            }
+          ],
+          "default": "button--secondary"
+        },
+        {
+          "type": "checkbox",
+          "id": "full_width",
+          "label": "Full width",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "new_tab",
+          "label": "Open in a new tab",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "anchor_links",
+      "name": "Jump links",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Accessible label",
+          "default": "Jump to"
+        },
+        {
+          "type": "textarea",
+          "id": "links",
+          "label": "Links",
+          "default": "Reviews | reviews\nDetails | details",
+          "info": "One per line: label, a vertical bar, then the id of the section to scroll to."
+        }
+      ]
+    },
+    {
+      "type": "separator",
+      "name": "Separator",
+      "settings": [
+        {
+          "type": "range",
+          "id": "spacing",
+          "min": 0,
+          "max": 48,
+          "step": 2,
+          "unit": "px",
+          "label": "Space around",
+          "default": 12
+        }
+      ]
+    },
+    {
+      "type": "custom_liquid",
+      "name": "Custom Liquid",
+      "settings": [
+        {
+          "type": "liquid",
+          "id": "custom_liquid",
+          "label": "Liquid",
+          "info": "An insertion point for app snippets and one-off markup."
+        }
+      ]
+    },
+    {
+      "type": "@app"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,131 @@
+{%- comment -%}
+  The totals, note, discount field, terms tick box and checkout button.
+  Shared by the drawer and the cart page so the two can never drift apart.
+
+  Accepts:
+  - context: {String} drawer | page
+{%- endcomment -%}
+{%- liquid
+  assign total_saving = 0
+  for line in cart.items
+    if line.variant.compare_at_price > line.variant.price
+      assign line_saving = line.variant.compare_at_price | minus: line.variant.price | times: line.quantity
+      assign total_saving = total_saving | plus: line_saving
+    endif
+  endfor
+  assign total_saving = total_saving | plus: cart.total_discount
+-%}
+<div class="cart-summary">
+  {%- if settings.cart_note_enabled -%}
+    <details class="cart-summary__disclosure">
+      <summary class="cart-summary__disclosure-summary">
+        {% render 'icon', icon: 'edit' %}
+        <span>{{ 'cart.note.add' | t }}</span>
+      </summary>
+      <div class="cart-summary__disclosure-body">
+        <label class="visually-hidden" for="cart-note-{{ context }}">{{ 'cart.note.label' | t }}</label>
+        <textarea
+          id="cart-note-{{ context }}"
+          class="cart-summary__note"
+          name="note"
+          placeholder="{{ 'cart.note.placeholder' | t | escape }}"
+          data-cart-note
+        >{{ cart.note }}</textarea>
+      </div>
+    </details>
+  {%- endif -%}
+
+  {%- if settings.cart_discount_field -%}
+    <details class="cart-summary__disclosure">
+      <summary class="cart-summary__disclosure-summary">
+        {% render 'icon', icon: 'tag' %}
+        <span>{{ 'cart.discount.label' | t }}</span>
+      </summary>
+      <div class="cart-summary__disclosure-body">
+        <div class="cart-summary__discount">
+          <label class="visually-hidden" for="cart-discount-{{ context }}">{{ 'cart.discount.label' | t }}</label>
+          <input
+            id="cart-discount-{{ context }}"
+            type="text"
+            class="cart-summary__discount-input"
+            placeholder="{{ 'cart.discount.placeholder' | t | escape }}"
+            data-discount-input
+            autocomplete="off"
+          >
+          <button type="button" class="button button--secondary button--small" data-discount-apply>
+            {{ 'cart.discount.apply' | t }}
+          </button>
+        </div>
+        <p class="text-tiny text-muted">{{ 'cart.discount.help' | t }}</p>
+        <p class="text-tiny text-success" data-discount-status hidden>{{ 'cart.discount.applied' | t }}</p>
+      </div>
+    </details>
+  {%- endif -%}
+
+  {%- if cart.cart_level_discount_applications.size > 0 -%}
+    <ul class="cart-summary__discounts">
+      {%- for discount in cart.cart_level_discount_applications -%}
+        <li class="cart-summary__row text-success text-small">
+          <span>{% render 'icon', icon: 'tag' %} {{ discount.title }}</span>
+          <span>−{{ discount.total_allocated_amount | money }}</span>
+        </li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+
+  {%- if settings.cart_show_savings and total_saving > 0 -%}
+    <div class="cart-summary__row cart-summary__row--saving text-sale">
+      <span>{{ 'cart.general.savings_total' | t }}</span>
+      <span>{{ total_saving | money }}</span>
+    </div>
+  {%- endif -%}
+
+  <div class="cart-summary__row cart-summary__row--total">
+    <span class="h5">{{ 'cart.general.subtotal' | t }}</span>
+    <span class="h5" data-cart-subtotal>{{ cart.total_price | money }}</span>
+  </div>
+
+  <p class="cart-summary__tax text-tiny text-muted">{{ 'cart.general.taxes_and_shipping_at_checkout' | t }}</p>
+
+  {%- if settings.cart_terms_required -%}
+    <div class="cart-summary__terms">
+      <label class="checkbox text-small" for="cart-terms-{{ context }}">
+        <input type="checkbox" id="cart-terms-{{ context }}" data-cart-terms>
+        <span>
+          {%- if settings.cart_terms_url != blank -%}
+            {{ 'cart.terms.label_html' | t: url: settings.cart_terms_url }}
+          {%- else -%}
+            {{ 'cart.terms.label_plain' | t }}
+          {%- endif -%}
+        </span>
+      </label>
+      <p class="field__error" data-terms-error hidden>{{ 'cart.terms.error' | t }}</p>
+    </div>
+  {%- endif -%}
+
+  <button
+    type="submit"
+    name="checkout"
+    class="button button--full button--large cart-summary__checkout"
+    data-checkout-button
+    {% if cart.item_count == 0 %}disabled{% endif %}
+  >
+    {% render 'icon', icon: 'lock' %}
+    <span>{{ 'cart.general.checkout' | t }}</span>
+  </button>
+
+  {%- if context == 'drawer' -%}
+    <a class="button button--link button--full" href="{{ routes.cart_url }}">{{ 'cart.general.view_cart' | t }}</a>
+  {%- endif -%}
+
+  {%- if settings.cart_show_trust_badge -%}
+    <p class="cart-summary__trust text-tiny text-muted">
+      {% render 'icon', icon: 'shield-check' %}
+      <span>{{ 'cart.trust.secure_checkout' | t }}</span>
+    </p>
+  {%- endif -%}
+
+  {%- if settings.cart_show_payment_icons -%}
+    {%- render 'payment-icons' -%}
+  {%- endif -%}
+</div>

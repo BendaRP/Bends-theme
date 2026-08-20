@@ -1,0 +1,32 @@
+{%- style -%}
+  {%- render 'section-styles', section_id: section.id, s: section.settings -%}
+{%- endstyle -%}
+
+<div class="section-wrapper color-{{ section.settings.color_scheme }}">
+  <div class="section">
+    <div class="page-width{% if section.settings.narrow %} page-width--narrow{% endif %}">
+      {%- if section.settings.show_breadcrumbs -%}
+        {%- render 'breadcrumbs' -%}
+      {%- endif -%}
+      {%- render 'heading', text: page.title, tag: 'h1', size: 'h1', ink: section.settings.ink_heading -%}
+      <div class="rte page-content" data-reveal>{{ page.content }}</div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Page",
+  "tag": "section",
+  "class": "section-main-page",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-1" },
+    { "type": "checkbox", "id": "narrow", "label": "Use the narrow reading width", "default": true },
+    { "type": "checkbox", "id": "show_breadcrumbs", "label": "Show breadcrumbs", "default": true },
+    { "type": "checkbox", "id": "ink_heading", "label": "Underline the last word with the ink accent", "default": false },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Top padding", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Bottom padding", "default": 64 }
+  ]
+}
+{% endschema %}
