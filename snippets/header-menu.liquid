@@ -12,7 +12,8 @@
   assign links = menu.links
   assign total = links.size
   assign half = total | divided_by: 2
-  if total > 0 and total | modulo: 2 != 0
+  assign remainder = total | modulo: 2
+  if total > 0 and remainder != 0
     assign half = half | plus: 1
   endif
 -%}

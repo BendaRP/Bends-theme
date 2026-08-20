@@ -196,10 +196,18 @@ thing to optimise.
 
 ```bash
 npm install -g @shopify/cli
+gem install liquid
 
 .dev/validate.sh          # the full acceptance run
 .dev/check.sh             # theme check, compact output
+.dev/parse_liquid.rb      # compile every template with the real Liquid engine
 ```
+
+`theme check` is static analysis — it never compiles a template. A filter used
+inside an `if` condition, a `}` sitting inside a string inside `{{ }}`, or a
+filter passed as a tag argument all sail past it and only fail when a shopper
+loads the page. `parse_liquid.rb` runs the real parser over all 111 templates,
+so those never ship again.
 
 Three files are generated and should not be edited by hand:
 
@@ -219,6 +227,13 @@ in one language and not the other.
 
 `check_contrast.py` verifies every shipped palette against WCAG, including the
 derived control-border colour.
+
+### Demo content language
+
+The theme's default locale is Hebrew, so every schema `default` that a shopper
+sees ships in Hebrew and a fresh install reads coherently right to left. Setting
+labels, section names and the info text explaining a setting stay in English —
+those are admin-facing.
 
 ### Packaging
 

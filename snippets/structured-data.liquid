@@ -35,6 +35,15 @@
     }
   </script>
 
+  {%- liquid
+    comment
+      Liquid ends an output tag at the first }, even inside a string literal,
+      so the search template has to be assembled in a tag rather than written
+      inline in {{ }}.
+    endcomment
+    assign search_query_template = '?q={search_term_string}'
+    assign search_url_template = shop.url | append: routes.search_url | append: search_query_template
+  -%}
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -45,7 +54,7 @@
         "@type": "SearchAction",
         "target": {
           "@type": "EntryPoint",
-          "urlTemplate": {{ shop.url | append: routes.search_url | append: '?q={search_term_string}' | json }}
+          "urlTemplate": {{ search_url_template | json }}
         },
         "query-input": "required name=search_term_string"
       }

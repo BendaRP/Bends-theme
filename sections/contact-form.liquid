@@ -15,7 +15,8 @@
         <div class="rte text-muted">{{ section.settings.text }}</div>
       {%- endif -%}
 
-      {%- form 'contact', class: 'contact-form', id: 'ContactForm-' | append: section.id -%}
+      {%- assign contact_form_id = 'ContactForm-' | append: section.id -%}
+      {%- form 'contact', class: 'contact-form', id: contact_form_id -%}
         {%- if form.posted_successfully? -%}
           <p class="form-status form-status--success" tabindex="-1" autofocus>
             {% render 'icon', icon: 'check-circle' %}
@@ -94,28 +95,97 @@
   "tag": "section",
   "class": "section-contact-form",
   "settings": [
-    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-1" },
-    { "type": "text", "id": "heading", "label": "Heading", "default": "Get in touch" },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Colour scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "דברו איתנו"
+    },
     {
       "type": "select",
       "id": "heading_size",
       "label": "Heading size",
       "options": [
-        { "value": "h3", "label": "Small" },
-        { "value": "h2", "label": "Medium" },
-        { "value": "h1", "label": "Large" }
+        {
+          "value": "h3",
+          "label": "Small"
+        },
+        {
+          "value": "h2",
+          "label": "Medium"
+        },
+        {
+          "value": "h1",
+          "label": "Large"
+        }
       ],
       "default": "h2"
     },
-    { "type": "checkbox", "id": "ink_heading", "label": "Underline the last word with the ink accent", "default": true },
-    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>We answer every message, usually within a working day.</p>" },
-    { "type": "checkbox", "id": "narrow", "label": "Use the narrow reading width", "default": true },
-    { "type": "checkbox", "id": "show_phone", "label": "Ask for a phone number", "default": true },
-    { "type": "checkbox", "id": "show_subject", "label": "Ask for a subject", "default": false },
-    { "type": "header", "content": "Spacing" },
-    { "type": "range", "id": "padding_top", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Top padding", "default": 56 },
-    { "type": "range", "id": "padding_bottom", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Bottom padding", "default": 56 }
+    {
+      "type": "checkbox",
+      "id": "ink_heading",
+      "label": "Underline the last word with the ink accent",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>אנחנו עונים לכל הודעה, בדרך כלל תוך יום עסקים.</p>"
+    },
+    {
+      "type": "checkbox",
+      "id": "narrow",
+      "label": "Use the narrow reading width",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_phone",
+      "label": "Ask for a phone number",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_subject",
+      "label": "Ask for a subject",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 56
+    }
   ],
-  "presets": [{ "name": "Contact form" }]
+  "presets": [
+    {
+      "name": "Contact form"
+    }
+  ]
 }
 {% endschema %}

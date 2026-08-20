@@ -6,7 +6,14 @@
   - button_label: {String} overrides the default button wording
   - class:        {String} extra class names
 {%- endcomment -%}
-{%- form 'customer', class: 'newsletter-form ' | append: class, id: 'newsletter-' | append: context -%}
+{%- liquid
+  assign form_class = 'newsletter-form'
+  if class != blank
+    assign form_class = form_class | append: ' ' | append: class
+  endif
+  assign form_id = 'newsletter-' | append: context
+-%}
+{%- form 'customer', class: form_class, id: form_id -%}
   <input type="hidden" name="contact[tags]" value="newsletter">
   {%- if form.posted_successfully? -%}
     <p class="form-status form-status--success" tabindex="-1" data-form-status>

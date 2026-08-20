@@ -19,7 +19,8 @@
 {%- if show_country or show_language -%}
   <div class="localization {{ class }}">
     {%- if show_country -%}
-      {%- form 'localization', class: 'localization__form', id: 'country-form-' | append: context -%}
+      {%- assign country_form_id = 'country-form-' | append: context -%}
+      {%- form 'localization', class: 'localization__form', id: country_form_id -%}
         <input type="hidden" name="country_code" value="{{ localization.country.iso_code }}">
         <div class="field">
           <label class="visually-hidden" for="country-{{ context }}">
@@ -40,7 +41,8 @@
     {%- endif -%}
 
     {%- if show_language -%}
-      {%- form 'localization', class: 'localization__form', id: 'language-form-' | append: context -%}
+      {%- assign language_form_id = 'language-form-' | append: context -%}
+      {%- form 'localization', class: 'localization__form', id: language_form_id -%}
         <input type="hidden" name="locale_code" value="{{ localization.language.iso_code }}">
         <div class="field">
           <label class="visually-hidden" for="language-{{ context }}">

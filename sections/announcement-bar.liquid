@@ -66,36 +66,118 @@
   "tag": "section",
   "class": "section-announcement",
   "settings": [
-    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-3" },
-    { "type": "checkbox", "id": "autorotate", "label": "Rotate automatically", "default": true },
-    { "type": "range", "id": "autorotate_speed", "min": 3, "max": 15, "step": 1, "unit": "s", "label": "Seconds per announcement", "default": 5 },
-    { "type": "header", "content": "Spacing" },
-    { "type": "range", "id": "padding_top", "min": 0, "max": 40, "step": 2, "unit": "px", "label": "Top padding", "default": 10 },
-    { "type": "range", "id": "padding_bottom", "min": 0, "max": 40, "step": 2, "unit": "px", "label": "Bottom padding", "default": 10 }
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Colour scheme",
+      "default": "scheme-3"
+    },
+    {
+      "type": "checkbox",
+      "id": "autorotate",
+      "label": "Rotate automatically",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autorotate_speed",
+      "min": 3,
+      "max": 15,
+      "step": 1,
+      "unit": "s",
+      "label": "Seconds per announcement",
+      "default": 5
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 10
+    }
   ],
   "blocks": [
     {
       "type": "announcement",
       "name": "Announcement",
       "settings": [
-        { "type": "text", "id": "text", "label": "Text", "default": "Free shipping over 250" },
-        { "type": "url", "id": "link", "label": "Link" },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "משלוח חינם מעל 250 ₪"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
         {
           "type": "select",
           "id": "icon",
           "label": "Icon",
           "options": [
-            { "value": "none", "label": "None" },
-            { "value": "truck", "label": "Delivery" },
-            { "value": "return", "label": "Returns" },
-            { "value": "shield-check", "label": "Secure" },
-            { "value": "gift", "label": "Gift" },
-            { "value": "percent", "label": "Discount" },
-            { "value": "fire", "label": "Hot" },
-            { "value": "sparkle", "label": "Sparkle" },
-            { "value": "leaf", "label": "Sustainable" },
-            { "value": "clock", "label": "Time" },
-            { "value": "bolt", "label": "Fast" }
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "truck",
+              "label": "Delivery"
+            },
+            {
+              "value": "return",
+              "label": "Returns"
+            },
+            {
+              "value": "shield-check",
+              "label": "Secure"
+            },
+            {
+              "value": "gift",
+              "label": "Gift"
+            },
+            {
+              "value": "percent",
+              "label": "Discount"
+            },
+            {
+              "value": "fire",
+              "label": "Hot"
+            },
+            {
+              "value": "sparkle",
+              "label": "Sparkle"
+            },
+            {
+              "value": "leaf",
+              "label": "Sustainable"
+            },
+            {
+              "value": "clock",
+              "label": "Time"
+            },
+            {
+              "value": "bolt",
+              "label": "Fast"
+            }
           ],
           "default": "truck"
         }
@@ -103,8 +185,17 @@
     }
   ],
   "default": {
-    "blocks": [{ "type": "announcement" }]
+    "blocks": [
+      {
+        "type": "announcement"
+      }
+    ]
   },
-  "enabled_on": { "groups": ["header", "footer"] }
+  "enabled_on": {
+    "groups": [
+      "header",
+      "footer"
+    ]
+  }
 }
 {% endschema %}

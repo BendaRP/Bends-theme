@@ -59,7 +59,8 @@
       <div class="notify-me" data-notify-me>
         <h2 class="h6">{{ 'products.product.notify_me.title' | t }}</h2>
         <p class="text-small text-muted">{{ 'products.product.notify_me.body' | t }}</p>
-        {%- form 'contact', id: 'notify-' | append: product.id | append: '-' | append: context, class: 'notify-me__form' -%}
+        {%- assign notify_form_id = 'notify-' | append: product.id | append: '-' | append: context -%}
+        {%- form 'contact', id: notify_form_id, class: 'notify-me__form' -%}
           {%- if form.posted_successfully? -%}
             <p class="form-status form-status--success" tabindex="-1">
               {{ 'products.product.notify_me.success' | t }}

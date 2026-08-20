@@ -5,25 +5,86 @@
     "trust-bar": {
       "type": "icon-bar",
       "blocks": {
-        "icon-1": { "type": "item", "settings": { "icon": "truck", "heading": "Fast delivery", "text": "Dispatched within one working day" } },
-        "icon-2": { "type": "item", "settings": { "icon": "return", "heading": "Easy returns", "text": "30 days to change your mind" } },
-        "icon-3": { "type": "item", "settings": { "icon": "shield-check", "heading": "Secure payment", "text": "Encrypted from cart to checkout" } },
-        "icon-4": { "type": "item", "settings": { "icon": "chat", "heading": "Real people", "text": "We answer every message" } }
+        "icon-1": {
+          "type": "item",
+          "settings": {
+            "icon": "truck",
+            "heading": "משלוח מהיר",
+            "text": "נשלח תוך יום עסקים אחד"
+          }
+        },
+        "icon-2": {
+          "type": "item",
+          "settings": {
+            "icon": "return",
+            "heading": "החזרות בקלות",
+            "text": "30 יום להתחרט"
+          }
+        },
+        "icon-3": {
+          "type": "item",
+          "settings": {
+            "icon": "shield-check",
+            "heading": "תשלום מאובטח",
+            "text": "מוצפן מהסל ועד התשלום"
+          }
+        },
+        "icon-4": {
+          "type": "item",
+          "settings": {
+            "icon": "chat",
+            "heading": "אנשים אמיתיים",
+            "text": "אנחנו עונים לכל הודעה"
+          }
+        }
       },
-      "block_order": ["icon-1", "icon-2", "icon-3", "icon-4"],
-      "settings": { "color_scheme": "scheme-2" }
+      "block_order": [
+        "icon-1",
+        "icon-2",
+        "icon-3",
+        "icon-4"
+      ],
+      "settings": {
+        "color_scheme": "scheme-2"
+      }
     },
     "footer": {
       "type": "footer",
       "blocks": {
-        "brand": { "type": "brand", "settings": {} },
-        "menu": { "type": "menu", "settings": { "heading": "Shop" } },
-        "help": { "type": "text", "settings": { "heading": "Help" } },
-        "newsletter": { "type": "newsletter", "settings": {} }
+        "brand": {
+          "type": "brand",
+          "settings": {}
+        },
+        "menu": {
+          "type": "menu",
+          "settings": {
+            "heading": "החנות"
+          }
+        },
+        "help": {
+          "type": "text",
+          "settings": {
+            "heading": "עזרה"
+          }
+        },
+        "newsletter": {
+          "type": "newsletter",
+          "settings": {}
+        }
       },
-      "block_order": ["brand", "menu", "help", "newsletter"],
-      "settings": { "color_scheme": "scheme-3" }
+      "block_order": [
+        "brand",
+        "menu",
+        "help",
+        "newsletter"
+      ],
+      "settings": {
+        "color_scheme": "scheme-3"
+      }
     }
   },
-  "order": ["trust-bar", "footer"]
+  "order": [
+    "trust-bar",
+    "footer"
+  ]
 }

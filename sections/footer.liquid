@@ -153,13 +153,54 @@
   "tag": "section",
   "class": "section-footer",
   "settings": [
-    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-3" },
-    { "type": "link_list", "id": "policy_menu", "label": "Legal menu", "info": "Privacy policy, terms, accessibility statement, returns." },
-    { "type": "checkbox", "id": "show_payment_icons", "label": "Show payment icons", "default": true },
-    { "type": "checkbox", "id": "show_localization", "label": "Show the country and language pickers", "default": true },
-    { "type": "header", "content": "Spacing" },
-    { "type": "range", "id": "padding_top", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Top padding", "default": 72 },
-    { "type": "range", "id": "padding_bottom", "min": 0, "max": 160, "step": 4, "unit": "px", "label": "Bottom padding", "default": 40 }
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Colour scheme",
+      "default": "scheme-3"
+    },
+    {
+      "type": "link_list",
+      "id": "policy_menu",
+      "label": "Legal menu",
+      "info": "Privacy policy, terms, accessibility statement, returns."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment_icons",
+      "label": "Show payment icons",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_localization",
+      "label": "Show the country and language pickers",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 40
+    }
   ],
   "blocks": [
     {
@@ -167,25 +208,64 @@
       "name": "Brand",
       "limit": 1,
       "settings": [
-        { "type": "range", "id": "logo_width", "min": 60, "max": 320, "step": 10, "unit": "px", "label": "Logo width", "default": 140 },
-        { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Made in small batches, shipped with care.</p>" },
-        { "type": "checkbox", "id": "show_social", "label": "Show social links", "default": true }
+        {
+          "type": "range",
+          "id": "logo_width",
+          "min": 60,
+          "max": 320,
+          "step": 10,
+          "unit": "px",
+          "label": "Logo width",
+          "default": 140
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>נעשה בסדרות קטנות, נשלח בקפידה.</p>"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_social",
+          "label": "Show social links",
+          "default": true
+        }
       ]
     },
     {
       "type": "menu",
       "name": "Menu",
       "settings": [
-        { "type": "text", "id": "heading", "label": "Heading", "default": "Shop" },
-        { "type": "link_list", "id": "menu", "label": "Menu", "default": "footer" }
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "החנות"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu",
+          "default": "footer"
+        }
       ]
     },
     {
       "type": "text",
       "name": "Text",
       "settings": [
-        { "type": "text", "id": "heading", "label": "Heading", "default": "About" },
-        { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Tell your story in a sentence or two.</p>" }
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "אודות"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>ספרו את הסיפור שלכם במשפט או שניים.</p>"
+        }
       ]
     },
     {
@@ -193,9 +273,24 @@
       "name": "Newsletter",
       "limit": 1,
       "settings": [
-        { "type": "text", "id": "heading", "label": "Heading", "default": "Stay in touch" },
-        { "type": "richtext", "id": "text", "label": "Text", "default": "<p>New arrivals and quiet offers. No noise.</p>" },
-        { "type": "text", "id": "button_label", "label": "Button label", "default": "Subscribe" }
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "נשארים בקשר"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>חדשים ומבצעים שקטים. בלי רעש.</p>"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "הרשמה"
+        }
       ]
     },
     {
@@ -203,31 +298,81 @@
       "name": "Contact",
       "limit": 1,
       "settings": [
-        { "type": "text", "id": "heading", "label": "Heading", "default": "Contact" },
-        { "type": "text", "id": "phone", "label": "Phone" },
-        { "type": "text", "id": "email", "label": "Email" },
-        { "type": "text", "id": "address", "label": "Address" },
-        { "type": "text", "id": "hours", "label": "Opening hours" }
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "יצירת קשר"
+        },
+        {
+          "type": "text",
+          "id": "phone",
+          "label": "Phone"
+        },
+        {
+          "type": "text",
+          "id": "email",
+          "label": "Email"
+        },
+        {
+          "type": "text",
+          "id": "address",
+          "label": "Address"
+        },
+        {
+          "type": "text",
+          "id": "hours",
+          "label": "Opening hours"
+        }
       ]
     },
     {
       "type": "image",
       "name": "Image",
       "settings": [
-        { "type": "image_picker", "id": "image", "label": "Image" },
-        { "type": "range", "id": "image_width", "min": 60, "max": 400, "step": 10, "unit": "px", "label": "Image width", "default": 180 },
-        { "type": "richtext", "id": "text", "label": "Text" }
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "range",
+          "id": "image_width",
+          "min": 60,
+          "max": 400,
+          "step": 10,
+          "unit": "px",
+          "label": "Image width",
+          "default": 180
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text"
+        }
       ]
     }
   ],
   "default": {
     "blocks": [
-      { "type": "brand" },
-      { "type": "menu" },
-      { "type": "text" },
-      { "type": "newsletter" }
+      {
+        "type": "brand"
+      },
+      {
+        "type": "menu"
+      },
+      {
+        "type": "text"
+      },
+      {
+        "type": "newsletter"
+      }
     ]
   },
-  "enabled_on": { "groups": ["footer"] }
+  "enabled_on": {
+    "groups": [
+      "footer"
+    ]
+  }
 }
 {% endschema %}

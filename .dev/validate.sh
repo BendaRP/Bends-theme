@@ -26,6 +26,10 @@ for f in assets/*.js; do node --check "$f" || fail=1; done
 echo "  all bundles parse"
 
 echo
+echo "== Liquid parses for real =="
+ruby -E UTF-8 .dev/parse_liquid.rb || fail=1
+
+echo
 echo "== Theme check (--fail-level warning) =="
 .dev/check.sh || fail=1
 

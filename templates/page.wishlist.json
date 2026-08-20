@@ -1,8 +1,27 @@
 {
   "sections": {
-    "main": { "type": "main-page", "settings": { "narrow": false } },
-    "wishlist": { "type": "wishlist-grid", "settings": { "heading": "Your wishlist" } },
-    "recently-viewed": { "type": "recently-viewed", "settings": { "heading": "Recently viewed" } }
+    "main": {
+      "type": "main-page",
+      "settings": {
+        "narrow": false
+      }
+    },
+    "wishlist": {
+      "type": "wishlist-grid",
+      "settings": {
+        "heading": "רשימת המשאלות שלך"
+      }
+    },
+    "recently-viewed": {
+      "type": "recently-viewed",
+      "settings": {
+        "heading": "נצפו לאחרונה"
+      }
+    }
   },
-  "order": ["main", "wishlist", "recently-viewed"]
+  "order": [
+    "main",
+    "wishlist",
+    "recently-viewed"
+  ]
 }
