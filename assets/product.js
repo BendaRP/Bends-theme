@@ -94,7 +94,7 @@
 
         var match = variants.find(function (variant) {
           return candidate.every(function (value, i) {
-            return value === undefined || i === index ? variant.options[i] === candidate[i] : variant.options[i] === value;
+            return value === undefined || variant.options[i] === value;
           });
         });
 
@@ -142,17 +142,22 @@
       var current = price.querySelector('.price__current');
       if (current) current.textContent = utils.formatMoney(variant.price);
 
-      var compare = price.querySelector('.price__compare');
       var onSale = variant.compare_at_price > variant.price;
       price.classList.toggle('price--on-sale', onSale);
 
+      var compare = price.querySelector('.price__compare');
+      if (!compare && onSale) {
+        /* The product may have loaded on a variant that was not discounted,
+           in which case there is no compare-at element to reuse yet. */
+        compare = document.createElement('s');
+        compare.className = 'price__compare';
+        var row = price.querySelector('.price__row');
+        if (row) row.appendChild(compare);
+      }
+
       if (compare) {
-        if (onSale) {
-          compare.textContent = utils.formatMoney(variant.compare_at_price);
-          compare.hidden = false;
-        } else {
-          compare.hidden = true;
-        }
+        compare.textContent = utils.formatMoney(variant.compare_at_price);
+        compare.hidden = !onSale;
       }
 
       var savings = price.querySelector('.price__savings');
@@ -563,7 +568,7 @@
         });
 
         var form = document.querySelector('[data-product-form]');
-        var input = document.querySelector('[data-quantity-input][form], [data-product-info] [data-quantity-input]');
+        var input = document.querySelector('[data-product-info] [data-quantity-input]');
         if (input) {
           input.value = tier.dataset.quantity;
           input.dispatchEvent(new Event('change', { bubbles: true }));

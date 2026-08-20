@@ -14,10 +14,19 @@
   assign heading_class = class | default: ''
   assign words = text | split: ' '
   assign word_count = words | size
+
+  comment
+    Rich-text headings can contain markup. Splitting those on spaces would cut
+    a tag in half, so the ink accent only applies to plain text.
+  endcomment
+  assign use_ink = ink
+  if text contains '<'
+    assign use_ink = false
+  endif
 -%}
 {%- if text != blank -%}
   <{{ heading_tag }} class="{{ heading_size }} {{ heading_class }}">
-    {%- if ink and word_count > 1 -%}
+    {%- if use_ink and word_count > 1 -%}
       {%- for word in words -%}
         {%- if forloop.last -%}
           <span class="ink-accent">{{ word }}</span>
@@ -25,7 +34,7 @@
           {{ word }}{{ ' ' }}
         {%- endif -%}
       {%- endfor -%}
-    {%- elsif ink -%}
+    {%- elsif use_ink -%}
       <span class="ink-accent">{{ text }}</span>
     {%- else -%}
       {{ text }}

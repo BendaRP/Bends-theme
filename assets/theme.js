@@ -671,9 +671,9 @@
           var doc = utils.parseHTML(html);
           var fresh = doc.querySelector('[data-cart-page]');
           if (fresh) {
+            /* The container itself survives, so its delegated listeners are
+               still attached — rebinding here would double every action. */
             main.innerHTML = fresh.innerHTML;
-            main.dataset.cartBound = 'false';
-            bindCartControls(main);
             initReveals(main);
           }
         });

@@ -128,7 +128,17 @@
 }
 
 {% for scheme in settings.color_schemes -%}
-  {%- assign scheme_class = '.color-' | append: scheme.id %}
+  {%- liquid
+    assign scheme_class = '.color-' | append: scheme.id
+
+    comment
+      Decorative hairlines can be soft, but the boundary of a form control has
+      to clear 3:1 against its background to be perceivable. Blending the
+      border colour halfway towards the text colour gets there in every
+      palette, while still reading as the merchant's chosen border.
+    endcomment
+    assign control_border = scheme.settings.border | color_mix: scheme.settings.text, 50
+  -%}
   {{ scheme_class }} {
     --color-background: {{ scheme.settings.background.red }} {{ scheme.settings.background.green }} {{ scheme.settings.background.blue }};
     --color-text: {{ scheme.settings.text.red }} {{ scheme.settings.text.green }} {{ scheme.settings.text.blue }};
@@ -140,6 +150,7 @@
     --color-border: {{ scheme.settings.border.red }} {{ scheme.settings.border.green }} {{ scheme.settings.border.blue }};
     --color-card: {{ scheme.settings.card.red }} {{ scheme.settings.card.green }} {{ scheme.settings.card.blue }};
     --color-shadow: {{ scheme.settings.shadow.red }} {{ scheme.settings.shadow.green }} {{ scheme.settings.shadow.blue }};
+    --color-border-control: {{ control_border.red }} {{ control_border.green }} {{ control_border.blue }};
     {%- if scheme.settings.background_gradient != blank %}
     --gradient-background: {{ scheme.settings.background_gradient }};
     {%- else %}
@@ -149,6 +160,7 @@
 {%- endfor %}
 
 {%- if settings.dark_mode != 'off' %}
+  {%- assign dark_control_border = settings.dark_border | color_mix: settings.dark_text, 50 -%}
   {%- capture dark_tokens -%}
     --color-background: {{ settings.dark_background.red }} {{ settings.dark_background.green }} {{ settings.dark_background.blue }};
     --color-text: {{ settings.dark_text.red }} {{ settings.dark_text.green }} {{ settings.dark_text.blue }};
@@ -158,6 +170,7 @@
     --color-button-text: {{ settings.dark_background.red }} {{ settings.dark_background.green }} {{ settings.dark_background.blue }};
     --color-button-secondary-text: {{ settings.dark_text.red }} {{ settings.dark_text.green }} {{ settings.dark_text.blue }};
     --color-border: {{ settings.dark_border.red }} {{ settings.dark_border.green }} {{ settings.dark_border.blue }};
+    --color-border-control: {{ dark_control_border.red }} {{ dark_control_border.green }} {{ dark_control_border.blue }};
     --color-card: {{ settings.dark_card.red }} {{ settings.dark_card.green }} {{ settings.dark_card.blue }};
     --color-shadow: 0 0 0;
     --gradient-background: none;

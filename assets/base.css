@@ -536,7 +536,7 @@ body[data-link-underline='never'] .link { text-decoration-line: none; }
   --button-bg: transparent;
   --button-fg: var(--color-text);
   background-color: transparent;
-  border-color: rgb(var(--color-border));
+  border-color: rgb(var(--color-border-control));
 }
 
 .button--link {
@@ -683,7 +683,7 @@ textarea {
   width: 100%;
   min-height: 46px;
   padding: 0.7rem 0.9rem;
-  border: var(--border-width) solid rgb(var(--color-border));
+  border: var(--border-width) solid rgb(var(--color-border-control));
   border-radius: var(--radius-input);
   background-color: rgb(var(--color-background));
   color: rgb(var(--color-text));

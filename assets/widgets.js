@@ -903,7 +903,10 @@
 
     Array.prototype.forEach.call((scope || document).querySelectorAll('[data-facet-toggle]'), function (toggle) {
       var panel = document.getElementById(toggle.getAttribute('aria-controls'));
-      if (!panel) return;
+      /* This button lives outside the markup a filter change swaps out, so it
+         survives re-initialisation and must only ever be bound once. */
+      if (!panel || toggle.dataset.bound === 'true') return;
+      toggle.dataset.bound = 'true';
       toggle.addEventListener('click', function () {
         var open = panel.classList.toggle('is-open');
         toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
